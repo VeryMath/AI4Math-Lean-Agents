@@ -1,0 +1,5 @@
+import StatInferenceLean.Basic
+import StatInferenceLean.Probability.Defs
+import StatInferenceLean.Statistics.Estimator
+import StatInferenceLean.Exercises.Week01
+import StatInferenceLean.Exercises.Week02
