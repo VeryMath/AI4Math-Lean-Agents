@@ -28,32 +28,6 @@ bash ./.cursor/skills/lean-agent-numina/install.sh
 - PowerShell: `-SkipOpenCode`
 - Bash: `--skip-opencode`
 
-## 0.5 自动打包分发（导出 zip）
-
-如果你要把 Skill 发给同学，推荐先导出标准分发包 zip。
-
-### Windows PowerShell
-
-```powershell
-powershell -ExecutionPolicy Bypass -File ".\.cursor\skills\lean-agent-numina\package.ps1"
-```
-
-生成文件：`.\dist\lean-agent-numina-package.zip`
-
-### WSL / Linux / macOS
-
-```bash
-bash ./.cursor/skills/lean-agent-numina/package.sh
-```
-
-生成文件：`./dist/lean-agent-numina-package.zip`
-
-### 分发包内容
-
-- `lean-agent-numina/`（包含 `SKILL.md`、`reference.md`、`examples.md`、安装脚本）
-- `.opencode/agents/numina-lean-agent.md`（如果项目中存在）
-- `README_INSTALL.md`（给接收方的安装说明）
-
 ## 1. 组件关系（先看这个）
 
 - `SKILL.md`：给 Cursor Skill 的主规则（何时触发、标准流程、检查点格式）。
