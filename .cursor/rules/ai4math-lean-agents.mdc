@@ -1,0 +1,14 @@
+---
+description: AI4Math Lean Agents workflow for Lean 4 formalization and proof repair
+globs:
+  - "**/*.lean"
+  - "**/lakefile.*"
+  - "**/lean-toolchain"
+alwaysApply: false
+---
+
+Use `skills/AI4Math-Lean-Agents/SKILL.md` as the canonical workflow.
+
+The coding agent directly edits Lean and validates with Lean/Lake. The helper CLI under `skills/AI4Math-Lean-Agents/scripts/` is optional and should be used only for environment checks, structured validation, patch review, `sorry` detection, or minimal failure handoff.
+
+Do not deploy Numina or require external model API keys for this workflow.

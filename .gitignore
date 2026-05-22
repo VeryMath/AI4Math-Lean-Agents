@@ -1,0 +1,15 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+.ai4math/
+.env
+.env.local
+
+*.olean
+*.ilean
+*.trace
+build/
+.lake/
