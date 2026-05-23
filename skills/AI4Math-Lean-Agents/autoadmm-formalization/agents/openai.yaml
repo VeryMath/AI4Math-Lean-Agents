@@ -1,0 +1,3 @@
+display_name: AutoADMM Formalization
+short_description: Check evolved adaptive-ADMM update rules and route Strategy3-safe candidates into Lean.
+default_prompt: Check this evolved update_rho candidate against the AutoADMM Strategy3 contract, render Lean only if it is safe, and report the smallest failure fragment otherwise.

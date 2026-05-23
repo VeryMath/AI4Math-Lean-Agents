@@ -11,4 +11,6 @@ Use `skills/AI4Math-Lean-Agents/SKILL.md` as the canonical workflow.
 
 The coding agent directly edits Lean and validates with Lean/Lake. The helper CLI under `skills/AI4Math-Lean-Agents/scripts/` is optional and should be used only for environment checks, structured validation, patch review, `sorry` detection, or minimal failure handoff.
 
+For evolved adaptive-ADMM `update_rho` candidates, follow `skills/AI4Math-Lean-Agents/autoadmm-formalization/SKILL.md` and run its deterministic Strategy3 gate before Lean rendering.
+
 Do not deploy Numina or require external model API keys for this workflow.

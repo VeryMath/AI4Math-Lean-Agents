@@ -35,6 +35,10 @@ REQUIRED_FILES = [
     "scripts/direct_task.py",
     "scripts/validate_patch.py",
     "scripts/extract_minimal_failure.py",
+    "autoadmm-formalization/SKILL.md",
+    "autoadmm-formalization/agents/openai.yaml",
+    "autoadmm-formalization/references/strategy3_contract.md",
+    "autoadmm-formalization/scripts/autoadmm_formalize.py",
 ]
 REQUIRED_COMMANDS = {
     "env",

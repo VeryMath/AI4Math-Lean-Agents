@@ -1,6 +1,6 @@
 # AI4Math Lean Agents
 
-AI4Math Lean Agents is a guidance-first Codex skill for Lean 4 formal verification. The active coding agent directly reads, edits, and checks Lean code; the bundled CLI is only a deterministic helper toolbox for environment checks, Lean validation, patch review, and minimal failure handoff.
+AI4Math Lean Agents is a guidance-first skill for Lean 4 formal verification. The active coding agent directly reads, edits, and checks Lean code; the bundled CLI is only a deterministic helper toolbox for environment checks, Lean validation, patch review, AutoADMM Strategy3 certification, and minimal failure handoff.
 
 The canonical skill package lives at:
 
@@ -14,6 +14,7 @@ skills/AI4Math-Lean-Agents/
 - Reusable `.ai4math/lean-workspace` setup for standalone Lean files.
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
+- AutoADMM evolved `update_rho` contract checks, best-candidate selection, Lean template rendering, and certificate JSON output.
 - Minimal failing Lean fragment extraction when a proof is blocked.
 
 This project does not deploy or call Numina. Numina is referenced only as workflow provenance in the skill documentation.
@@ -35,6 +36,7 @@ This project does not deploy or call Numina. Numina is referenced only as workfl
     └── AI4Math-Lean-Agents/
         ├── SKILL.md
         ├── agents/
+        ├── autoadmm-formalization/
         ├── config/
         ├── prompts/
         ├── references/
@@ -53,6 +55,7 @@ rsync -a --delete skills/AI4Math-Lean-Agents/ ~/.codex/skills/ai4math-lean-agent
 ```
 
 Then ask Codex for Lean formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, or minimal failure extraction.
+For evolved adaptive-ADMM rules, ask it to certify an `update_rho` candidate or an OpenEvolve output directory against the Strategy3 contract.
 
 ## Helper Commands
 
@@ -64,6 +67,7 @@ python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py doctor --cwd .
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py configure --cwd . --create-workspace
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py check --cwd . --skip-build
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
+python skills/AI4Math-Lean-Agents/autoadmm-formalization/scripts/autoadmm_formalize.py certify-best --help
 ```
 
 The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, and choosing proof strategy.
