@@ -29,7 +29,7 @@ Do not route creative proof search through helper commands. `prove`, `formalize`
 
 ## Workspace Choice
 
-Prefer a user's existing Lake project when the target file is inside one. For standalone `.lean` files, use the reusable `.ai4math/lean-workspace` so Lean, Lake, and mathlib artifacts are shared across tasks.
+Prefer a user's existing Lake project when the target file is inside one. For standalone `.lean` files, use the reusable `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` so Lean, Lake, and mathlib artifacts are shared across tasks and projects.
 
 When a user project has its own `lean-toolchain` and mathlib revision, keep those versions unless the user explicitly approves a change. When creating a managed workspace, use the configured preferred toolchain or `auto`.
 

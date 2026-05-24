@@ -31,7 +31,7 @@ The default AI4Math loop still works without these runtime dependencies:
 - API-key or login setup;
 - backend round streaming or benchmark execution.
 
-When the user wants original Numina behavior, those concerns are handled by the official upstream checkout under `.ai4math/numina-runtime/` and the human-in-the-loop flow in `numina_runtime.md`.
+When the user wants original Numina behavior, those concerns are handled by the official upstream checkout under `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/` and the human-in-the-loop flow in `numina_runtime.md`.
 
 ## Adapted Direct Workflow
 
@@ -58,7 +58,7 @@ flowchart TD
 | Statement drift guard | `validate_patch.py` |
 | Placeholder guard | `detect_sorry.py` and `review` |
 | Minimal blocked artifact | `extract_minimal_failure.py` |
-| Reusable project context | `.ai4math/lean-workspace` |
+| Reusable project context | `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` |
 
 ## Failure Lessons
 

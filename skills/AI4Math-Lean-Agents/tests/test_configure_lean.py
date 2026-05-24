@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import tempfile
 import unittest
+import os
 from pathlib import Path
 from unittest.mock import patch
 
@@ -22,7 +23,9 @@ class ConfigureLeanTests(unittest.TestCase):
             (root / "lakefile.toml").write_text('name = "proj"\n', encoding="utf-8")
             target.write_text("example : True := by trivial\n", encoding="utf-8")
 
-            result = inspect_environment(root, target=target)
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(root / "shared-ai4math")}, clear=False):
+                os.environ["AI4MATH_LEAN_WORKSPACE"] = ""
+                result = inspect_environment(root, target=target)
 
             self.assertTrue(result["ok"])
             self.assertEqual(result["agent"]["mode"], "direct-coding-agent")
@@ -36,7 +39,9 @@ class ConfigureLeanTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
 
-            result = configure(root, save_local=True, toolchain="leanprover/lean4:v4.28.0")
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(root / "shared-ai4math")}, clear=False):
+                os.environ["AI4MATH_LEAN_WORKSPACE"] = ""
+                result = configure(root, save_local=True, toolchain="leanprover/lean4:v4.28.0")
             local = load_toml(root / ".ai4math" / "lean_agent.local.toml")
 
             self.assertFalse(result["ok"])
@@ -50,7 +55,8 @@ class ConfigureLeanTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
 
-            with patch("configure_lean.find_tool", return_value="/usr/bin/lake"), \
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(root / "shared-ai4math")}, clear=False), \
+                patch("configure_lean.find_tool", return_value="/usr/bin/lake"), \
                 patch("configure_lean.run_command", return_value={
                     "ok": False,
                     "returncode": 1,
@@ -58,6 +64,7 @@ class ConfigureLeanTests(unittest.TestCase):
                     "stderr": "download failed",
                     "command": ["/usr/bin/lake", "new", "lean_workspace", "math"],
                 }):
+                os.environ["AI4MATH_LEAN_WORKSPACE"] = ""
                 result = configure(root, create_workspace=True)
 
             self.assertFalse(result["ok"])
@@ -66,7 +73,10 @@ class ConfigureLeanTests(unittest.TestCase):
 
     def test_configure_setup_numina_requires_project_name(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            result = configure(Path(tmp), setup_numina=True, dry_run=True)
+            root = Path(tmp)
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(root / "shared-ai4math")}, clear=False):
+                os.environ["AI4MATH_LEAN_WORKSPACE"] = ""
+                result = configure(root, setup_numina=True, dry_run=True)
 
         self.assertFalse(result["numina"]["ok"])
         self.assertEqual(result["numina"]["status"], "missing_project_name")

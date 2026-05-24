@@ -11,6 +11,7 @@ skills/AI4Math-Lean-Agents/SKILL.md
 Rules:
 
 - Directly inspect and edit Lean files.
+- Match the user's language by default.
 - Validate with Lean/Lake after meaningful edits.
 - Use helper CLI commands only as deterministic guardrails.
 - Use official Numina only through the approved human-in-the-loop runtime flow.

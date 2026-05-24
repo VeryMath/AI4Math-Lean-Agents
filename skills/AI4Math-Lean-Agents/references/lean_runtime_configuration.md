@@ -2,19 +2,18 @@
 
 This skill uses a direct coding-agent workflow by default. It can also prepare an optional official Numina runtime under ignored local state when the user approves that path; see `numina_runtime.md` for deployment and call details.
 
-## Local Layout
+## Shared Layout
 
 ```text
-.ai4math/
+${AI4MATH_HOME:-~/.ai4math}/
 ├── lean-workspace/
 ├── lean-workspaces/
 ├── numina-runtime/
-├── lean_agent.local.toml
 ├── logs/
 └── failures/
 ```
 
-The skill should create `.ai4math/.gitignore` before writing local config.
+Repository-local machine settings still live under `<repo>/.ai4math/` and should not be committed. The reusable Lean workspace and optional Numina runtime are shared by default so standalone tasks do not create a fresh workspace in every project.
 
 ## Tool Checks
 
@@ -29,7 +28,7 @@ Required local tools for the direct workflow are `git`, `python3`, `elan`, `lean
 
 ## Reusable Lean Workspace
 
-For standalone tasks, prefer `.ai4math/lean-workspace`. Create it once with:
+For standalone tasks, prefer `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`. Create it once with:
 
 ```bash
 python scripts/ai4m_lean.py configure --cwd . --create-workspace --toolchain leanprover/lean4:v4.28.0
@@ -44,7 +43,7 @@ lake exe cache get
 lake build
 ```
 
-If a user project already has `lean-toolchain` and `lakefile.{lean,toml}`, use that project and do not change versions without approval. If a standalone task needs a different Lean/mathlib revision than the managed workspace, use a versioned workspace under `.ai4math/lean-workspaces/`.
+If a user project already has `lean-toolchain` and `lakefile.{lean,toml}`, use that project and do not change versions without approval. If a standalone task needs a different Lean/mathlib revision than the shared managed workspace, use a versioned workspace under `${AI4MATH_HOME:-~/.ai4math}/lean-workspaces/`.
 
 ## Local Config
 
@@ -53,7 +52,7 @@ Machine-specific settings live in `.ai4math/lean_agent.local.toml` and should no
 ```toml
 [lean]
 workspace_mode = "reuse-managed"
-managed_workspace_path = ".ai4math/lean-workspace"
+managed_workspace_path = "~/.ai4math/lean-workspace"
 align_workspace_versions = true
 preferred_toolchain = "auto"
 
@@ -65,7 +64,8 @@ backend = "none"
 Environment overrides:
 
 ```bash
-export AI4MATH_LEAN_WORKSPACE=".ai4math/lean-workspace"
+export AI4MATH_HOME="~/.ai4math"
+export AI4MATH_LEAN_WORKSPACE="~/.ai4math/lean-workspace"
 export AI4MATH_LEAN_TOOLCHAIN="leanprover/lean4:v4.28.0"
-export AI4MATH_NUMINA_HOME=".ai4math/numina-runtime"
+export AI4MATH_NUMINA_HOME="~/.ai4math/numina-runtime"
 ```

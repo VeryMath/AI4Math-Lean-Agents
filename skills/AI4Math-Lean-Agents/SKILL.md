@@ -7,29 +7,32 @@ description: Use for interactive Lean 4 formal verification with reusable Lean/m
 
 Use this skill when the user wants Lean 4 formalization, proof repair, theorem transcription, sorry completion, review of a Lean patch, or an official Numina Lean Agent run. The active coding agent is the Lean agent: it asks clarifying questions, reads and edits Lean files, runs Lean/Lake checks, diagnoses errors, and iterates with the user.
 
+Match the user's language by default. If the user writes Chinese, respond in Chinese from the first turn unless they ask otherwise.
+
 The bundled CLI is a helper toolbox, not the workflow driver. Prefer normal coding-agent judgment, direct file edits, `rg`, Lean/Lake commands, and repository context. Use helper commands only when their deterministic output is useful.
 
-Use official Numina through a human-in-the-loop runtime workflow. Numina is optional and lives under ignored local state at `.ai4math/numina-runtime/`; the coding agent explains clone, setup, API-key, and upstream runner implications before running setup or calling the official runner. Do not turn helper commands into a closed proof workflow.
+Use official Numina through a human-in-the-loop runtime workflow. Numina is optional and lives under shared local state at `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/`; the coding agent explains clone, setup, API-key, and upstream runner implications before running setup or calling the official runner. Do not turn helper commands into a closed proof workflow.
 
 ## Agent Playbook
 
 1. Understand the user's intent: repair a file, formalize a statement, prove a target, complete `sorry`, review a patch, batch a folder, or minimize a failure.
 2. Locate the relevant Lean project, files, declarations, imports, and current errors. Use the user's existing Lake project when available.
-3. For standalone files, use or create `.ai4math/lean-workspace` only when a project context is needed.
-4. If the user asks for original Numina behavior, or if an official Numina run would clearly help, inspect `doctor` readiness, explain the deployment/call, and proceed only after approval.
-5. For natural-language or LaTeX input, draft the Lean declaration and ask for confirmation before long proof work.
-6. Edit Lean directly in small steps. Run Lean/Lake validation after meaningful changes.
-7. Preserve theorem statements unless the user explicitly approves a change.
-8. Reject final patches that contain `sorry`, `admit`, or newly introduced `axiom`.
-9. If blocked, stop cleanly with the smallest useful failing Lean fragment, exact errors/goals, and the next mathematical decision needed.
+3. For standalone files, use or create the shared workspace `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`; do not create a second project-local workspace unless the user asks for isolation.
+4. When reporting readiness, separate direct Lean readiness from optional Numina readiness. Do not describe the environment as "not configured" when a Lake project or shared Lean workspace is already usable.
+5. If the user asks for original Numina behavior, or if an official Numina run would clearly help, inspect `doctor` readiness, explain the deployment/call, and proceed only after approval.
+6. For natural-language or LaTeX input, draft the Lean declaration and ask for confirmation before long proof work.
+7. Edit Lean directly in small steps. Run Lean/Lake validation after meaningful changes.
+8. Preserve theorem statements unless the user explicitly approves a change.
+9. Reject final patches that contain `sorry`, `admit`, or newly introduced `axiom`.
+10. If blocked, stop cleanly with the smallest useful failing Lean fragment, exact errors/goals, and the next mathematical decision needed.
 
 ## Helper Toolbox
 
 Use `python scripts/ai4m_lean.py <command>` when it saves effort or reduces risk:
 
 - `env` / `doctor`: inspect Lean workspace, local tool availability, and optional Numina readiness.
-- `configure --create-workspace`: create or reuse the managed workspace.
-- `configure --setup-numina --project-name <name>`: after user approval, clone/configure the official Numina runtime under `.ai4math/numina-runtime/`.
+- `configure --create-workspace`: create or reuse the shared managed workspace.
+- `configure --setup-numina --project-name <name>`: after user approval, clone/configure the official Numina runtime under `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/`.
 - `check`: run a structured Lean/Lake validation.
 - `review` / `detect-sorry`: guard against placeholders, axioms, and statement drift.
 - `minimize-failure`: extract a compact failing Lean fragment.
@@ -44,10 +47,10 @@ When using the official Numina runtime, follow `references/numina_runtime.md`. T
 
 ## Safety Rules
 
-- Do not require Numina, Claude Code CLI, external model APIs, or API keys unless the user explicitly wants an official Numina deployment or run.
+- Do not require Numina, Claude CLI tooling, external model APIs, or API keys unless the user explicitly wants an official Numina deployment or run.
 - Do not commit local machine-specific paths.
 - Do not call external APIs during `env`, `doctor`, `check`, `review`, `detect-sorry`, tests, or dry-runs.
-- Do not store secrets in tracked files; use environment variables or `.ai4math/numina-runtime/.env.local`.
+- Do not store secrets in tracked files; use environment variables or `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/.env.local`.
 - Do not accept final Lean patches containing `sorry`, `admit`, or newly introduced `axiom`.
 - Do not silently weaken theorem statements or change existing project versions.
 - Do not let helper command availability override a better direct coding-agent path.

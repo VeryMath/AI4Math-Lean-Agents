@@ -9,7 +9,7 @@ from unittest.mock import patch
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from common import expand_path, load_toml, read_env_local, write_env_local  # noqa: E402
+from common import ai4math_home, expand_path, load_toml, read_env_local, write_env_local  # noqa: E402
 
 
 class CommonConfigTests(unittest.TestCase):
@@ -36,6 +36,16 @@ class CommonConfigTests(unittest.TestCase):
             link.symlink_to(real)
 
             self.assertEqual(expand_path(str(link), root), link)
+
+    def test_ai4math_home_honors_environment_override(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            custom = root / "shared-ai4math"
+
+            with patch.dict("os.environ", {"AI4MATH_HOME": str(custom)}, clear=False):
+                result = ai4math_home(root)
+
+            self.assertEqual(result, custom)
 
     def test_write_env_local_updates_values_and_is_ignored(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

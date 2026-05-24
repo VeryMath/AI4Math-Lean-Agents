@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from check_lean_project import find_project_root, read_mathlib_revision, read_toolchain
-from common import expand_path, read_config
+from common import ai4math_home, expand_path, read_config
 
 
 TASK_TO_PROMPT = {
@@ -18,7 +18,7 @@ TASK_TO_PROMPT = {
 
 def _managed_workspace_root(config: dict[str, Any], cwd_path: Path) -> tuple[Path | None, Path]:
     lean = config.get("lean", {})
-    workspace_path = expand_path(lean.get("managed_workspace_path"), cwd_path) or (cwd_path / ".ai4math" / "lean-workspace")
+    workspace_path = expand_path(lean.get("managed_workspace_path"), cwd_path) or (ai4math_home(cwd_path) / "lean-workspace")
     workspace_root = find_project_root(workspace_path) if workspace_path.exists() else None
     return workspace_root, workspace_path
 
@@ -78,8 +78,8 @@ def build_direct_task(
         "result_dir": str(Path(result_dir).expanduser().resolve()) if result_dir else None,
         "max_rounds": max_rounds,
         "missing_config": missing,
-        "required_inputs": ["existing Lake project or reusable managed workspace"] if "lean_workspace" in missing else [],
-        "recommended_next_action": "run configure --create-workspace or move target into a Lake project" if missing else "coding agent should edit/check directly",
+        "required_inputs": ["existing Lake project or shared reusable managed workspace"] if "lean_workspace" in missing else [],
+        "recommended_next_action": "run configure --create-workspace for the shared workspace or move target into a Lake project" if missing else "coding agent should edit/check directly",
         "direct_workflow": next_actions,
     }
 

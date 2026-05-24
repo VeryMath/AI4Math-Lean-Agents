@@ -3,7 +3,9 @@ from __future__ import annotations
 import sys
 import tempfile
 import unittest
+import os
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
@@ -22,7 +24,8 @@ class DirectTaskTests(unittest.TestCase):
             target = root / "Standalone.lean"
             target.write_text("example : True := by trivial\n", encoding="utf-8")
 
-            result = build_direct_task("prove", root, target)
+            with patch.dict(os.environ, {"AI4MATH_LEAN_WORKSPACE": str(workspace)}, clear=False):
+                result = build_direct_task("prove", root, target)
 
             self.assertTrue(result["ok"])
             self.assertEqual(result["status"], "direct_task_ready")
@@ -37,7 +40,8 @@ class DirectTaskTests(unittest.TestCase):
             target = root / "Standalone.lean"
             target.write_text("example : True := by trivial\n", encoding="utf-8")
 
-            result = build_direct_task("prove", root, target)
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(root / "shared-ai4math"), "AI4MATH_LEAN_WORKSPACE": ""}, clear=False):
+                result = build_direct_task("prove", root, target)
 
             self.assertFalse(result["ok"])
             self.assertEqual(result["status"], "missing_config")

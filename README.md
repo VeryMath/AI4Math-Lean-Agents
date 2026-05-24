@@ -11,13 +11,13 @@ skills/AI4Math-Lean-Agents/
 ## What It Supports
 
 - Lean project/workspace inspection.
-- Reusable `.ai4math/lean-workspace` setup for standalone Lean files.
+- Reusable shared `~/.ai4math/lean-workspace` setup for standalone Lean files.
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
 - Optional official `project-numina/numina-lean-agent` deployment/call flow, mediated by the coding agent.
 
-Numina is optional. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `.ai4math/numina-runtime/`.
+Numina is optional. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
 
 ## Repository Layout
 
@@ -29,7 +29,6 @@ Numina is optional. The public CLI does not expose a parallel `numina-*` workflo
 ├── README.md
 ├── LICENSE
 ├── .github/
-├── .codex/              # optional Codex adapter
 ├── .cursor/             # optional Cursor rule
 ├── .opencode/           # optional OpenCode agent
 └── skills/
@@ -55,12 +54,11 @@ skills/AI4Math-Lean-Agents/SKILL.md
 The repository also includes lightweight adapters for several agent environments:
 
 - `AGENTS.md` for general repository-aware coding agents.
-- `.codex/skills/ai4math-lean-agents/SKILL.md` as a Codex repo-local shim.
 - `.cursor/rules/ai4math-lean-agents.mdc` for Cursor.
 - `.opencode/agents/ai4math-lean-agents.md` for OpenCode.
 - `CLAUDE.md` and `GEMINI.md` for agent-specific repository instructions.
 
-For Codex-style skill installation, sync the skill folder into the user skill directory:
+For Codex-style skill installation, sync the skill folder into the user skill directory. The repository does not include a repo-local Codex shim, so a workspace that also has the system skill installed will not show two `ai4math-lean-agents` entries.
 
 ```bash
 mkdir -p ~/.codex/skills
@@ -82,7 +80,7 @@ python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py check --cwd . --skip-buil
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
 ```
 
-The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, and choosing proof strategy.
+The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, choosing proof strategy, and matching the user's language.
 
 For the optional Numina path, read `skills/AI4Math-Lean-Agents/references/numina_runtime.md`. Setup and official runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
 

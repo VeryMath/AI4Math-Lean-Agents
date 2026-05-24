@@ -9,6 +9,6 @@ alwaysApply: false
 
 Use `skills/AI4Math-Lean-Agents/SKILL.md` as the canonical workflow.
 
-The coding agent directly edits Lean and validates with Lean/Lake. The helper CLI under `skills/AI4Math-Lean-Agents/scripts/` is optional and should be used only for environment checks, structured validation, optional Numina readiness/setup, patch review, `sorry` detection, or minimal failure handoff.
+The coding agent directly edits Lean and validates with Lean/Lake. Match the user's language by default. The helper CLI under `skills/AI4Math-Lean-Agents/scripts/` is optional and should be used only for environment checks, structured validation, optional Numina readiness/setup, patch review, `sorry` detection, or minimal failure handoff.
 
 Deploy or call the official Numina runtime only when the user asks for it or approves it after an explanation. Keep secrets in environment variables or ignored local files.

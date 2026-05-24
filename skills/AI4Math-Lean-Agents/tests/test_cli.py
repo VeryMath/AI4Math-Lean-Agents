@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -41,6 +42,7 @@ class CliTests(unittest.TestCase):
                 text=True,
                 capture_output=True,
                 check=False,
+                env={**os.environ, "AI4MATH_LEAN_WORKSPACE": str(workspace), "AI4MATH_NUMINA_HOME": str(root / "shared-ai4math" / "numina-runtime")},
             )
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
@@ -72,6 +74,7 @@ class CliTests(unittest.TestCase):
             text=True,
             capture_output=True,
             check=False,
+            env={**os.environ, "AI4MATH_HOME": str(SKILL_ROOT / ".test-ai4math-home"), "AI4MATH_NUMINA_HOME": ""},
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
@@ -83,13 +86,14 @@ class CliTests(unittest.TestCase):
 
     def test_configure_setup_numina_dry_run_outputs_official_upstream(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
             result = subprocess.run(
                 [
                     sys.executable,
                     str(CLI),
                     "configure",
                     "--cwd",
-                    tmp,
+                    str(root),
                     "--setup-numina",
                     "--project-name",
                     "demo_project",
@@ -98,6 +102,7 @@ class CliTests(unittest.TestCase):
                 text=True,
                 capture_output=True,
                 check=False,
+                env={**os.environ, "AI4MATH_HOME": str(root / "shared-ai4math"), "AI4MATH_NUMINA_HOME": ""},
             )
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)

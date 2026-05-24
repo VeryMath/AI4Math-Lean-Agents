@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from check_lean_project import find_project_root, read_mathlib_revision, read_toolchain
-from common import ensure_ai4math_gitignore, expand_path, read_config, run_command, update_local_toml
+from common import ai4math_home, ensure_ai4math_gitignore, expand_path, read_config, run_command, update_local_toml
 from numina_runtime import execute_configure_plan, numina_readiness
 from tool_status import find_tool
 
@@ -57,14 +57,14 @@ def inspect_environment(cwd: str | Path = ".", config_path: str | Path | None = 
     lean = config.get("lean", {})
     target_path = Path(target).expanduser().resolve() if target else cwd_path
     project_root = find_project_root(target_path)
-    workspace_path = expand_path(lean.get("managed_workspace_path"), cwd_path) or (cwd_path / ".ai4math" / "lean-workspace")
+    workspace_path = expand_path(lean.get("managed_workspace_path"), cwd_path) or (ai4math_home(cwd_path) / "lean-workspace")
     workspace_root = find_project_root(workspace_path) if workspace_path.exists() else None
 
     missing: list[str] = []
     required_inputs: list[str] = []
     if project_root is None and workspace_root is None:
         missing.append("lean_workspace")
-        required_inputs.append("existing Lake project or permission to create reusable .ai4math/lean-workspace")
+        required_inputs.append("existing Lake project or permission to create/reuse the shared Lean workspace")
 
     return {
         "ok": not missing,
@@ -113,7 +113,8 @@ def configure(
 
     config = read_config(cwd_path, config_path)
     lean = config.get("lean", {})
-    workspace = expand_path(lean.get("managed_workspace_path"), cwd_path) or (cwd_path / ".ai4math" / "lean-workspace")
+    workspace = expand_path(lean.get("managed_workspace_path"), cwd_path) or (ai4math_home(cwd_path) / "lean-workspace")
+    workspace_root_config = expand_path(lean.get("managed_workspace_root"), cwd_path) or (workspace.parent / "lean-workspaces")
     workspace_actions: list[dict[str, Any]] = []
     if create_workspace:
         lake = find_tool("lake") or "lake"
@@ -165,7 +166,7 @@ def configure(
             "lean": {
                 "workspace_mode": "reuse-managed",
                 "managed_workspace_path": str(workspace),
-                "managed_workspace_root": str(cwd_path / ".ai4math" / "lean-workspaces"),
+                "managed_workspace_root": str(workspace_root_config),
                 "reuse_managed_workspace": True,
                 "workspace_key": "lean-toolchain",
                 "align_workspace_versions": True,

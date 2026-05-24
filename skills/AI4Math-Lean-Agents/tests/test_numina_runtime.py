@@ -25,12 +25,16 @@ from numina_runtime import (  # noqa: E402
 class NuminaRuntimePathTests(unittest.TestCase):
     def test_runtime_paths_default_under_ai4math(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            paths = runtime_paths(Path(tmp))
+            root = Path(tmp)
+            shared = root / "shared-ai4math"
 
-            root = Path(tmp).resolve() / ".ai4math" / "numina-runtime"
-            self.assertEqual(paths["root"], str(root))
-            self.assertEqual(paths["upstream"], str(root / "upstream"))
-            self.assertEqual(paths["results"], str(root / "results"))
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(shared), "AI4MATH_NUMINA_HOME": ""}, clear=False):
+                paths = runtime_paths(root)
+
+            runtime = shared / "numina-runtime"
+            self.assertEqual(paths["root"], str(runtime))
+            self.assertEqual(paths["upstream"], str(runtime / "upstream"))
+            self.assertEqual(paths["results"], str(runtime / "results"))
             self.assertEqual(paths["default_upstream_url"], DEFAULT_UPSTREAM_URL)
 
     def test_runtime_paths_honor_ai4math_numina_home(self) -> None:
@@ -55,7 +59,9 @@ class NuminaRuntimePathTests(unittest.TestCase):
 class NuminaRuntimeCredentialTests(unittest.TestCase):
     def test_env_local_is_read_from_numina_runtime_root(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            env_path = Path(tmp) / ".ai4math" / "numina-runtime" / ".env.local"
+            root = Path(tmp)
+            shared = root / "shared-ai4math"
+            env_path = shared / "numina-runtime" / ".env.local"
             env_path.parent.mkdir(parents=True)
             env_path.write_text(
                 "export ANTHROPIC_AUTH_TOKEN=secret-token\n"
@@ -63,7 +69,8 @@ class NuminaRuntimeCredentialTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            values = read_numina_env_local(Path(tmp))
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(shared), "AI4MATH_NUMINA_HOME": ""}, clear=False):
+                values = read_numina_env_local(root)
 
         self.assertEqual(values["ANTHROPIC_AUTH_TOKEN"], "secret-token")
         self.assertEqual(values["OPENAI_API_KEY"], "sk-test")
@@ -83,7 +90,10 @@ class NuminaRuntimeCredentialTests(unittest.TestCase):
 class NuminaRuntimePlanTests(unittest.TestCase):
     def test_install_plan_clones_official_upstream_when_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            plan = build_install_plan(Path(tmp), dry_run=True)
+            root = Path(tmp)
+            shared = root / "shared-ai4math"
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(shared), "AI4MATH_NUMINA_HOME": ""}, clear=False):
+                plan = build_install_plan(root, dry_run=True)
 
         self.assertTrue(plan["ok"])
         self.assertEqual(plan["status"], "install_plan_ready")
@@ -92,18 +102,21 @@ class NuminaRuntimePlanTests(unittest.TestCase):
 
     def test_install_plan_blocks_dirty_upstream(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            upstream = Path(tmp) / ".ai4math" / "numina-runtime" / "upstream"
+            root = Path(tmp)
+            shared = root / "shared-ai4math"
+            upstream = shared / "numina-runtime" / "upstream"
             upstream.mkdir(parents=True)
             (upstream / ".git").mkdir()
 
-            with patch("numina_runtime.run_command", return_value={
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(shared), "AI4MATH_NUMINA_HOME": ""}, clear=False), \
+                patch("numina_runtime.run_command", return_value={
                 "ok": True,
                 "returncode": 0,
                 "stdout": " M tutorial/foo.py\n",
                 "stderr": "",
                 "command": ["git", "status", "--short"],
             }):
-                plan = build_install_plan(Path(tmp), dry_run=False)
+                plan = build_install_plan(root, dry_run=False)
 
         self.assertFalse(plan["ok"])
         self.assertEqual(plan["status"], "dirty_upstream")
@@ -111,17 +124,20 @@ class NuminaRuntimePlanTests(unittest.TestCase):
 
     def test_configure_plan_uses_official_setup_and_uv_commands(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            upstream = Path(tmp) / ".ai4math" / "numina-runtime" / "upstream"
+            root = Path(tmp)
+            shared = root / "shared-ai4math"
+            upstream = shared / "numina-runtime" / "upstream"
             (upstream / ".git").mkdir(parents=True)
 
-            with patch("numina_runtime.run_command", return_value={
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(shared), "AI4MATH_NUMINA_HOME": ""}, clear=False), \
+                patch("numina_runtime.run_command", return_value={
                 "ok": True,
                 "returncode": 0,
                 "stdout": "",
                 "stderr": "",
                 "command": ["git", "status", "--short"],
             }):
-                plan = build_configure_plan(Path(tmp), project_name="demo_project", dry_run=True)
+                plan = build_configure_plan(root, project_name="demo_project", dry_run=True)
 
         commands = [action["command"] for action in plan["actions"]]
         self.assertTrue(plan["ok"])
@@ -135,10 +151,12 @@ class NuminaRuntimePlanTests(unittest.TestCase):
             root = Path(tmp)
             theorem = root / "Demo.lean"
             theorem.write_text("example : True := by\n  trivial\n", encoding="utf-8")
-            upstream = root / ".ai4math" / "numina-runtime" / "upstream"
+            shared = root / "shared-ai4math"
+            upstream = shared / "numina-runtime" / "upstream"
             upstream.mkdir(parents=True)
 
-            plan = build_run_plan(root, file=theorem, max_iters=3)
+            with patch.dict(os.environ, {"AI4MATH_HOME": str(shared), "AI4MATH_NUMINA_HOME": ""}, clear=False):
+                plan = build_run_plan(root, file=theorem, max_iters=3)
 
         self.assertTrue(plan["ok"])
         self.assertEqual(plan["status"], "run_plan_ready")

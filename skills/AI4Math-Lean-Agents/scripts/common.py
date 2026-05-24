@@ -86,6 +86,14 @@ def expand_path(value: str | None, cwd: Path) -> Path | None:
     return Path(os.path.abspath(path))
 
 
+def ai4math_home(cwd: str | Path = ".") -> Path:
+    cwd_path = Path(cwd).resolve()
+    override = os.environ.get("AI4MATH_HOME")
+    if override:
+        return expand_path(override, cwd_path) or (Path.home() / ".ai4math")
+    return Path.home() / ".ai4math"
+
+
 def read_config(cwd: str | Path = ".", config_path: str | Path | None = None) -> dict[str, Any]:
     cwd_path = Path(cwd).resolve()
     config = load_toml(DEFAULT_CONFIG)
@@ -94,14 +102,15 @@ def read_config(cwd: str | Path = ".", config_path: str | Path | None = None) ->
     local_config = cwd_path / ".ai4math" / "lean_agent.local.toml"
     config = deep_merge(config, load_toml(local_config))
 
-    env_lean = {
-        key: value
-        for key, value in {
-            "managed_workspace_path": os.environ.get("AI4MATH_LEAN_WORKSPACE"),
-            "preferred_toolchain": os.environ.get("AI4MATH_LEAN_TOOLCHAIN"),
-        }.items()
-        if value
+    home = ai4math_home(cwd_path)
+    env_values = {
+        "managed_workspace_path": os.environ.get("AI4MATH_LEAN_WORKSPACE"),
+        "preferred_toolchain": os.environ.get("AI4MATH_LEAN_TOOLCHAIN"),
     }
+    if os.environ.get("AI4MATH_HOME") and not env_values["managed_workspace_path"]:
+        env_values["managed_workspace_path"] = str(home / "lean-workspace")
+        env_values["managed_workspace_root"] = str(home / "lean-workspaces")
+    env_lean = {key: value for key, value in env_values.items() if value}
     if env_lean:
         config = deep_merge(config, {"lean": env_lean})
     return config

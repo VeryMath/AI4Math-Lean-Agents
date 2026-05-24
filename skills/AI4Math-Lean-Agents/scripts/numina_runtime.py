@@ -5,7 +5,7 @@ import shlex
 from pathlib import Path
 from typing import Any
 
-from common import ENV_KEY_RE, ensure_ai4math_gitignore, expand_path, run_command
+from common import ENV_KEY_RE, ai4math_home, ensure_ai4math_gitignore, expand_path, run_command
 from tool_status import tool_versions
 
 
@@ -19,8 +19,8 @@ def runtime_root(cwd: str | Path) -> Path:
     cwd_path = Path(cwd).resolve()
     override = os.environ.get("AI4MATH_NUMINA_HOME")
     if override:
-        return expand_path(override, cwd_path) or (cwd_path / ".ai4math" / "numina-runtime")
-    return cwd_path / ".ai4math" / "numina-runtime"
+        return expand_path(override, cwd_path) or (ai4math_home(cwd_path) / "numina-runtime")
+    return ai4math_home(cwd_path) / "numina-runtime"
 
 
 def runtime_paths(cwd: str | Path) -> dict[str, str]:
