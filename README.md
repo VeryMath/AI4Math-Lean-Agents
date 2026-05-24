@@ -1,6 +1,6 @@
 # AI4Math Lean Agents
 
-AI4Math Lean Agents is a guidance-first Codex skill for Lean 4 formal verification. The active coding agent directly reads, edits, and checks Lean code; the bundled CLI is only a deterministic helper toolbox for environment checks, Lean validation, optional official Numina runtime setup, patch review, and minimal failure handoff.
+AI4Math Lean Agents is a guidance-first skill package for Lean 4 formal verification with coding agents. The active coding agent directly reads, edits, and checks Lean code; the bundled CLI is only a deterministic helper toolbox for environment checks, Lean validation, optional official Numina runtime setup, patch review, and minimal failure handoff.
 
 The canonical skill package lives at:
 
@@ -28,10 +28,10 @@ Numina is optional. The public CLI does not expose a parallel `numina-*` workflo
 ├── GEMINI.md
 ├── README.md
 ├── LICENSE
-├── .codex/
-├── .cursor/
 ├── .github/
-├── .opencode/
+├── .codex/              # optional Codex adapter
+├── .cursor/             # optional Cursor rule
+├── .opencode/           # optional OpenCode agent
 └── skills/
     └── AI4Math-Lean-Agents/
         ├── SKILL.md
@@ -44,16 +44,30 @@ Numina is optional. The public CLI does not expose a parallel `numina-*` workflo
         └── tests/
 ```
 
-## Use With Codex
+## Use With Coding Agents
 
-Install or sync the skill folder into your Codex skills directory:
+Point your coding agent at the canonical workflow:
+
+```text
+skills/AI4Math-Lean-Agents/SKILL.md
+```
+
+The repository also includes lightweight adapters for several agent environments:
+
+- `AGENTS.md` for general repository-aware coding agents.
+- `.codex/skills/ai4math-lean-agents/SKILL.md` as a Codex repo-local shim.
+- `.cursor/rules/ai4math-lean-agents.mdc` for Cursor.
+- `.opencode/agents/ai4math-lean-agents.md` for OpenCode.
+- `CLAUDE.md` and `GEMINI.md` for agent-specific repository instructions.
+
+For Codex-style skill installation, sync the skill folder into the user skill directory:
 
 ```bash
 mkdir -p ~/.codex/skills
 rsync -a --delete skills/AI4Math-Lean-Agents/ ~/.codex/skills/ai4math-lean-agents/
 ```
 
-Then ask Codex for Lean formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, or minimal failure extraction.
+Then ask the coding agent for Lean formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, or minimal failure extraction.
 
 ## Helper Commands
 

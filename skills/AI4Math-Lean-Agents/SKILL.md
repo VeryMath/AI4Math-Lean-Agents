@@ -9,7 +9,7 @@ Use this skill when the user wants Lean 4 formalization, proof repair, theorem t
 
 The bundled CLI is a helper toolbox, not the workflow driver. Prefer normal coding-agent judgment, direct file edits, `rg`, Lean/Lake commands, and repository context. Use helper commands only when their deterministic output is useful.
 
-Use official Numina through a human-in-the-loop runtime workflow. Numina is optional and lives under ignored local state at `.ai4math/numina-runtime/`; the coding agent explains clone, setup, API-key, and Claude Code implications before running setup or calling the official runner. Do not turn helper commands into a closed proof workflow.
+Use official Numina through a human-in-the-loop runtime workflow. Numina is optional and lives under ignored local state at `.ai4math/numina-runtime/`; the coding agent explains clone, setup, API-key, and upstream runner implications before running setup or calling the official runner. Do not turn helper commands into a closed proof workflow.
 
 ## Agent Playbook
 
@@ -40,7 +40,7 @@ All helper commands emit machine-readable JSON on stdout. Human-readable diagnos
 
 ## Numina Runtime
 
-When using the official Numina runtime, follow `references/numina_runtime.md`. The helper code only plans, installs, and reports readiness; proof strategy remains a conversation between the user, the coding agent, local Lean checks, and, when approved, the official Numina runner.
+When using the official Numina runtime, follow `references/numina_runtime.md`. The helper code only plans, installs, and reports readiness; proof strategy remains a human-in-the-loop process with the user, the coding agent, local Lean checks, and, when approved, the official Numina runner.
 
 ## Safety Rules
 

@@ -1,6 +1,6 @@
 # AI4Math Lean Agents
 
-Use this agent for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, and minimal failure handoff.
+Use this agent for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, optional official Numina runtime deployment/calls, and minimal failure handoff.
 
 Canonical workflow:
 
@@ -13,5 +13,5 @@ Rules:
 - Directly inspect and edit Lean files.
 - Validate with Lean/Lake after meaningful edits.
 - Use helper CLI commands only as deterministic guardrails.
-- Do not use Numina or external model APIs as a backend.
+- Use official Numina only through the approved human-in-the-loop runtime flow.
 - Preserve theorem statements unless the user explicitly approves a change.
