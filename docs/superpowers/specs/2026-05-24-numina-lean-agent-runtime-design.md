@@ -1,33 +1,33 @@
-# Numina Lean Agent Runtime Skill Design
+# Numina Lean Agent Runtime Skill 设计
 
-## Context
+## 背景
 
-The current `ai4math-lean-agents` skill is intentionally a distilled, direct Lean coding-agent workflow. It uses the public Numina workflow as design provenance, but it does not deploy Numina, require Claude Code, call model APIs, or treat Numina as a proof backend.
+当前的 `ai4math-lean-agents` skill 是一个有意保持轻量的“蒸馏版”直接 Lean coding-agent 工作流。它把公开 Numina 工作流当作设计来源，但不部署 Numina、不要求 Claude Code、不调用模型 API，也不把 Numina 当成证明后端。
 
-The new work adds a separate sister skill for users who explicitly want the opposite mode: fetch the official upstream Numina Lean Agent, configure a local runtime environment, and invoke the upstream runner.
+新的工作要补上另一种模式：当用户明确想调用原版 Numina 时，创建一个独立的 sister skill，负责抓取官方上游 Numina Lean Agent、配置本地运行环境，并调用上游 runner。
 
-## Goal
+## 目标
 
-Create a new skill named `numina-lean-agent-runtime` that guides Codex through local deployment and invocation of the official `project-numina/numina-lean-agent` repository.
+创建新 skill：`numina-lean-agent-runtime`。它指导 Codex 在本地部署并调用官方 `project-numina/numina-lean-agent` 仓库。
 
-The skill must:
+这个 skill 必须支持：
 
-- clone or update the official upstream repository locally;
-- configure required local tools and Python dependencies;
-- run the upstream setup flow for a named Lean project;
-- diagnose missing tools, project layout problems, and API-key gaps before long runs;
-- invoke upstream `scripts.run_claude` commands for `run`, `batch`, and `from-folder` tasks;
-- keep this runtime workflow separate from `ai4math-lean-agents`.
+- 在本地 clone 或更新官方上游仓库；
+- 配置所需本地工具和 Python 依赖；
+- 为指定 Lean 项目运行上游 setup 流程；
+- 在长时间运行前诊断缺失工具、Lean 项目布局问题和 API key 缺口；
+- 调用上游 `scripts.run_claude` 的 `run`、`batch` 和 `from-folder` 任务；
+- 保持这个 runtime 工作流和 `ai4math-lean-agents` 相互独立。
 
-## Non-Goals
+## 非目标
 
-- Do not vendor, fork, or modify Numina source code by default.
-- Do not make `ai4math-lean-agents` depend on Numina.
-- Do not claim offline or key-free operation.
-- Do not hide that upstream Numina may call Claude, external services, or third-party CLI skills.
-- Do not store secrets in tracked files.
+- 默认不 vendor、不 fork、不修改 Numina 源码。
+- 不让 `ai4math-lean-agents` 依赖 Numina。
+- 不声称离线可用，也不声称无需 key。
+- 不隐藏上游 Numina 可能调用 Claude、外部服务或第三方 CLI skills。
+- 不把密钥写入被 git 跟踪的文件。
 
-## Proposed Repository Layout
+## 仓库布局
 
 ```text
 skills/
@@ -46,86 +46,86 @@ skills/
       test_numina_runtime.py
 ```
 
-Use `Numina-Lean-Agent-Runtime/` as the package folder name to match the existing repository style. Use `numina-lean-agent-runtime` as the skill name in frontmatter and docs.
+目录名使用 `Numina-Lean-Agent-Runtime/`，保持和当前仓库的技能包风格一致。skill frontmatter 和文档中的 skill 名使用 `numina-lean-agent-runtime`。
 
-## Runtime State
+## 运行状态目录
 
-Runtime state lives under `.ai4math/numina-runtime/` by default and must be ignored by git.
+默认运行状态放在 `.ai4math/numina-runtime/`，并且必须被 git 忽略。
 
 ```text
 .ai4math/
   numina-runtime/
-    upstream/            # cloned official project-numina/numina-lean-agent
-    projects/            # optional project workspace root used by setup.sh
-    results/             # default wrapper result root
-    .env.local           # optional local environment overrides, not tracked
+    upstream/            # clone 下来的官方 project-numina/numina-lean-agent
+    projects/            # setup.sh 使用的可选项目工作区根目录
+    results/             # wrapper 默认结果目录
+    .env.local           # 可选本地环境变量覆盖，不跟踪
     numina_runtime.local.toml
 ```
 
-The wrapper must respect these environment variables:
+wrapper 必须支持这些环境变量：
 
-- `AI4MATH_NUMINA_HOME`: override runtime root.
-- `NUMINA_LEAN_AGENT_REPO`: override upstream URL only when the user explicitly requests it.
-- `NUMINA_LEAN_AGENT_REF`: optional branch, tag, or commit to check out.
+- `AI4MATH_NUMINA_HOME`：覆盖 runtime 根目录。
+- `NUMINA_LEAN_AGENT_REPO`：仅在用户明确要求时覆盖上游仓库 URL。
+- `NUMINA_LEAN_AGENT_REF`：可选 branch、tag 或 commit。
 
-The default upstream URL is `https://github.com/project-numina/numina-lean-agent`.
+默认上游 URL 是 `https://github.com/project-numina/numina-lean-agent`。
 
 ## CLI Wrapper
 
-`scripts/numina_runtime.py` provides a deterministic wrapper around upstream setup and runner commands.
+`scripts/numina_runtime.py` 提供一层确定性 wrapper，负责包装上游 setup 和 runner 命令。
 
 ### `doctor`
 
-Report JSON with:
+输出 JSON 报告：
 
-- tool availability: `git`, `curl`, `uv`, `elan`, `lean`, `lake`, `claude`, `python`;
-- upstream clone status and current commit;
-- Python environment status;
-- required and optional API key presence, redacted;
-- whether a target path is inside a Lake project when a target is supplied.
+- 工具可用性：`git`、`curl`、`uv`、`elan`、`lean`、`lake`、`claude`、`python`；
+- 上游 clone 状态和当前 commit；
+- Python 环境状态；
+- required/optional API key 是否存在，输出时必须 redacted；
+- 如果传入 target，检查它是否位于 Lake 项目内。
 
-`doctor` must not call external model APIs.
+`doctor` 不得调用外部模型 API。
 
-Credential diagnostics must distinguish:
+credential 诊断必须区分：
 
-- Claude configuration: `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_BASE_URL`, and `ANTHROPIC_MODEL`, or an already authenticated `claude` CLI;
-- Numina skill keys: `GEMINI_API_KEY`, `OPENAI_API_KEY`, `LEAN_LEANDEX_API_KEY`, and `AXLE_API_KEY`;
-- optional keys from required keys, because upstream Numina only needs some keys for specific backends or tools.
+- Claude 配置：`ANTHROPIC_AUTH_TOKEN`、`ANTHROPIC_BASE_URL`、`ANTHROPIC_MODEL`，或已经登录可用的 `claude` CLI；
+- Numina skill keys：`GEMINI_API_KEY`、`OPENAI_API_KEY`、`LEAN_LEANDEX_API_KEY`、`AXLE_API_KEY`；
+- required keys 和 optional keys，因为上游 Numina 只在特定 backend 或工具路径下需要部分 key。
 
 ### `install`
 
-Clone or update upstream Numina into `.ai4math/numina-runtime/upstream`.
+把上游 Numina clone 或更新到 `.ai4math/numina-runtime/upstream`。
 
-Default behavior:
+默认行为：
 
-- clone when missing;
-- fetch when present;
-- checkout `NUMINA_LEAN_AGENT_REF` only when configured;
-- avoid overwriting local upstream modifications without reporting them.
+- 缺失时 clone；
+- 已存在时 fetch；
+- 仅在配置 `NUMINA_LEAN_AGENT_REF` 时 checkout 指定 ref；
+- 如果上游 checkout 有本地修改，不覆盖，必须报告。
 
-The first version must include `--dry-run`, returning the clone/fetch/checkout commands without running them.
+第一版必须支持 `--dry-run`，返回 clone/fetch/checkout 命令，但不实际执行。
 
 ### `configure`
 
-Run upstream setup for a named Lean project:
+为指定 Lean 项目运行上游 setup：
 
 ```bash
 python scripts/numina_runtime.py configure --project-name myproofs
 ```
 
-The wrapper should:
+wrapper 需要：
 
-- ensure upstream is installed;
-- run `tutorial/setup.sh <project-name>` from the upstream `tutorial/` directory;
-- run `uv python install` and `uv sync` from the upstream root when `uv` is available;
-- record paths and status in local JSON/TOML metadata;
-- return clear next steps when `claude`, API keys, Lean, or Lake setup is missing.
+- 确保上游仓库已安装；
+- 从上游 `tutorial/` 目录运行 `tutorial/setup.sh <project-name>`；
+- 当 `uv` 可用时，在上游根目录运行 `uv python install` 和 `uv sync`；
+- 把路径和状态记录到本地 JSON/TOML metadata；
+- 当 `claude`、API keys、Lean 或 Lake 配置缺失时，返回明确下一步。
 
-`configure` runs dependency sync by default and supports `--skip-sync` for users who only want the upstream project scaffold step.
+`configure` 默认执行依赖同步，并支持 `--skip-sync`，给只想生成上游项目脚手架的用户使用。
 
 ### `run`
 
-Invoke upstream single-target mode:
+调用上游单目标模式：
 
 ```bash
 python scripts/numina_runtime.py run \
@@ -134,14 +134,14 @@ python scripts/numina_runtime.py run \
   --max-rounds 10
 ```
 
-Before launching upstream Numina, validate:
+启动上游 Numina 前先验证：
 
-- the target exists;
-- the target is inside a Lake project with `lean-toolchain` and `lakefile.lean` or `lakefile.toml`;
-- a prompt or prompt file is available;
-- upstream installation and Python environment are present.
+- target 存在；
+- target 位于包含 `lean-toolchain` 和 `lakefile.lean` 或 `lakefile.toml` 的 Lake 项目内；
+- 已提供 prompt 或 prompt file；
+- 上游安装和 Python 环境已存在。
 
-The actual upstream command should be equivalent to:
+实际上游命令应等价于：
 
 ```bash
 python -m scripts.run_claude run <target> --prompt-file <prompt-file> --max-rounds <n> --result-dir <dir>
@@ -149,7 +149,7 @@ python -m scripts.run_claude run <target> --prompt-file <prompt-file> --max-roun
 
 ### `from-folder`
 
-Invoke upstream folder scanning mode:
+调用上游文件夹扫描模式：
 
 ```bash
 python scripts/numina_runtime.py from-folder \
@@ -158,97 +158,97 @@ python scripts/numina_runtime.py from-folder \
   --max-rounds 10
 ```
 
-The wrapper should provide a default result directory under `.ai4math/numina-runtime/results/` if the user does not supply one.
+如果用户没有提供结果目录，wrapper 应默认使用 `.ai4math/numina-runtime/results/` 下的目录。
 
 ### `batch`
 
-Pass through to upstream batch mode for YAML or JSON configs:
+透传到上游 YAML 或 JSON config 的 batch 模式：
 
 ```bash
 python scripts/numina_runtime.py batch --config /path/to/config.yaml
 ```
 
-The wrapper should validate the config file exists and then invoke upstream `python -m scripts.run_claude batch`.
+wrapper 必须先验证 config 文件存在，然后调用上游 `python -m scripts.run_claude batch`。
 
-## Skill Behavior
+## Skill 行为
 
-The skill body should guide Codex to:
+skill body 应指导 Codex：
 
-1. Confirm the user wants official Numina runtime mode, not the distilled direct Lean workflow.
-2. Run `doctor` before installation or invocation.
-3. Use `install` to fetch upstream.
-4. Use `configure` for first-time setup.
-5. Validate the target Lake project before `run`, `batch`, or `from-folder`.
-6. Report missing credentials without printing secret values.
-7. Treat upstream runner output and result directories as the source of truth.
-8. Fall back to `ai4math-lean-agents` only when the user chooses direct local Lean repair instead of official Numina runtime.
+1. 先确认用户想要官方 Numina runtime 模式，而不是蒸馏版 direct Lean 工作流。
+2. 在安装或调用前先运行 `doctor`。
+3. 用 `install` 抓取上游。
+4. 第一次设置时用 `configure`。
+5. 在 `run`、`batch` 或 `from-folder` 前验证目标 Lake 项目。
+6. 报告缺失 credential，但不打印 secret value。
+7. 把上游 runner 输出和 result directories 当作事实来源。
+8. 只有当用户选择直接本地 Lean repair 时，才回退到 `ai4math-lean-agents`。
 
-## Error Handling
+## 错误处理
 
-The wrapper should return machine-readable JSON for all commands.
+wrapper 的所有命令都应返回 machine-readable JSON。
 
-Common statuses:
+常见 status：
 
-- `ready`: local runtime is usable.
-- `missing_tool`: required executable is unavailable.
-- `missing_upstream`: upstream repo has not been cloned.
-- `upstream_dirty`: upstream checkout has local modifications.
-- `missing_credentials`: model or skill API keys are absent.
-- `missing_lake_project`: target is not inside a Lake project.
-- `setup_failed`: upstream setup or dependency sync failed.
-- `run_failed`: upstream runner exited nonzero.
+- `ready`：本地 runtime 可用。
+- `missing_tool`：缺少必需可执行文件。
+- `missing_upstream`：上游仓库尚未 clone。
+- `upstream_dirty`：上游 checkout 有本地修改。
+- `missing_credentials`：缺少模型或 skill API keys。
+- `missing_lake_project`：target 不在 Lake 项目内。
+- `setup_failed`：上游 setup 或 dependency sync 失败。
+- `run_failed`：上游 runner 非零退出。
 
-Human-facing diagnostics should explain the next concrete command.
+面向人的 diagnostics 应说明下一条具体命令。
 
-## Secrets and Local Files
+## Secrets 和本地文件
 
-Tracked files may include only examples such as:
+被 git 跟踪的文件只能包含 example，例如：
 
 ```text
 config/numina_runtime.example.toml
 ```
 
-Local files must be ignored:
+本地文件必须被忽略：
 
 ```text
 .ai4math/numina-runtime/
 ```
 
-The wrapper must read `.ai4math/numina-runtime/.env.local` when present, redact values in output, and never write user-provided secrets unless the user explicitly asks.
+wrapper 必须在存在时读取 `.ai4math/numina-runtime/.env.local`，输出时 redacted，并且除非用户明确要求，不写入用户密钥。
 
-## Tests
+## 测试
 
-Default tests must be offline and deterministic.
+默认测试必须离线且确定性。
 
-Required unit coverage:
+必需单测覆盖：
 
-- Lake project root detection.
-- command construction for `install`, `configure`, `run`, `from-folder`, and `batch`;
-- missing tool diagnostics;
-- missing upstream diagnostics;
-- dirty upstream protection;
-- key redaction;
-- default path resolution under `.ai4math/numina-runtime`;
-- JSON output shape.
+- Lake project root detection；
+- `install`、`configure`、`run`、`from-folder` 和 `batch` 的命令构造；
+- missing tool diagnostics；
+- missing upstream diagnostics；
+- dirty upstream protection；
+- key redaction；
+- `.ai4math/numina-runtime` 下默认路径解析；
+- JSON output shape。
 
-Do not clone upstream, run `uv sync`, call `claude`, or call external APIs in default tests.
+默认测试不得 clone 上游、运行 `uv sync`、调用 `claude` 或调用外部 API。
 
-Optional integration tests may be gated by an environment variable such as `AI4MATH_NUMINA_INTEGRATION=1`.
+可选集成测试可以用环境变量门控，例如 `AI4MATH_NUMINA_INTEGRATION=1`。
 
-## Validation
+## 验证
 
-The implementation is acceptable when:
+实现可接受的条件：
 
-- the new skill passes skill validation;
-- repository unit tests pass;
-- wrapper offline tests pass without network or API keys;
-- `doctor` works on a fresh checkout and reports missing runtime state cleanly;
-- `install --dry-run` or equivalent command construction test proves the official upstream URL is used;
-- existing `ai4math-lean-agents` delivery verification still passes.
+- 新 skill 通过 skill validation；
+- 仓库单测通过；
+- wrapper 离线测试在无网络、无 API keys 情况下通过；
+- `doctor` 在 fresh checkout 上能正常运行，并清楚报告缺失 runtime state；
+- `install --dry-run` 或等价命令构造测试证明使用官方上游 URL；
+- 现有 `ai4math-lean-agents` delivery verification 仍然通过。
 
-## Implementation Decisions
+## 实现决策
 
-- `install --dry-run` is required in the first version.
-- `.env.local` loading belongs in the wrapper, with redacted reporting.
-- `configure` runs `uv sync` by default and supports `--skip-sync`.
-- Validation remains per skill; do not add a repository-level `verify-all` helper in the first version.
+- 第一版必须支持 `install --dry-run`。
+- `.env.local` 读取放在 wrapper 中，输出 redacted 状态。
+- `configure` 默认运行 `uv sync`，并支持 `--skip-sync`。
+- 第一版保持 per-skill 验证，不新增仓库级 `verify-all` helper。
