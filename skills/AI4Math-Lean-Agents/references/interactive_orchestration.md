@@ -2,7 +2,26 @@
 
 The coordinating coding agent owns both user interaction and proof iteration. It does not delegate proof search to Numina, helper CLI commands, or any external backend.
 
-This reference covers the guidance layer: intake, task classification, decomposition, direct Lean editing, result review, bounded iteration, and minimal failure handoff.
+This reference covers the guidance layer: session opening, intake, task classification, decomposition, direct Lean editing, result review, bounded iteration, and minimal failure handoff.
+
+## Session Opening
+
+Lead the interaction; do not wait for the user to drive every step. On a broad request, first orient to the current state instead of asking for every input at once:
+
+- inspect whether the current directory is a Lake project;
+- check whether the shared `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` exists;
+- mention optional Numina readiness separately from direct Lean readiness;
+- say what can be done immediately and what would require confirmation.
+
+If no precise target is provided, offer a small menu and recommend one path. For example:
+
+- repair or complete an existing Lean file;
+- formalize a natural-language or LaTeX theorem;
+- inspect a Lean/Lake project and summarize readiness;
+- prepare the shared Lean workspace;
+- discuss whether an official Numina run is appropriate.
+
+Ask at most one blocking question at a time. A good opening ends with one decision question, not a checklist.
 
 ## Intake Questions
 
@@ -13,6 +32,8 @@ Ask only when not inferable:
 - Is changing the theorem statement allowed?
 - Should standalone work use the reusable managed workspace?
 - For natural-language or LaTeX input, what statement should be considered authoritative?
+
+Prefer asking these only after orientation. If the repository already reveals the likely next step, state the recommendation and ask for confirmation.
 
 ## Decomposition
 

@@ -101,18 +101,29 @@ def _package_hygiene() -> dict[str, Any]:
 
 def _guidance_first_check() -> dict[str, Any]:
     text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8", errors="replace")
+    orchestration = (SKILL_ROOT / "references" / "interactive_orchestration.md").read_text(encoding="utf-8", errors="replace")
     required_phrases = [
         "## Agent Playbook",
         "## Helper Toolbox",
+        "Lead the interaction; do not wait for the user to drive every step.",
+        "offer a small next-step menu",
+        "Ask at most one blocking question at a time.",
         "The bundled CLI is a helper toolbox, not the workflow driver.",
         "Use official Numina through a human-in-the-loop runtime workflow.",
         "Do not turn helper commands into a closed proof workflow.",
         "Do not let helper command availability override a better direct coding-agent path.",
     ]
     missing = [phrase for phrase in required_phrases if phrase not in text]
+    orchestration_required = [
+        "## Session Opening",
+        "Lead the interaction; do not wait for the user to drive every step.",
+        "A good opening ends with one decision question, not a checklist.",
+    ]
+    orchestration_missing = [phrase for phrase in orchestration_required if phrase not in orchestration]
     return {
-        "ok": not missing and "## Commands" not in text,
+        "ok": not missing and not orchestration_missing and "## Commands" not in text,
         "missing_phrases": missing,
+        "orchestration_missing_phrases": orchestration_missing,
         "commands_section_present": "## Commands" in text,
     }
 
