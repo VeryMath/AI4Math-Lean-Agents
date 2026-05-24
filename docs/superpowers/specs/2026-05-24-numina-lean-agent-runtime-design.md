@@ -1,254 +1,359 @@
-# Numina Lean Agent Runtime Skill 设计
+# AI4Math Lean Agents 调用原版 Numina 改造设计
 
 ## 背景
 
-当前的 `ai4math-lean-agents` skill 是一个有意保持轻量的“蒸馏版”直接 Lean coding-agent 工作流。它把公开 Numina 工作流当作设计来源，但不部署 Numina、不要求 Claude Code、不调用模型 API，也不把 Numina 当成证明后端。
+当前 `AI4Math-Lean-Agents` skill 的定位是“蒸馏版”直接 Lean coding-agent 工作流：Codex 自己读写 Lean，CLI 只做确定性 guardrail，并且文档明确写着不部署、不调用 Numina。
 
-新的工作要补上另一种模式：当用户明确想调用原版 Numina 时，创建一个独立的 sister skill，负责抓取官方上游 Numina Lean Agent、配置本地运行环境，并调用上游 runner。
+用户现在希望保留这个 skill 的总框架，但把定位改成：**自动抓取官方原版 Numina Lean Agent，在本地交互配置环境，然后调用上游 Numina runner**。直接 Lean 操作仍可作为诊断、review、最小失败 handoff 和 fallback，但不再是唯一主路径。
 
 ## 目标
 
-创建新 skill：`numina-lean-agent-runtime`。它指导 Codex 在本地部署并调用官方 `project-numina/numina-lean-agent` 仓库。
+改造现有 `skills/AI4Math-Lean-Agents/`，不新增 sister skill。
 
-这个 skill 必须支持：
+改造后，这个 skill 必须支持：
 
-- 在本地 clone 或更新官方上游仓库；
-- 配置所需本地工具和 Python 依赖；
-- 为指定 Lean 项目运行上游 setup 流程；
-- 在长时间运行前诊断缺失工具、Lean 项目布局问题和 API key 缺口；
-- 调用上游 `scripts.run_claude` 的 `run`、`batch` 和 `from-folder` 任务；
-- 保持这个 runtime 工作流和 `ai4math-lean-agents` 相互独立。
+- clone 或更新官方 `project-numina/numina-lean-agent`；
+- 本地配置 Numina 运行环境、Python 依赖、Claude CLI/API key 和相关 skill keys；
+- 为用户的 Lean/Lake 项目调用官方 Numina runner；
+- 在调用前检查工具、credential、Lake 项目结构和上游 checkout 状态；
+- 保留现有 Lean/Lake 校验、patch review、`sorry` 检测、最小失败提取等 guardrails；
+- 明确告诉用户：默认证明/修复路线会调用原版 Numina，可能产生外部 API 调用和费用。
 
 ## 非目标
 
+- 不创建新的 `Numina-Lean-Agent-Runtime/` skill 目录。
 - 默认不 vendor、不 fork、不修改 Numina 源码。
-- 不让 `ai4math-lean-agents` 依赖 Numina。
-- 不声称离线可用，也不声称无需 key。
-- 不隐藏上游 Numina 可能调用 Claude、外部服务或第三方 CLI skills。
-- 不把密钥写入被 git 跟踪的文件。
+- 不把密钥写入 git 跟踪文件。
+- 不假装离线、无 key、无外部 API 可完成 Numina 路线。
+- 不删除现有直接 Lean 工具；它们继续服务于检查、review、fallback 和失败最小化。
 
-## 仓库布局
+## 保持不大动的现有框架
+
+继续使用现有包：
 
 ```text
 skills/
   AI4Math-Lean-Agents/
-  Numina-Lean-Agent-Runtime/
     SKILL.md
     agents/
       openai.yaml
     config/
-      numina_runtime.example.toml
+    prompts/
     references/
-      upstream_usage.md
+    schemas/
     scripts/
-      numina_runtime.py
     tests/
-      test_numina_runtime.py
 ```
 
-目录名使用 `Numina-Lean-Agent-Runtime/`，保持和当前仓库的技能包风格一致。skill frontmatter 和文档中的 skill 名使用 `numina-lean-agent-runtime`。
+在现有框架内新增：
+
+```text
+skills/AI4Math-Lean-Agents/
+  config/
+    numina_runtime.example.toml
+  references/
+    numina_runtime.md
+  scripts/
+    numina_runtime.py
+  tests/
+    test_numina_runtime.py
+```
+
+并更新：
+
+```text
+skills/AI4Math-Lean-Agents/
+  SKILL.md
+  agents/openai.yaml
+  scripts/ai4m_lean.py
+  scripts/verify_delivery.py
+  README.md
+  AGENTS.md
+  CLAUDE.md
+  GEMINI.md
+```
 
 ## 运行状态目录
 
-默认运行状态放在 `.ai4math/numina-runtime/`，并且必须被 git 忽略。
+Numina runtime 状态默认放在 `.ai4math/numina-runtime/`，必须被 `.ai4math/.gitignore` 忽略。
 
 ```text
 .ai4math/
   numina-runtime/
-    upstream/            # clone 下来的官方 project-numina/numina-lean-agent
-    projects/            # setup.sh 使用的可选项目工作区根目录
+    upstream/            # 官方 project-numina/numina-lean-agent clone
+    projects/            # setup.sh 可用的本地项目工作区
     results/             # wrapper 默认结果目录
     .env.local           # 可选本地环境变量覆盖，不跟踪
     numina_runtime.local.toml
 ```
 
-wrapper 必须支持这些环境变量：
+wrapper 必须支持：
 
 - `AI4MATH_NUMINA_HOME`：覆盖 runtime 根目录。
 - `NUMINA_LEAN_AGENT_REPO`：仅在用户明确要求时覆盖上游仓库 URL。
 - `NUMINA_LEAN_AGENT_REF`：可选 branch、tag 或 commit。
 
-默认上游 URL 是 `https://github.com/project-numina/numina-lean-agent`。
+默认上游 URL 固定为：
 
-## CLI Wrapper
+```text
+https://github.com/project-numina/numina-lean-agent
+```
 
-`scripts/numina_runtime.py` 提供一层确定性 wrapper，负责包装上游 setup 和 runner 命令。
+## CLI 设计
 
-### `doctor`
+继续用 `scripts/ai4m_lean.py` 作为总入口，在现有命令旁新增 Numina runtime 命令。
 
-输出 JSON 报告：
+```bash
+python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py numina-doctor --cwd .
+python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py numina-install --cwd .
+python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py numina-configure --cwd . --project-name myproofs
+python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py numina-run --cwd . --file /path/to/Foo.lean --prompt-file /path/to/prompt.md
+python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py numina-from-folder --cwd . --folder /path/to/LeanFolder
+python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py numina-batch --cwd . --config /path/to/config.yaml
+```
 
-- 工具可用性：`git`、`curl`、`uv`、`elan`、`lean`、`lake`、`claude`、`python`；
-- 上游 clone 状态和当前 commit；
-- Python 环境状态；
-- required/optional API key 是否存在，输出时必须 redacted；
-- 如果传入 target，检查它是否位于 Lake 项目内。
+底层实现放在 `scripts/numina_runtime.py`，`ai4m_lean.py` 只负责参数解析、调用和统一 exit code。
 
-`doctor` 不得调用外部模型 API。
+## 现有命令语义调整
 
-credential 诊断必须区分：
+### 保持原样的 guardrail 命令
 
-- Claude 配置：`ANTHROPIC_AUTH_TOKEN`、`ANTHROPIC_BASE_URL`、`ANTHROPIC_MODEL`，或已经登录可用的 `claude` CLI；
-- Numina skill keys：`GEMINI_API_KEY`、`OPENAI_API_KEY`、`LEAN_LEANDEX_API_KEY`、`AXLE_API_KEY`；
-- required keys 和 optional keys，因为上游 Numina 只在特定 backend 或工具路径下需要部分 key。
+这些命令继续是本地确定性工具，不调用外部 API：
 
-### `install`
+- `env`
+- `doctor`
+- `check`
+- `review`
+- `detect-sorry`
+- `minimize-failure`
+- `verify-delivery`
 
-把上游 Numina clone 或更新到 `.ai4math/numina-runtime/upstream`。
+其中 `doctor` 和 `env` 应补充 Numina runtime readiness 摘要，但不得自动 clone、安装或调用模型。
+
+### 扩展 `configure`
+
+现有 `configure --create-workspace` 继续保留，用于 Lean workspace。
+
+新增可选 Numina 配置路径：
+
+```bash
+python scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs
+```
+
+它等价于执行：
+
+1. `numina-install`
+2. `numina-configure --project-name myproofs`
+
+### 改造任务命令
+
+这些任务命令应默认进入 Numina runtime 路线：
+
+- `prove`
+- `formalize`
+- `repair`
+- `complete-sorries`
+- `batch`
 
 默认行为：
 
+1. 检查 target 或 folder 是否存在。
+2. 检查 target 是否在 Lake 项目内。
+3. 检查 Numina runtime 是否已安装、依赖是否准备好、credential 是否足够。
+4. 如果缺 runtime，返回 `missing_numina_runtime` 和下一步命令，不静默 fallback。
+5. 如果 runtime ready，则构造并执行官方 Numina runner 命令。
+
+为保留现有轻量能力，第一版允许 `--direct` 或 `--dry-run`：
+
+- `--dry-run`：只返回 Numina command plan，不执行。
+- `--direct`：沿用现有 direct coding-agent task envelope，用于用户明确要求不调用 Numina 的场景。
+
+## Numina Runtime Wrapper
+
+`scripts/numina_runtime.py` 需要提供可单测的纯函数和命令入口。
+
+### `numina-doctor`
+
+输出 JSON，包含：
+
+- `git`、`curl`、`uv`、`elan`、`lean`、`lake`、`claude`、`python` 可用性；
+- 上游是否已 clone、当前 commit、是否 dirty；
+- Python/uv 环境状态；
+- credential 状态，必须 redacted；
+- 目标路径的 Lake 项目检测结果。
+
+credential 诊断区分：
+
+- Claude 配置：`ANTHROPIC_AUTH_TOKEN`、`ANTHROPIC_BASE_URL`、`ANTHROPIC_MODEL`，或已经可用的 `claude` CLI；
+- Numina skill keys：`GEMINI_API_KEY`、`OPENAI_API_KEY`、`LEAN_LEANDEX_API_KEY`、`AXLE_API_KEY`；
+- required 和 optional keys。
+
+`numina-doctor` 不得调用外部模型 API。
+
+### `numina-install`
+
+clone 或更新官方 Numina：
+
 - 缺失时 clone；
 - 已存在时 fetch；
-- 仅在配置 `NUMINA_LEAN_AGENT_REF` 时 checkout 指定 ref；
-- 如果上游 checkout 有本地修改，不覆盖，必须报告。
+- 配置 `NUMINA_LEAN_AGENT_REF` 时 checkout 指定 ref；
+- 上游 checkout dirty 时不覆盖，返回 `upstream_dirty`。
 
-第一版必须支持 `--dry-run`，返回 clone/fetch/checkout 命令，但不实际执行。
-
-### `configure`
-
-为指定 Lean 项目运行上游 setup：
+第一版必须支持：
 
 ```bash
-python scripts/numina_runtime.py configure --project-name myproofs
+python scripts/ai4m_lean.py numina-install --cwd . --dry-run
 ```
 
-wrapper 需要：
+`--dry-run` 返回将执行的 clone/fetch/checkout 命令，不实际执行。
 
-- 确保上游仓库已安装；
-- 从上游 `tutorial/` 目录运行 `tutorial/setup.sh <project-name>`；
-- 当 `uv` 可用时，在上游根目录运行 `uv python install` 和 `uv sync`；
-- 把路径和状态记录到本地 JSON/TOML metadata；
-- 当 `claude`、API keys、Lean 或 Lake 配置缺失时，返回明确下一步。
+### `numina-configure`
 
-`configure` 默认执行依赖同步，并支持 `--skip-sync`，给只想生成上游项目脚手架的用户使用。
-
-### `run`
-
-调用上游单目标模式：
+为指定 project name 运行上游 setup：
 
 ```bash
-python scripts/numina_runtime.py run \
-  --target /path/to/Foo.lean \
+python scripts/ai4m_lean.py numina-configure --cwd . --project-name myproofs
+```
+
+行为：
+
+- 确保上游已安装；
+- 从上游 `tutorial/` 目录运行 `setup.sh <project-name>`；
+- 默认在上游根目录运行 `uv python install` 和 `uv sync`；
+- 支持 `--skip-sync`；
+- 记录本地 metadata；
+- 失败时返回 `setup_failed` 和具体 stderr/stdout 摘要。
+
+### `numina-run`
+
+单文件调用官方 runner：
+
+```bash
+python scripts/ai4m_lean.py numina-run \
+  --cwd . \
+  --file /path/to/Foo.lean \
   --prompt-file /path/to/prompt.md \
   --max-rounds 10
 ```
 
-启动上游 Numina 前先验证：
+启动前必须验证：
 
-- target 存在；
-- target 位于包含 `lean-toolchain` 和 `lakefile.lean` 或 `lakefile.toml` 的 Lake 项目内；
-- 已提供 prompt 或 prompt file；
-- 上游安装和 Python 环境已存在。
+- 文件存在；
+- 文件在 Lake 项目内；
+- prompt 或 prompt file 存在；
+- 上游安装、uv 环境和 credential 状态可用。
 
-实际上游命令应等价于：
-
-```bash
-python -m scripts.run_claude run <target> --prompt-file <prompt-file> --max-rounds <n> --result-dir <dir>
-```
-
-### `from-folder`
-
-调用上游文件夹扫描模式：
+实际上游命令等价于：
 
 ```bash
-python scripts/numina_runtime.py from-folder \
-  --target /path/to/LeanFolder \
-  --prompt-file prompts/autosearch/main_entry.md \
-  --max-rounds 10
+python -m scripts.run_claude run <file> --prompt-file <prompt-file> --max-rounds <n> --result-dir <dir>
 ```
 
-如果用户没有提供结果目录，wrapper 应默认使用 `.ai4math/numina-runtime/results/` 下的目录。
+### `numina-from-folder`
 
-### `batch`
-
-透传到上游 YAML 或 JSON config 的 batch 模式：
+文件夹模式调用：
 
 ```bash
-python scripts/numina_runtime.py batch --config /path/to/config.yaml
+python scripts/ai4m_lean.py numina-from-folder --cwd . --folder /path/to/LeanFolder
 ```
 
-wrapper 必须先验证 config 文件存在，然后调用上游 `python -m scripts.run_claude batch`。
+默认 result dir 放在 `.ai4math/numina-runtime/results/`。
 
-## Skill 行为
+### `numina-batch`
 
-skill body 应指导 Codex：
+批量配置调用：
 
-1. 先确认用户想要官方 Numina runtime 模式，而不是蒸馏版 direct Lean 工作流。
-2. 在安装或调用前先运行 `doctor`。
-3. 用 `install` 抓取上游。
-4. 第一次设置时用 `configure`。
-5. 在 `run`、`batch` 或 `from-folder` 前验证目标 Lake 项目。
-6. 报告缺失 credential，但不打印 secret value。
-7. 把上游 runner 输出和 result directories 当作事实来源。
-8. 只有当用户选择直接本地 Lean repair 时，才回退到 `ai4math-lean-agents`。
-
-## 错误处理
-
-wrapper 的所有命令都应返回 machine-readable JSON。
-
-常见 status：
-
-- `ready`：本地 runtime 可用。
-- `missing_tool`：缺少必需可执行文件。
-- `missing_upstream`：上游仓库尚未 clone。
-- `upstream_dirty`：上游 checkout 有本地修改。
-- `missing_credentials`：缺少模型或 skill API keys。
-- `missing_lake_project`：target 不在 Lake 项目内。
-- `setup_failed`：上游 setup 或 dependency sync 失败。
-- `run_failed`：上游 runner 非零退出。
-
-面向人的 diagnostics 应说明下一条具体命令。
-
-## Secrets 和本地文件
-
-被 git 跟踪的文件只能包含 example，例如：
-
-```text
-config/numina_runtime.example.toml
+```bash
+python scripts/ai4m_lean.py numina-batch --cwd . --config /path/to/config.yaml
 ```
 
-本地文件必须被忽略：
+wrapper 先验证 config 存在，再调用上游 batch。
+
+## Skill 文档改造
+
+`SKILL.md` 需要从“Numina 不部署不调用”改成：
+
+- 默认工作流是官方 Numina runtime assisted workflow；
+- Codex 先用本地 guardrails 识别目标、检查 Lake 项目、检查 runtime；
+- runtime 未安装时，引导 `numina-install` 和 `numina-configure`；
+- runtime ready 时调用官方 Numina runner；
+- runner 结束后用 `check`、`detect-sorry`、`review` 做交付前验证；
+- 如果 Numina 路线失败，使用 `minimize-failure` 给出最小失败片段和下一步。
+
+`references/numina_reverse_analysis.md` 可以保留，但应改为历史/背景材料，不再承担“只蒸馏不调用”的政策含义。
+
+## 安全和本地文件
+
+被 git 跟踪的文件只能包含 example config。
+
+本地文件必须忽略：
 
 ```text
 .ai4math/numina-runtime/
 ```
 
-wrapper 必须在存在时读取 `.ai4math/numina-runtime/.env.local`，输出时 redacted，并且除非用户明确要求，不写入用户密钥。
+wrapper 必须读取 `.ai4math/numina-runtime/.env.local`（如果存在），但输出 redacted 状态，不打印真实 secret。除非用户明确要求，不写入用户密钥。
+
+## 错误状态
+
+新增或使用这些 status：
+
+- `numina_ready`
+- `missing_numina_runtime`
+- `missing_numina_credentials`
+- `missing_lake_project`
+- `upstream_dirty`
+- `numina_setup_failed`
+- `numina_run_failed`
+- `direct_task_ready`
+
+`ai4m_lean.py` 需要把 Numina 相关失败映射到稳定 exit code，避免和 Lean 编译失败混淆。
 
 ## 测试
 
-默认测试必须离线且确定性。
+默认测试必须离线、确定性、无 API。
 
-必需单测覆盖：
+新增单测覆盖：
 
-- Lake project root detection；
-- `install`、`configure`、`run`、`from-folder` 和 `batch` 的命令构造；
-- missing tool diagnostics；
-- missing upstream diagnostics；
-- dirty upstream protection；
-- key redaction；
-- `.ai4math/numina-runtime` 下默认路径解析；
-- JSON output shape。
+- Numina runtime 默认路径解析；
+- `.ai4math/.gitignore` 写入 `numina-runtime/`；
+- Lake project root detection 复用现有逻辑；
+- `numina-install --dry-run` 使用官方上游 URL；
+- dirty upstream 保护；
+- credential redaction；
+- `numina-run`、`numina-from-folder`、`numina-batch` 命令构造；
+- `prove/repair/complete-sorries/batch --dry-run` 走 Numina command plan；
+- `--direct` 保留旧 direct task envelope；
+- `verify-delivery` 检查新增文件和命令。
 
-默认测试不得 clone 上游、运行 `uv sync`、调用 `claude` 或调用外部 API。
+默认测试不得：
 
-可选集成测试可以用环境变量门控，例如 `AI4MATH_NUMINA_INTEGRATION=1`。
+- clone 官方仓库；
+- 运行 `uv sync`；
+- 调用 `claude`；
+- 调用外部 API。
 
-## 验证
+可选集成测试用环境变量门控：
 
-实现可接受的条件：
+```text
+AI4MATH_NUMINA_INTEGRATION=1
+```
 
-- 新 skill 通过 skill validation；
-- 仓库单测通过；
-- wrapper 离线测试在无网络、无 API keys 情况下通过；
-- `doctor` 在 fresh checkout 上能正常运行，并清楚报告缺失 runtime state；
-- `install --dry-run` 或等价命令构造测试证明使用官方上游 URL；
-- 现有 `ai4math-lean-agents` delivery verification 仍然通过。
+## 验收标准
+
+实现完成时必须满足：
+
+- `verify-delivery --run-tests` 通过；
+- 新增 Numina runtime offline tests 通过；
+- `numina-install --dry-run` 输出官方上游 URL；
+- `numina-doctor` 在未安装 runtime 的 fresh checkout 上清楚报告下一步；
+- `SKILL.md`、README、AGENTS/CLAUDE/GEMINI 说明一致：本 skill 现在会部署并调用官方 Numina；
+- 最终交付仍拒绝 `sorry`、`admit` 和新 `axiom`。
 
 ## 实现决策
 
-- 第一版必须支持 `install --dry-run`。
-- `.env.local` 读取放在 wrapper 中，输出 redacted 状态。
-- `configure` 默认运行 `uv sync`，并支持 `--skip-sync`。
-- 第一版保持 per-skill 验证，不新增仓库级 `verify-all` helper。
+- 不新增 sister skill，直接改造 `AI4Math-Lean-Agents`。
+- 保留现有 direct Lean guardrails。
+- 证明/修复类任务默认准备或调用 Numina runtime。
+- 第一版必须支持 `--dry-run` 和 `--direct`，降低迁移风险。
+- 默认 runtime 根目录是 `.ai4math/numina-runtime/`。
