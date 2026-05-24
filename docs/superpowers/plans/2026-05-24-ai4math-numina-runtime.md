@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 改造现有 `AI4Math-Lean-Agents` skill，使其通过现有 CLI 自动部署并调用官方 `project-numina/numina-lean-agent`，同时保留现有 Lean guardrails 和 `--direct` fallback。
+**Goal:** 改造现有 `AI4Math-Lean-Agents` skill，使 coding agent 能通过交互式流程部署并调用官方 `project-numina/numina-lean-agent`，同时保留现有 Lean guardrails 和 direct task envelope。
 
-**Architecture:** 新增 `scripts/numina_runtime.py` 作为内部 runtime wrapper，负责本地路径、credential redaction、上游状态、安装/配置计划和官方 runner command plan。公开 CLI 不新增一组平行的 `numina-*` 命令；`doctor` 展示 Numina readiness，`configure --setup-numina` 负责安装/配置，`prove/repair/formalize/complete-sorries/batch` 默认走 Numina runtime，`--direct` 保留旧 direct task envelope。
+**Architecture:** 新增 `scripts/numina_runtime.py` 作为内部 runtime helper，负责本地路径、credential redaction、上游状态、安装/配置计划和官方 runner command plan。公开 CLI 不新增一组平行的 `numina-*` 命令；`doctor` 展示 Numina readiness，`configure --setup-numina` 负责可审阅的安装/配置，`SKILL.md` 和 `references/numina_runtime.md` 指导 coding agent 何时向用户说明、何时调用上游 Numina、何时使用本地 guardrails。现有 `prove/repair/formalize/complete-sorries/batch` 保持 task envelope/辅助入口，不强制改造成 Numina 流水线。
 
 **Tech Stack:** Python 3 standard library, `unittest`, existing Lean/Lake helper modules, `git`, `uv`, `claude` CLI, official `project-numina/numina-lean-agent`.
 
@@ -19,8 +19,7 @@
 - Modify `skills/AI4Math-Lean-Agents/scripts/common.py`: add `numina-runtime/` to `.ai4math/.gitignore`.
 - Modify `skills/AI4Math-Lean-Agents/scripts/tool_status.py`: include `curl`, `uv`, and `claude` in tool reporting.
 - Modify `skills/AI4Math-Lean-Agents/scripts/configure_lean.py`: add Numina readiness to `inspect_environment`; add `setup_numina`, `project_name`, `skip_numina_sync` handling to `configure`.
-- Modify `skills/AI4Math-Lean-Agents/scripts/direct_task.py`: add default Numina task-plan builder while preserving existing direct builder.
-- Modify `skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py`: wire `configure --setup-numina`; add `--direct` to task commands; route task commands through Numina by default.
+- Modify `skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py`: wire `configure --setup-numina`; keep task commands as existing envelopes.
 - Modify `skills/AI4Math-Lean-Agents/scripts/verify_delivery.py`: require new runtime files and update policy checks.
 - Modify docs: `skills/AI4Math-Lean-Agents/SKILL.md`, `README.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `skills/AI4Math-Lean-Agents/agents/openai.yaml`, `skills/AI4Math-Lean-Agents/references/numina_reverse_analysis.md`.
 
@@ -738,174 +737,7 @@ git commit -m "Add Numina setup through configure"
 
 ---
 
-### Task 4: Default Task Commands Route Through Numina, `--direct` Preserves Old Behavior
-
-**Files:**
-- Modify: `skills/AI4Math-Lean-Agents/scripts/direct_task.py`
-- Modify: `skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py`
-- Modify: `skills/AI4Math-Lean-Agents/tests/test_direct_task.py`
-- Modify: `skills/AI4Math-Lean-Agents/tests/test_cli.py`
-
-- [ ] **Step 1: Add failing tests**
-
-Append to `skills/AI4Math-Lean-Agents/tests/test_direct_task.py`:
-
-```python
-from direct_task import build_numina_task  # noqa: E402
-
-
-class NuminaTaskRoutingTests(unittest.TestCase):
-    def test_numina_task_reports_missing_runtime(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "lean-toolchain").write_text("leanprover/lean4:v4.28.0\n", encoding="utf-8")
-            (root / "lakefile.toml").write_text('name = "proj"\n', encoding="utf-8")
-            target = root / "Main.lean"
-            target.write_text("example : True := by trivial\n", encoding="utf-8")
-
-            result = build_numina_task("repair", root, target, max_rounds=5, prompt_file=None, result_dir=None, dry_run=True)
-
-        self.assertFalse(result["ok"])
-        self.assertEqual(result["status"], "missing_numina_runtime")
-        self.assertEqual(result["backend"], "official-numina")
-```
-
-Append to `skills/AI4Math-Lean-Agents/tests/test_cli.py`:
-
-```python
-    def test_repair_direct_preserves_old_task_envelope(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "lean-toolchain").write_text("leanprover/lean4:v4.28.0\n", encoding="utf-8")
-            (root / "lakefile.toml").write_text('name = "proj"\n', encoding="utf-8")
-            target = root / "Main.lean"
-            target.write_text("example : True := by trivial\n", encoding="utf-8")
-            result = subprocess.run(
-                [sys.executable, str(CLI), "repair", "--cwd", str(root), "--file", str(target), "--dry-run", "--direct"],
-                text=True,
-                capture_output=True,
-                check=False,
-            )
-
-        self.assertEqual(result.returncode, 0, result.stderr)
-        payload = json.loads(result.stdout)
-        self.assertEqual(payload["agent_mode"], "direct-coding-agent")
-        self.assertEqual(payload["backend"], "none")
-
-    def test_repair_default_routes_to_numina(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "lean-toolchain").write_text("leanprover/lean4:v4.28.0\n", encoding="utf-8")
-            (root / "lakefile.toml").write_text('name = "proj"\n', encoding="utf-8")
-            target = root / "Main.lean"
-            target.write_text("example : True := by trivial\n", encoding="utf-8")
-            result = subprocess.run(
-                [sys.executable, str(CLI), "repair", "--cwd", str(root), "--file", str(target), "--dry-run"],
-                text=True,
-                capture_output=True,
-                check=False,
-            )
-
-        self.assertEqual(result.returncode, 4, result.stderr)
-        payload = json.loads(result.stdout)
-        self.assertEqual(payload["backend"], "official-numina")
-        self.assertEqual(payload["status"], "missing_numina_runtime")
-```
-
-- [ ] **Step 2: Verify tests fail**
-
-Run:
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 python -m unittest \
-  skills/AI4Math-Lean-Agents/tests/test_direct_task.py \
-  skills/AI4Math-Lean-Agents/tests/test_cli.py
-```
-
-Expected: FAIL with missing `build_numina_task` and unknown `--direct`.
-
-- [ ] **Step 3: Implement Numina task builder**
-
-Modify `skills/AI4Math-Lean-Agents/scripts/direct_task.py` imports:
-
-```python
-from numina_runtime import build_batch_plan, build_run_plan
-```
-
-Add:
-
-```python
-def build_numina_task(
-    task_type: str,
-    cwd: str | Path,
-    target: str | Path,
-    max_rounds: int = 5,
-    prompt_file: str | Path | None = None,
-    result_dir: str | Path | None = None,
-    dry_run: bool = False,
-) -> dict[str, Any]:
-    if task_type == "batch":
-        result = build_batch_plan(cwd, target, prompt_file=prompt_file, max_rounds=max_rounds, result_dir=result_dir, dry_run=dry_run)
-    else:
-        result = build_run_plan(cwd, target, prompt_file=prompt_file, prompt=None, max_rounds=max_rounds, result_dir=result_dir, dry_run=dry_run)
-    result.setdefault("task_type", task_type)
-    result["agent_mode"] = "numina-runtime"
-    result["backend"] = "official-numina"
-    return result
-```
-
-- [ ] **Step 4: Wire `--direct` in task commands**
-
-In `ai4m_lean.py`, import:
-
-```python
-from direct_task import run_direct_task, build_numina_task
-```
-
-Add to proof and batch parser definitions:
-
-```python
-        proof.add_argument("--direct", action="store_true", help="Use direct local Lean task envelope instead of official Numina")
-```
-
-```python
-    batch.add_argument("--direct", action="store_true", help="Use direct local Lean batch envelope instead of official Numina")
-```
-
-In task dispatch, use `run_direct_task` only when `args.direct` is true. Otherwise call `build_numina_task(...)`.
-
-Modify `_exit_code`:
-
-```python
-    if status in {"missing_config", "direct_task_missing_config", "missing_numina_runtime", "missing_numina_credentials"}:
-        return EXIT_MISSING_CONFIG
-```
-
-- [ ] **Step 5: Verify focused tests pass**
-
-Run:
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 python -m unittest \
-  skills/AI4Math-Lean-Agents/tests/test_direct_task.py \
-  skills/AI4Math-Lean-Agents/tests/test_cli.py
-```
-
-Expected: PASS.
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add skills/AI4Math-Lean-Agents/scripts/direct_task.py \
-  skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py \
-  skills/AI4Math-Lean-Agents/tests/test_direct_task.py \
-  skills/AI4Math-Lean-Agents/tests/test_cli.py
-git commit -m "Route task commands through Numina runtime"
-```
-
----
-
-### Task 5: Documentation and Delivery Verification
+### Task 4: Documentation and Delivery Verification
 
 **Files:**
 - Create: `skills/AI4Math-Lean-Agents/config/numina_runtime.example.toml`
@@ -953,29 +785,29 @@ python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py configure --cwd . --setup
 
 ## Invocation
 
-Run one file through the default Numina route:
+After explaining the external API implications and confirming with the user, the coding agent can run an upstream Numina command from the cloned upstream checkout. A typical command shape is:
 
 ```bash
-python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py repair --cwd . --file path/to/Foo.lean --prompt-file path/to/prompt.md
+python -m scripts.run_claude run path/to/Foo.lean --prompt-file path/to/prompt.md --max-rounds 5 --result-dir .ai4math/numina-runtime/results/run
 ```
 
-Use the old direct local task envelope only when explicitly requested:
+The existing direct local task envelope remains available:
 
 ```bash
-python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py repair --cwd . --file path/to/Foo.lean --direct --dry-run
+python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py repair --cwd . --file path/to/Foo.lean --dry-run
 ```
 
 ## Safety
 
-The default Numina route may call external model APIs through upstream Numina and Claude. Never print secret values. Use `.ai4math/numina-runtime/.env.local` or the shell environment for credentials.
+The Numina route may call external model APIs through upstream Numina and Claude. Never print secret values. Use `.ai4math/numina-runtime/.env.local` or the shell environment for credentials.
 ```
 
 - [ ] **Step 2: Update skill and root docs**
 
 Update:
 
-- `skills/AI4Math-Lean-Agents/SKILL.md`: default workflow is official Numina runtime assisted; direct local Lean is fallback via `--direct`; guardrails still validate final delivery.
-- `README.md`: show `doctor`, `configure --setup-numina`, default `repair/prove` route, and `--direct`.
+- `skills/AI4Math-Lean-Agents/SKILL.md`: workflow is official Numina runtime assisted and human-in-the-loop; direct local Lean guardrails remain part of diagnosis and final validation.
+- `README.md`: show `doctor`, `configure --setup-numina`, an example upstream `scripts.run_claude` command, and existing `repair/prove --dry-run` task-envelope usage.
 - `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`: replace no-Numina policy with official Numina runtime default plus external API warning.
 - `skills/AI4Math-Lean-Agents/agents/openai.yaml`: mention official Numina runtime.
 - `skills/AI4Math-Lean-Agents/references/numina_reverse_analysis.md`: add a top note that it is historical background and no longer defines a no-call policy.
@@ -999,14 +831,14 @@ Replace `_guidance_first_check()` required phrases with:
         "## Agent Playbook",
         "## Helper Toolbox",
         "official Numina runtime",
-        "Direct local Lean editing remains available as a fallback via `--direct`",
+        "Use official Numina through a human-in-the-loop runtime workflow",
     ]
 ```
 
 Update `external_api_note`:
 
 ```python
-        "external_api_note": "The default Numina runtime workflow may call upstream Numina, Claude, and external model APIs. Guardrail commands and default tests remain local/offline.",
+        "external_api_note": "The Numina runtime workflow may call upstream Numina, Claude, and external model APIs after user-facing explanation/confirmation. Guardrail commands and default tests remain local/offline.",
 ```
 
 Update `test_verify_delivery_package_checks` in `test_cli.py`:
@@ -1096,6 +928,6 @@ Expected: no unstaged or uncommitted implementation changes.
 
 ## Self-Review Notes
 
-- Spec coverage: The plan covers existing-skill modification, official upstream install/configure through existing CLI, runtime state, task routing, `--direct`, docs, tests, delivery verifier, and external API disclosure.
+- Spec coverage: The plan covers existing-skill modification, official upstream install/configure through existing CLI, runtime state, human-in-the-loop Numina invocation guidance, docs, tests, delivery verifier, and external API disclosure.
 - Completeness scan: The plan uses concrete code snippets, exact commands, expected outputs, and no open-ended steps.
 - Type consistency: Runtime status names use the spec vocabulary: `missing_numina_runtime`, `upstream_dirty`, `numina_run_ready`, and `direct_task_ready`.
