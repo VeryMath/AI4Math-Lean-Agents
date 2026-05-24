@@ -21,18 +21,21 @@ REQUIRED_FILES = [
     "SKILL.md",
     "agents/openai.yaml",
     "config/lean_agent.example.toml",
+    "config/numina_runtime.example.toml",
     "schemas/task.schema.json",
     "schemas/result.schema.json",
     "schemas/config.schema.json",
     "references/lean_runtime_configuration.md",
     "references/interactive_orchestration.md",
     "references/direct_lean_workflow.md",
+    "references/numina_runtime.md",
     "references/review_checklist.md",
     "references/failure_taxonomy.md",
     "references/numina_reverse_analysis.md",
     "scripts/ai4m_lean.py",
     "scripts/configure_lean.py",
     "scripts/direct_task.py",
+    "scripts/numina_runtime.py",
     "scripts/validate_patch.py",
     "scripts/extract_minimal_failure.py",
 ]
@@ -102,6 +105,8 @@ def _guidance_first_check() -> dict[str, Any]:
         "## Agent Playbook",
         "## Helper Toolbox",
         "The bundled CLI is a helper toolbox, not the workflow driver.",
+        "Use official Numina through a human-in-the-loop runtime workflow.",
+        "Do not turn helper commands into a closed proof workflow.",
         "Do not let helper command availability override a better direct coding-agent path.",
     ]
     missing = [phrase for phrase in required_phrases if phrase not in text]
@@ -164,6 +169,7 @@ def verify(
     checks = {
         "required_files": all(item["exists"] for item in files),
         "required_commands": REQUIRED_COMMANDS.issubset(commands),
+        "no_parallel_numina_commands": not any(command.startswith("numina") for command in commands),
         "schemas": all(item["ok"] for item in schemas),
         "guidance_first_skill": bool(guidance_first.get("ok")),
         "dry_run_prove": bool(dry_run.get("ok") and dry_run.get("status") == "dry_run"),
@@ -219,7 +225,7 @@ def verify(
         "workspace_check": workspace_check,
         "workspace_build": workspace_build,
         "unit_tests": tests,
-        "external_api_note": "This direct workflow does not call Numina or external model APIs; the coding agent edits and checks Lean locally.",
+        "external_api_note": "env, doctor, check, review, tests, and dry-runs do not call external APIs. configure --setup-numina and approved official Numina runs may clone/install/call external tools, then final Lean changes must be validated locally.",
     }
 
 

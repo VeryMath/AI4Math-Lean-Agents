@@ -6,6 +6,6 @@ For Lean work in this repository, read and follow:
 skills/AI4Math-Lean-Agents/SKILL.md
 ```
 
-Use Claude Code as the direct Lean coding agent. Edit Lean files directly, run Lean/Lake checks frequently, and use the helper CLI only for deterministic checks such as environment inspection, patch review, `sorry` detection, and minimal failure extraction.
+Use Claude Code as the direct Lean coding agent. Edit Lean files directly, run Lean/Lake checks frequently, and use the helper CLI only for deterministic checks such as environment inspection, optional Numina readiness/setup, patch review, `sorry` detection, and minimal failure extraction.
 
-Do not deploy Numina or require API keys for this workflow.
+Deploy or call the official Numina runtime only when the user asks for it or approves it after an explanation. Keep secrets in environment variables or ignored local files.

@@ -141,7 +141,7 @@ python scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name mypr
 
 1. 内部 Numina upstream install/update；
 2. 内部 Numina setup/configure；
-3. 可选 dependency sync，默认开启，可用 `--skip-numina-sync` 跳过。
+3. 按官方 README 执行 `uv python install` 和 `uv sync`。
 
 ### 任务调用的交互原则
 
@@ -233,7 +233,7 @@ python scripts/ai4m_lean.py repair \
 实际上游命令等价于：
 
 ```bash
-python -m scripts.run_claude run <file> --prompt-file <prompt-file> --max-rounds <n> --result-dir <dir>
+uv run python -m scripts.run_claude from-folder <target> --prompt-file <prompt-file> --max-rounds <n> --result-dir <dir>
 ```
 
 ### folder/batch helpers

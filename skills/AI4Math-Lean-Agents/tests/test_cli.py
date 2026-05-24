@@ -78,6 +78,34 @@ class CliTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertIn("tools", payload)
         self.assertIn("readiness", payload)
+        self.assertIn("numina", payload)
+        self.assertIn("readiness", payload["numina"])
+
+    def test_configure_setup_numina_dry_run_outputs_official_upstream(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(CLI),
+                    "configure",
+                    "--cwd",
+                    tmp,
+                    "--setup-numina",
+                    "--project-name",
+                    "demo_project",
+                    "--dry-run",
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertIn("numina", payload)
+        self.assertEqual(payload["numina"]["status"], "dry_run")
+        commands = [action["command"] for action in payload["numina"]["actions"]]
+        self.assertIn("https://github.com/project-numina/numina-lean-agent", str(commands))
+        self.assertIn(["./setup.sh", "demo_project"], commands)
 
     def test_lean_workspace_deploy_failure_uses_lean_exit_code(self) -> None:
         self.assertEqual(

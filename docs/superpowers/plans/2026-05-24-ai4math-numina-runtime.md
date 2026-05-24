@@ -303,12 +303,12 @@ class NuminaRuntimePlanTests(unittest.TestCase):
         self.assertFalse(result["upstream"]["exists"])
         self.assertIn("configure --setup-numina", result["recommended_next_action"])
 
-    def test_configure_plan_includes_install_setup_and_sync(self) -> None:
+    def test_configure_plan_includes_install_setup_and_uv(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.make_upstream(root)
 
-            result = build_configure_plan(root, project_name="myproofs", skip_sync=False, dry_run=True)
+            result = build_configure_plan(root, project_name="myproofs", dry_run=True)
 
         commands = [action["command"] for action in result["actions"]]
         self.assertIn(["git", "fetch", "--all", "--tags"], commands)
@@ -451,18 +451,16 @@ def numina_readiness(cwd: str | Path, target: str | Path | None = None) -> dict[
 def build_configure_plan(
     cwd: str | Path,
     project_name: str,
-    skip_sync: bool = False,
     dry_run: bool = False,
 ) -> dict[str, Any]:
     install = build_install_plan(cwd, dry_run=dry_run)
     actions = list(install.get("actions", []))
     upstream = _upstream_path(cwd)
     actions.append({"command": ["./setup.sh", project_name], "cwd": str(upstream / "tutorial")})
-    if not skip_sync:
-        actions.extend([
-            {"command": ["uv", "python", "install"], "cwd": str(upstream)},
-            {"command": ["uv", "sync"], "cwd": str(upstream)},
-        ])
+    actions.extend([
+        {"command": ["uv", "python", "install"], "cwd": str(upstream)},
+        {"command": ["uv", "sync"], "cwd": str(upstream)},
+    ])
     return {
         "ok": bool(install.get("ok")),
         "status": "dry_run" if dry_run else "configure_plan_ready",
@@ -699,7 +697,7 @@ Before returning `env`, add:
                 "recommended_next_action": "pass --project-name when using --setup-numina",
             })
         else:
-            numina_actions.append(build_configure_plan(cwd_path, project_name, skip_sync=skip_numina_sync, dry_run=dry_run))
+            numina_actions.append(build_configure_plan(cwd_path, project_name, dry_run=dry_run))
     env["numina_actions"] = numina_actions
 ```
 
@@ -708,7 +706,6 @@ In `ai4m_lean.py`, add parser args to `configure_parser`:
 ```python
     configure_parser.add_argument("--setup-numina", action="store_true")
     configure_parser.add_argument("--project-name", default=None)
-    configure_parser.add_argument("--skip-numina-sync", action="store_true")
 ```
 
 Pass them into `configure()`.
@@ -788,7 +785,7 @@ python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py configure --cwd . --setup
 After explaining the external API implications and confirming with the user, the coding agent can run an upstream Numina command from the cloned upstream checkout. A typical command shape is:
 
 ```bash
-python -m scripts.run_claude run path/to/Foo.lean --prompt-file path/to/prompt.md --max-rounds 5 --result-dir .ai4math/numina-runtime/results/run
+uv run python -m scripts.run_claude from-folder path/to/Foo.lean --prompt-file prompts/autosearch/main_entry.md --max-rounds 5 --result-dir .ai4math/numina-runtime/results/run
 ```
 
 The existing direct local task envelope remains available:

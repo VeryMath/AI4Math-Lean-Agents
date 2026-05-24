@@ -1,6 +1,6 @@
 # AI4Math Lean Agents
 
-AI4Math Lean Agents is a guidance-first Codex skill for Lean 4 formal verification. The active coding agent directly reads, edits, and checks Lean code; the bundled CLI is only a deterministic helper toolbox for environment checks, Lean validation, patch review, and minimal failure handoff.
+AI4Math Lean Agents is a guidance-first Codex skill for Lean 4 formal verification. The active coding agent directly reads, edits, and checks Lean code; the bundled CLI is only a deterministic helper toolbox for environment checks, Lean validation, optional official Numina runtime setup, patch review, and minimal failure handoff.
 
 The canonical skill package lives at:
 
@@ -15,8 +15,9 @@ skills/AI4Math-Lean-Agents/
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
+- Optional official `project-numina/numina-lean-agent` deployment/call flow, mediated by the coding agent.
 
-This project does not deploy or call Numina. Numina is referenced only as workflow provenance in the skill documentation.
+Numina is optional. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `.ai4math/numina-runtime/`.
 
 ## Repository Layout
 
@@ -62,11 +63,14 @@ Run commands from the repository root:
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py env --cwd .
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py doctor --cwd .
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py configure --cwd . --create-workspace
+python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs --dry-run
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py check --cwd . --skip-build
 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
 ```
 
 The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, and choosing proof strategy.
+
+For the optional Numina path, read `skills/AI4Math-Lean-Agents/references/numina_runtime.md`. Setup and official runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
 
 ## Validate
 

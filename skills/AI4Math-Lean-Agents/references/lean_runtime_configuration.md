@@ -1,6 +1,6 @@
 # Lean Runtime Configuration
 
-This skill uses a direct coding-agent workflow. It does not deploy Numina, run a Numina Python environment, or require Claude Code/API credentials as a backend.
+This skill uses a direct coding-agent workflow by default. It can also prepare an optional official Numina runtime under ignored local state when the user approves that path; see `numina_runtime.md` for deployment and call details.
 
 ## Local Layout
 
@@ -8,6 +8,7 @@ This skill uses a direct coding-agent workflow. It does not deploy Numina, run a
 .ai4math/
 ├── lean-workspace/
 ├── lean-workspaces/
+├── numina-runtime/
 ├── lean_agent.local.toml
 ├── logs/
 └── failures/
@@ -24,7 +25,7 @@ python scripts/ai4m_lean.py doctor --cwd .
 python scripts/ai4m_lean.py env --cwd .
 ```
 
-Required local tools for the direct workflow are `git`, `python3`, `elan`, `lean`, and `lake`. `uv`, `claude`, Numina, and model API keys are not required by this skill.
+Required local tools for the direct workflow are `git`, `python3`, `elan`, `lean`, and `lake`. Optional Numina setup additionally reports `curl`, `uv`, and `claude` readiness. Numina and model API keys are not required for the direct workflow.
 
 ## Reusable Lean Workspace
 
@@ -66,4 +67,5 @@ Environment overrides:
 ```bash
 export AI4MATH_LEAN_WORKSPACE=".ai4math/lean-workspace"
 export AI4MATH_LEAN_TOOLCHAIN="leanprover/lean4:v4.28.0"
+export AI4MATH_NUMINA_HOME=".ai4math/numina-runtime"
 ```

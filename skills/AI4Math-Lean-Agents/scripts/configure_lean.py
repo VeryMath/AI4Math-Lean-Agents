@@ -6,6 +6,7 @@ from typing import Any
 
 from check_lean_project import find_project_root, read_mathlib_revision, read_toolchain
 from common import ensure_ai4math_gitignore, expand_path, read_config, run_command, update_local_toml
+from numina_runtime import execute_configure_plan, numina_readiness
 from tool_status import find_tool
 
 
@@ -74,6 +75,7 @@ def inspect_environment(cwd: str | Path = ".", config_path: str | Path | None = 
             "mode": "direct-coding-agent",
             "backend": "none",
             "numina_required": False,
+            "numina_runtime": "optional-official-runtime",
         },
         "lean": {
             "target": str(target_path),
@@ -87,6 +89,7 @@ def inspect_environment(cwd: str | Path = ".", config_path: str | Path | None = 
             "workspace_mode": lean.get("workspace_mode", "reuse-managed"),
             "align_workspace_versions": bool(lean.get("align_workspace_versions", True)),
         },
+        "numina": numina_readiness(cwd_path, target=target_path),
         "missing_config": missing,
         "required_inputs": required_inputs,
         "recommended_next_action": "run configure --create-workspace or provide a Lake project" if missing else "ready",
@@ -101,6 +104,8 @@ def configure(
     toolchain: str | None = None,
     save_local: bool = False,
     dry_run: bool = False,
+    setup_numina: bool = False,
+    project_name: str | None = None,
 ) -> dict[str, Any]:
     cwd_path = Path(cwd).resolve()
     if not dry_run:
@@ -177,6 +182,23 @@ def configure(
     env = inspect_environment(cwd_path, config_path=config_path, target=target)
     env["workspace"] = workspace_info
     env["workspace_actions"] = workspace_actions
+    if setup_numina:
+        numina_result = execute_configure_plan(
+            cwd_path,
+            project_name=project_name,
+            dry_run=dry_run,
+        )
+        env["numina"] = numina_result
+        if numina_result.get("ok"):
+            env["ok"] = True
+            env["status"] = numina_result.get("status", "numina_configured")
+            env["configuration_status"] = "numina_runtime_ready" if not dry_run else "numina_runtime_dry_run"
+            env["recommended_next_action"] = numina_result.get("recommended_next_action", "ready")
+        else:
+            env["ok"] = False
+            env["status"] = "interactive_required" if numina_result.get("status") == "missing_project_name" else numina_result.get("status", "numina_setup_failed")
+            env["configuration_status"] = "numina_runtime_missing_config"
+            env["recommended_next_action"] = numina_result.get("recommended_next_action", "review Numina setup requirements")
     if workspace_failed:
         env["ok"] = False
         env["status"] = "lean_workspace_setup_failed"

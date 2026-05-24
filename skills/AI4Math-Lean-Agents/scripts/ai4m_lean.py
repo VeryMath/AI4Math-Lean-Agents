@@ -11,6 +11,7 @@ from configure_lean import configure, inspect_environment
 from detect_sorry import scan_file
 from direct_task import run_direct_task
 from extract_minimal_failure import extract
+from numina_runtime import numina_readiness
 from tool_status import doctor
 from validate_patch import review_files
 from verify_delivery import verify as verify_delivery
@@ -73,6 +74,8 @@ def build_parser() -> argparse.ArgumentParser:
     configure_parser.add_argument("--toolchain", default=None, help="Optional Lean toolchain for managed workspace")
     configure_parser.add_argument("--save-local", action="store_true")
     configure_parser.add_argument("--dry-run", action="store_true")
+    configure_parser.add_argument("--setup-numina", action="store_true", help="Install/configure official Numina runtime after review")
+    configure_parser.add_argument("--project-name", default=None, help="Lean project name for official Numina tutorial setup")
 
     for name in ("prove", "formalize", "repair", "complete-sorries"):
         proof = sub.add_parser(name, help=f"Prepare a direct coding-agent {name} task")
@@ -129,6 +132,7 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.command == "doctor":
         result = doctor(args.cwd)
+        result["numina"] = numina_readiness(args.cwd)
         _finish(result, args.json_output)
 
     if args.command == "check":
@@ -147,6 +151,8 @@ def main(argv: list[str] | None = None) -> None:
             toolchain=args.toolchain,
             save_local=args.save_local,
             dry_run=args.dry_run,
+            setup_numina=args.setup_numina,
+            project_name=args.project_name,
         )
         _finish(result, args.json_output, fail_code=EXIT_INTERACTIVE_REQUIRED)
 

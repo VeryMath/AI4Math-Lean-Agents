@@ -116,6 +116,7 @@ def ensure_ai4math_gitignore(cwd: str | Path) -> Path:
         ".env.local",
         "lean-workspace/",
         "lean-workspaces/",
+        "numina-runtime/",
         "logs/",
         "failures/",
     ]

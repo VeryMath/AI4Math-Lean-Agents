@@ -29,6 +29,8 @@ class ConfigureLeanTests(unittest.TestCase):
             self.assertEqual(result["agent"]["backend"], "none")
             self.assertFalse(result["agent"]["numina_required"])
             self.assertEqual(result["missing_config"], [])
+            self.assertIn("numina", result)
+            self.assertIn("readiness", result["numina"])
 
     def test_save_local_writes_lean_agent_config(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -61,6 +63,14 @@ class ConfigureLeanTests(unittest.TestCase):
             self.assertFalse(result["ok"])
             self.assertEqual(result["status"], "lean_workspace_setup_failed")
             self.assertIn("retry configure --create-workspace", result["recommended_next_action"])
+
+    def test_configure_setup_numina_requires_project_name(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            result = configure(Path(tmp), setup_numina=True, dry_run=True)
+
+        self.assertFalse(result["numina"]["ok"])
+        self.assertEqual(result["numina"]["status"], "missing_project_name")
+        self.assertIn("--project-name", result["numina"]["recommended_next_action"])
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # Numina Reverse Analysis for AI4Math
 
-This reference records what was distilled from the public Numina Lean Agent workflow. It is design provenance only. The AI4Math Lean Agents skill does not install, deploy, configure, import, or call Numina at runtime.
+This reference records what was distilled from the public Numina Lean Agent workflow and what remains delegated to the optional official runtime. For deployment/call instructions, use `numina_runtime.md`.
 
 ## Source Scope
 
@@ -20,9 +20,9 @@ The goal is not to copy Numina prompts or reimplement Numina proof search. The g
 6. When blocked, reduce the problem to the smallest useful failing Lean fragment.
 7. Prefer reusable Lean workspaces so setup cost is not paid on every standalone problem.
 
-## What Was Removed
+## What Is Optional Runtime State
 
-The direct AI4Math skill intentionally removes these runtime dependencies:
+The default AI4Math loop still works without these runtime dependencies:
 
 - upstream Numina repository checkout;
 - Numina Python environment;
@@ -31,7 +31,7 @@ The direct AI4Math skill intentionally removes these runtime dependencies:
 - API-key or login setup;
 - backend round streaming or benchmark execution.
 
-Those concerns made sense for the original system, but they are not part of this skill's delivery target.
+When the user wants original Numina behavior, those concerns are handled by the official upstream checkout under `.ai4math/numina-runtime/` and the human-in-the-loop flow in `numina_runtime.md`.
 
 ## Adapted Direct Workflow
 
@@ -69,10 +69,12 @@ flowchart TD
 
 ## Practical Rule
 
-If a future agent reads this file during normal Lean work, the action item is not "run Numina." The action item is:
+If a future agent reads this file during normal Lean work, the default action item is:
 
 1. use the direct skill CLI to verify local Lean readiness;
 2. edit Lean directly;
 3. run Lean/Lake checks frequently;
 4. review safety constraints;
 5. return a verified patch or minimal failure.
+
+If the user asks for original Numina behavior, switch to `numina_runtime.md`, explain setup/call implications, and validate all resulting Lean changes locally.

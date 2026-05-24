@@ -5,7 +5,8 @@
   "properties": {
     "lean": {"type": "object", "additionalProperties": true},
     "agent": {"type": "object", "additionalProperties": true},
-    "policy": {"type": "object", "additionalProperties": true}
+    "policy": {"type": "object", "additionalProperties": true},
+    "numina": {"type": "object", "additionalProperties": true}
   },
   "additionalProperties": false
 }

@@ -7,7 +7,7 @@ from typing import Any
 from common import run_command
 
 
-DEFAULT_TOOLS = ["git", "python3", "elan", "lean", "lake"]
+DEFAULT_TOOLS = ["git", "python3", "elan", "lean", "lake", "curl", "uv", "claude"]
 EXTRA_BIN_DIRS = [
     Path.home() / ".elan" / "bin",
     Path.home() / ".local" / "bin",
