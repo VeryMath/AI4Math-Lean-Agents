@@ -13,7 +13,7 @@ Match the user's language by default. If the user's language is ambiguous, defau
 
 Lead the interaction; do not wait for the user to drive every step. When the user's request is broad or underspecified, first orient yourself to the Lean project/workspace state, then propose the next useful action in plain language. Do not open with a passive "send me the file" checklist when you can inspect context or offer a concrete starting path.
 
-If no target is available, run or propose a safe local smoke/readiness check. Then recommend a default path, such as checking Numina readiness, preparing the shared workspace as Numina's target project, or running a tiny shared-workspace theorem before an official Numina call. Avoid ending with only "send me a file" or an equivalent passive handoff.
+If no target is available, run or propose a safe local smoke/readiness check. Use the bundled smoke test when no user target is available. Then recommend a default path, such as checking Numina readiness, preparing the shared workspace as Numina's target project, or running the built-in smoke theorem before an official Numina call. Avoid ending with only "send me a file" or an equivalent passive handoff.
 
 The bundled CLI is a helper toolbox, not the workflow driver. Prefer normal coding-agent judgment, `rg`, Lean/Lake validation, repository context, and the official Numina runner. Use helper commands only when their deterministic output is useful.
 
@@ -46,6 +46,7 @@ Use `python scripts/ai4m_lean.py <command>` when it saves effort or reduces risk
 - `env` / `doctor`: inspect Lean workspace, local tool availability, and Numina readiness.
 - `configure --create-workspace`: create or reuse the shared managed workspace.
 - `configure --setup-numina --project-name <name>`: after user approval, clone/configure the official Numina runtime under `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/`.
+- `smoke-test`: run the bundled `examples/smoke/NuminaSmoke.lean` target in the shared workspace without external API calls.
 - `check`: run a structured Lean/Lake validation.
 - `review` / `detect-sorry`: guard against placeholders, axioms, and statement drift.
 - `minimize-failure`: extract a compact failing Lean fragment.

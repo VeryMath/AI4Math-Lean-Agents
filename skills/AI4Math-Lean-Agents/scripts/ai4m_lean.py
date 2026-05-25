@@ -12,6 +12,7 @@ from detect_sorry import scan_file
 from direct_task import run_direct_task
 from extract_minimal_failure import extract
 from numina_runtime import numina_readiness
+from smoke_test import run_smoke_test
 from tool_status import doctor
 from validate_patch import review_files
 from verify_delivery import verify as verify_delivery
@@ -66,6 +67,11 @@ def build_parser() -> argparse.ArgumentParser:
     check.add_argument("--file", default=None)
     check.add_argument("--skip-build", action="store_true")
     check.add_argument("--timeout", type=int, default=300)
+
+    smoke = sub.add_parser("smoke-test", help="Run the bundled Lean smoke target in the shared workspace")
+    add_common(smoke)
+    smoke.add_argument("--timeout", type=int, default=120)
+    smoke.add_argument("--dry-run", action="store_true")
 
     configure_parser = sub.add_parser("configure", help="Inspect or create local Lean workspace configuration")
     add_common(configure_parser)
@@ -140,6 +146,10 @@ def main(argv: list[str] | None = None) -> None:
             result = check_project(args.cwd, skip_build=True, file=args.file, timeout=args.timeout) if args.skip_build else check_file(args.file, timeout=args.timeout)
         else:
             result = check_project(args.cwd, skip_build=args.skip_build, timeout=args.timeout)
+        _finish(result, args.json_output, fail_code=EXIT_LEAN_FAILED)
+
+    if args.command == "smoke-test":
+        result = run_smoke_test(args.cwd, config_path=args.config, timeout=args.timeout, dry_run=args.dry_run)
         _finish(result, args.json_output, fail_code=EXIT_LEAN_FAILED)
 
     if args.command == "configure":

@@ -68,6 +68,23 @@ class CliTests(unittest.TestCase):
             self.assertTrue(payload["ok"])
             self.assertEqual(payload["toolchain"], "leanprover/lean4:v4.26.0")
 
+    def test_smoke_test_dry_run_uses_bundled_target(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            result = subprocess.run(
+                [sys.executable, str(CLI), "smoke-test", "--cwd", str(root), "--dry-run"],
+                text=True,
+                capture_output=True,
+                check=False,
+                env={**os.environ, "AI4MATH_HOME": str(root / "shared-ai4math"), "AI4MATH_LEAN_WORKSPACE": ""},
+            )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["status"], "dry_run")
+        self.assertTrue(payload["smoke_file"].endswith("examples/smoke/NuminaSmoke.lean"))
+        self.assertFalse(payload["external_api_call"])
+
     def test_doctor_outputs_tool_report(self) -> None:
         result = subprocess.run(
             [sys.executable, str(CLI), "doctor", "--cwd", str(SKILL_ROOT)],

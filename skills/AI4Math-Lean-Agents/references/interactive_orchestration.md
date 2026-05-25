@@ -24,12 +24,13 @@ When checking Numina, distinguish runtime readiness from upstream demo readiness
 
 A language switch is not a task reset. Restate the current state in the user's language, keep the prior diagnosis, and continue with the recommended next action instead of returning to generic intake.
 
-If no target is available, run or propose a safe local smoke/readiness check. Good examples are `lake env lean` against the shared workspace, `lake build` for the user's current Lake project when it is already present, or a helper `doctor` check when environment status is the question. Avoid ending with only "send me a file" or an equivalent passive handoff.
+If no target is available, run or propose a safe local smoke/readiness check. Use the bundled smoke test when no user target is available. Good examples are `smoke-test` against `examples/smoke/NuminaSmoke.lean`, `lake build` for the user's current Lake project when it is already present, or a helper `doctor` check when environment status is the question. Avoid ending with only "send me a file" or an equivalent passive handoff.
 
 If no precise target is provided, offer a small menu and recommend one path. For example:
 
 - configure missing Numina credentials/auth;
 - run a Numina readiness check;
+- run the bundled smoke test to verify the local Lean/mathlib validation layer;
 - prepare the shared workspace as the Numina target project;
 - call Numina on a natural-language/LaTeX theorem or Lean file;
 - inspect a Lean/Lake project and summarize whether Numina can target it.

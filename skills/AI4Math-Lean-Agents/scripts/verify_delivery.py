@@ -12,6 +12,7 @@ from common import run_command
 from configure_lean import inspect_environment
 from direct_task import run_direct_task
 from extract_minimal_failure import extract
+from smoke_test import run_smoke_test
 from tool_status import doctor, find_tool
 from validate_patch import review_files
 
@@ -22,6 +23,7 @@ REQUIRED_FILES = [
     "agents/openai.yaml",
     "config/lean_agent.example.toml",
     "config/numina_runtime.example.toml",
+    "examples/smoke/NuminaSmoke.lean",
     "schemas/task.schema.json",
     "schemas/result.schema.json",
     "schemas/config.schema.json",
@@ -36,6 +38,7 @@ REQUIRED_FILES = [
     "scripts/configure_lean.py",
     "scripts/direct_task.py",
     "scripts/numina_runtime.py",
+    "scripts/smoke_test.py",
     "scripts/validate_patch.py",
     "scripts/extract_minimal_failure.py",
 ]
@@ -52,6 +55,7 @@ REQUIRED_COMMANDS = {
     "review",
     "detect-sorry",
     "minimize-failure",
+    "smoke-test",
     "verify-delivery",
 }
 
@@ -109,6 +113,7 @@ def _guidance_first_check() -> dict[str, Any]:
         "Default execution mode is Numina Agent mode.",
         "The coding agent orchestrates Numina deployment, configuration, invocation, and local Lean validation.",
         "Direct Lean editing is a validation and fallback path, not the default Lean Agent mode.",
+        "Use the bundled smoke test when no user target is available.",
         "Lead the interaction; do not wait for the user to drive every step.",
         "If the user's language is ambiguous, default to Chinese.",
         "A language switch is not a task reset.",
@@ -129,6 +134,7 @@ def _guidance_first_check() -> dict[str, Any]:
         "## Session Opening",
         "In this skill, Lean Agent means the official Numina Lean Agent runtime.",
         "Default execution mode is Numina Agent mode.",
+        "Use the bundled smoke test when no user target is available.",
         "Lead the interaction; do not wait for the user to drive every step.",
         "A language switch is not a task reset.",
         "If no target is available, run or propose a safe local smoke/readiness check.",
@@ -184,6 +190,7 @@ def verify(
         dry_run = run_direct_task("prove", dry_root, dry_target, dry_run=True)
     review = review_files(fixtures / "before.lean", fixtures / "after_bad.lean")
     failure = extract(fixtures / "failure.lean", target=None, run_lean=False)
+    smoke = run_smoke_test(cwd_path, dry_run=True)
 
     tool_report = doctor(cwd_path) if require_environment else None
     env_report = inspect_environment(cwd_path) if require_environment else None
@@ -214,6 +221,7 @@ def verify(
         "dry_run_prove": bool(dry_run.get("ok") and dry_run.get("status") == "dry_run"),
         "patch_guard": bool(not review.get("ok") and review.get("findings")),
         "minimal_failure": bool(failure.get("ok") and failure.get("minimal_failure", {}).get("snippet")),
+        "bundled_smoke_test": bool(smoke.get("ok") and smoke.get("status") == "dry_run" and Path(smoke.get("smoke_file", "")).exists()),
         "package_hygiene": bool(hygiene.get("ok")),
     }
     if require_environment:
@@ -257,6 +265,12 @@ def verify(
             "status": failure.get("status"),
             "start_line": failure.get("minimal_failure", {}).get("start_line"),
             "end_line": failure.get("minimal_failure", {}).get("end_line"),
+        },
+        "bundled_smoke_test": {
+            "ok": smoke.get("ok"),
+            "status": smoke.get("status"),
+            "smoke_file": smoke.get("smoke_file"),
+            "project_root": smoke.get("project_root"),
         },
         "hygiene": hygiene,
         "tool_environment": tool_report,
