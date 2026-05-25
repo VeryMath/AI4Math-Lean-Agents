@@ -109,6 +109,9 @@ def _guidance_first_check() -> dict[str, Any]:
         "A language switch is not a task reset.",
         "If no target is available, run or propose a safe local smoke/readiness check.",
         "Avoid ending with only \"send me a file\"",
+        "Opening readiness should inspect both direct Lean and optional Numina status before recommending work.",
+        "Do not say Numina is unnecessary before checking or explaining its readiness.",
+        "Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.",
         "offer a small next-step menu",
         "Ask at most one blocking question at a time.",
         "The bundled CLI is a helper toolbox, not the workflow driver.",
@@ -123,6 +126,9 @@ def _guidance_first_check() -> dict[str, Any]:
         "A language switch is not a task reset.",
         "If no target is available, run or propose a safe local smoke/readiness check.",
         "Avoid ending with only \"send me a file\"",
+        "Opening readiness should inspect both direct Lean and optional Numina status before recommending work.",
+        "Do not say Numina is unnecessary before checking or explaining its readiness.",
+        "Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.",
         "A good opening ends with one decision question, not a checklist.",
     ]
     orchestration_missing = [phrase for phrase in orchestration_required if phrase not in orchestration]

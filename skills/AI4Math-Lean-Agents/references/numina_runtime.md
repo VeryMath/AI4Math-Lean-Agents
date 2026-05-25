@@ -11,6 +11,8 @@ This skill can deploy and call the official `project-numina/numina-lean-agent` r
 5. For an official run, call the upstream runner from `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/upstream` using its documented interface, normally `uv run python -m scripts.run_claude from-folder <target> --prompt-file prompts/autosearch/main_entry.md --max-rounds <n> --result-dir <dir>`.
 6. After Numina changes Lean files, use local `check`, `detect-sorry`, and `review` before accepting the patch.
 
+Default to the shared Lean workspace for user tasks. Upstream Numina examples or benchmarks may pin their own `lean-toolchain`; that only describes the example project, not the readiness of `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`.
+
 ## Local State
 
 - Runtime root: `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/`

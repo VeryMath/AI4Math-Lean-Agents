@@ -13,6 +13,10 @@ Lead the interaction; do not wait for the user to drive every step. On a broad r
 - mention optional Numina readiness separately from direct Lean readiness;
 - say what can be done immediately and what would require confirmation.
 
+Opening readiness should inspect both direct Lean and optional Numina status before recommending work. Do not say Numina is unnecessary before checking or explaining its readiness. Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.
+
+When checking Numina, distinguish runtime readiness from upstream demo readiness. The runtime can be usable with the shared Lean workspace even if an upstream example or benchmark pins a different `lean-toolchain`. Report that as an example-project issue, not as a failure of the shared environment.
+
 A language switch is not a task reset. Restate the current state in the user's language, keep the prior diagnosis, and continue with the recommended next action instead of returning to generic intake.
 
 If no target is available, run or propose a safe local smoke/readiness check. Good examples are `lake env lean` against the shared workspace, `lake build` for the user's current Lake project when it is already present, or a helper `doctor` check when environment status is the question. Avoid ending with only "send me a file" or an equivalent passive handoff.

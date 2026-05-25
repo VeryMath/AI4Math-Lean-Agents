@@ -17,9 +17,11 @@ The bundled CLI is a helper toolbox, not the workflow driver. Prefer normal codi
 
 Use official Numina through a human-in-the-loop runtime workflow. Numina is optional and lives under shared local state at `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/`; the coding agent explains clone, setup, API-key, and upstream runner implications before running setup or calling the official runner. Do not turn helper commands into a closed proof workflow.
 
+Opening readiness should inspect both direct Lean and optional Numina status before recommending work. Do not say Numina is unnecessary before checking or explaining its readiness. Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.
+
 ## Agent Playbook
 
-1. Start by orienting the session: inspect the current repository/workspace when possible, distinguish existing Lake project, shared Lean workspace, and optional Numina runtime, and summarize what is already usable.
+1. Start by orienting the session: inspect the current repository/workspace when possible, distinguish existing Lake project, shared Lean workspace, and optional Numina runtime, and summarize what is already usable. Treat upstream Numina example projects as demos only; do not let their pinned `lean-toolchain` make the shared workspace look broken.
 2. If the user has not provided a precise target, offer a small next-step menu such as repair an existing Lean file, formalize a natural-language/LaTeX theorem, inspect a Lean project, or prepare the shared workspace. Recommend one default path based on what inspection found.
 3. Ask at most one blocking question at a time. Prefer a concrete recommendation plus one decision question over a list of required inputs.
 4. Understand the user's intent: repair a file, formalize a statement, prove a target, complete `sorry`, review a patch, batch a folder, or minimize a failure.
