@@ -105,30 +105,36 @@ def _guidance_first_check() -> dict[str, Any]:
     required_phrases = [
         "## Agent Playbook",
         "## Helper Toolbox",
+        "In this skill, Lean Agent means the official Numina Lean Agent runtime.",
+        "Default execution mode is Numina Agent mode.",
+        "The coding agent orchestrates Numina deployment, configuration, invocation, and local Lean validation.",
+        "Direct Lean editing is a validation and fallback path, not the default Lean Agent mode.",
         "Lead the interaction; do not wait for the user to drive every step.",
         "If the user's language is ambiguous, default to Chinese.",
         "A language switch is not a task reset.",
         "If no target is available, run or propose a safe local smoke/readiness check.",
         "Avoid ending with only \"send me a file\"",
-        "Opening readiness should inspect both direct Lean and optional Numina status before recommending work.",
-        "Do not say Numina is unnecessary before checking or explaining its readiness.",
+        "Opening readiness should inspect Numina readiness before recommending work.",
+        "Do not say API keys are unnecessary until the Numina mode is clear.",
         "Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.",
         "offer a small next-step menu",
         "Ask at most one blocking question at a time.",
         "The bundled CLI is a helper toolbox, not the workflow driver.",
         "Use official Numina through a human-in-the-loop runtime workflow.",
         "Do not turn helper commands into a closed proof workflow.",
-        "Do not let helper command availability override a better direct coding-agent path.",
+        "Do not redefine Lean Agent as the coding agent.",
     ]
     missing = [phrase for phrase in required_phrases if phrase not in text]
     orchestration_required = [
         "## Session Opening",
+        "In this skill, Lean Agent means the official Numina Lean Agent runtime.",
+        "Default execution mode is Numina Agent mode.",
         "Lead the interaction; do not wait for the user to drive every step.",
         "A language switch is not a task reset.",
         "If no target is available, run or propose a safe local smoke/readiness check.",
         "Avoid ending with only \"send me a file\"",
-        "Opening readiness should inspect both direct Lean and optional Numina status before recommending work.",
-        "Do not say Numina is unnecessary before checking or explaining its readiness.",
+        "Opening readiness should inspect Numina readiness before recommending work.",
+        "Do not say API keys are unnecessary until the Numina mode is clear.",
         "Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.",
         "A good opening ends with one decision question, not a checklist.",
     ]
@@ -137,6 +143,8 @@ def _guidance_first_check() -> dict[str, Any]:
     openai_required = [
         "请用中文开始",
         "如果用户明确使用其他语言",
+        "Lean Agent 默认指 Numina",
+        "先检查 Numina readiness",
     ]
     openai_missing = [phrase for phrase in openai_required if phrase not in openai_yaml]
     return {

@@ -1,17 +1,19 @@
 # Agent Instructions
 
-Use the canonical skill at `skills/AI4Math-Lean-Agents/SKILL.md` for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, optional official Numina runtime deployment/calls, and minimal failure handoff.
+Use the canonical skill at `skills/AI4Math-Lean-Agents/SKILL.md` for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, official Numina Lean Agent runtime deployment/calls, local Lean validation, and minimal failure handoff.
 
 Core rules:
 
-- The coding agent directly operates Lean; do not treat helper CLI commands as a proof backend.
-- Numina is optional: deploy or call the official runtime only through the human-in-the-loop flow in `references/numina_runtime.md`.
+- In this skill, Lean Agent means the official Numina Lean Agent runtime.
+- The coding agent orchestrates Numina deployment, configuration, invocation, and local Lean validation.
+- Direct Lean editing is a validation and fallback path, not the default Lean Agent mode.
 - Match the user's language by default.
 - If the user's language is ambiguous, default to Chinese.
 - Lead the interaction: inspect context, summarize what is ready, recommend the next useful step, and ask at most one blocking question.
 - Do not treat a language switch as a task reset; keep the current diagnosis and continue leading in the new language.
 - When no target is provided, run or propose a safe local smoke/readiness check before asking for more input.
-- Opening readiness should inspect both direct Lean and optional Numina status before recommending work.
+- Opening readiness should inspect Numina readiness before recommending work.
+- Do not say API keys are unnecessary until the Numina mode is clear.
 - Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.
 - Prefer the user's existing Lake project. Use the shared `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` only when a standalone file needs project context.
 - Preserve theorem statements unless the user explicitly approves a change.

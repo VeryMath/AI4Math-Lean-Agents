@@ -1,6 +1,6 @@
 # Lean Runtime Configuration
 
-This skill uses a direct coding-agent workflow by default. It can also prepare an optional official Numina runtime under ignored local state when the user approves that path; see `numina_runtime.md` for deployment and call details.
+This skill uses the official Numina Lean Agent runtime by default. Local Lean/Lake is the validation layer and fallback repair path. Numina runtime state lives under ignored shared local state; see `numina_runtime.md` for deployment and call details.
 
 ## Shared Layout
 
@@ -13,7 +13,7 @@ ${AI4MATH_HOME:-~/.ai4math}/
 └── failures/
 ```
 
-Repository-local machine settings still live under `<repo>/.ai4math/` and should not be committed. The reusable Lean workspace and optional Numina runtime are shared by default so standalone tasks do not create a fresh workspace in every project.
+Repository-local machine settings still live under `<repo>/.ai4math/` and should not be committed. The reusable Lean workspace and Numina runtime are shared by default so standalone tasks do not create a fresh workspace in every project.
 
 ## Tool Checks
 
@@ -24,7 +24,7 @@ python scripts/ai4m_lean.py doctor --cwd .
 python scripts/ai4m_lean.py env --cwd .
 ```
 
-Required local tools for the direct workflow are `git`, `python3`, `elan`, `lean`, and `lake`. Optional Numina setup additionally reports `curl`, `uv`, and `claude` readiness. Numina and model API keys are not required for the direct workflow.
+Required local validation tools are `git`, `python3`, `elan`, `lean`, and `lake`. Numina setup additionally reports `curl`, `uv`, and `claude` readiness. Official Numina calls need a working Claude CLI/auth path and may need additional API keys for search/tool skills.
 
 ## Reusable Lean Workspace
 
@@ -57,8 +57,8 @@ align_workspace_versions = true
 preferred_toolchain = "auto"
 
 [agent]
-mode = "direct-coding-agent"
-backend = "none"
+mode = "numina-agent"
+backend = "official-numina"
 ```
 
 Environment overrides:

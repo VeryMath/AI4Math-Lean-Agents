@@ -17,14 +17,14 @@ class CommonConfigTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "config.toml"
             path.write_text(
-                '[agent]\nmode = "direct-coding-agent"\nbackend = "none"\n'
+                '[agent]\nmode = "numina-agent"\nbackend = "official-numina"\n'
                 '[lean]\nreuse_managed_workspace = true\n',
                 encoding="utf-8",
             )
             with patch("common.tomllib", None):
                 data = load_toml(path)
 
-            self.assertEqual(data["agent"]["backend"], "none")
+            self.assertEqual(data["agent"]["backend"], "official-numina")
             self.assertTrue(data["lean"]["reuse_managed_workspace"])
 
     def test_expand_path_preserves_symlink_text(self) -> None:

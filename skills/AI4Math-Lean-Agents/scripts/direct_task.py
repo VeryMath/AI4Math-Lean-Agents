@@ -49,8 +49,10 @@ def build_direct_task(
         missing.append("target")
 
     next_actions = [
-        "Read the target Lean file and identify the exact declaration or error.",
-        "Run check or lake env lean after each small edit.",
+        "Inspect Numina readiness and confirm the target project/file.",
+        "Explain the official Numina run command, prompt, max rounds, result directory, and credential state before approval.",
+        "Run the official Numina Lean Agent after approval.",
+        "Run check or lake env lean on Numina output.",
         "Keep theorem statements unchanged unless the user explicitly approves a change.",
         "Stop when the file verifies without sorry/admit/axiom, or return minimize-failure output.",
     ]
@@ -61,9 +63,9 @@ def build_direct_task(
 
     return {
         "ok": not missing,
-        "status": "direct_task_ready" if not missing else "missing_config",
-        "agent_mode": "direct-coding-agent",
-        "backend": "none",
+        "status": "numina_task_ready" if not missing else "missing_config",
+        "agent_mode": "numina-agent",
+        "backend": "official-numina",
         "task_type": task_type,
         "target": str(target_path),
         "cwd": str(cwd_path),
@@ -79,8 +81,8 @@ def build_direct_task(
         "max_rounds": max_rounds,
         "missing_config": missing,
         "required_inputs": ["existing Lake project or shared reusable managed workspace"] if "lean_workspace" in missing else [],
-        "recommended_next_action": "run configure --create-workspace for the shared workspace or move target into a Lake project" if missing else "coding agent should edit/check directly",
-        "direct_workflow": next_actions,
+        "recommended_next_action": "run configure --create-workspace for the shared workspace or move target into a Lake project" if missing else "inspect Numina readiness, explain the official run, then call Numina after approval",
+        "numina_workflow": next_actions,
     }
 
 

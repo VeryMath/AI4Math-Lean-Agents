@@ -1,15 +1,15 @@
-# Direct Lean Coding-Agent Workflow
+# Local Lean Validation and Fallback Workflow
 
-This skill distills the useful workflow pattern from Numina without deploying or calling Numina. The active coding agent is the Lean proof worker; helper CLI commands are optional guardrails.
+Direct Lean editing is a validation and fallback path, not the default Lean Agent mode. The default Lean Agent is the official Numina runtime; the coding agent uses local Lean/Lake to prepare targets, validate Numina output, minimize failures, and continue locally only when the user declines or cannot use Numina.
 
 ## Guidance-First Loop
 
-1. Read the user's request and classify the mathematical task.
+1. Read the user's request and classify whether this is Numina setup, Numina call, output validation, or fallback local repair.
 2. Inspect the target files, imports, nearby lemmas, and current Lean errors.
 3. Choose the validation context: existing Lake project first, managed workspace only for standalone files.
 4. For formalization, draft the Lean declaration and ask for confirmation before long proof work.
 5. Make one small Lean edit at a time.
-6. Run direct Lean/Lake validation after meaningful edits, usually `lake env lean <file>`, `lake build`, or the helper `check` command.
+6. Run Lean/Lake validation after meaningful edits or Numina output, usually `lake env lean <file>`, `lake build`, or the helper `check` command.
 7. Diagnose the first concrete Lean error or unsolved goal before changing strategy.
 8. Add helper lemmas only when they reduce proof complexity and keep theorem statements unchanged.
 9. Review the final patch with direct inspection and, when useful, `review` or `detect-sorry`.
@@ -25,7 +25,7 @@ Use helpers for mechanical checks:
 - failure handoff: `minimize-failure`;
 - package QA: `verify-delivery`.
 
-Do not route creative proof search through helper commands. `prove`, `formalize`, `repair`, `complete-sorries`, and `batch` only produce optional task envelopes for bookkeeping; they are not proof engines and should not constrain how the coding agent edits Lean.
+Do not route creative proof search through helper commands. `prove`, `formalize`, `repair`, `complete-sorries`, and `batch` only produce optional task envelopes for bookkeeping; the official Numina runner is the default Lean Agent for proof search/formalization.
 
 ## Workspace Choice
 

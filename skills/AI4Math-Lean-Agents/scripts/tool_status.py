@@ -76,4 +76,4 @@ def _recommend(
         return "install git before using Lake projects with remote dependencies"
     if missing_lean:
         return "install Lean/elan before creating the reusable Lean workspace"
-    return "ready for direct Lean coding-agent workflow"
+    return "ready for Numina Agent orchestration and local Lean validation"

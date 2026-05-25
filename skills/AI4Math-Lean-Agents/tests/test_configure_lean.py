@@ -15,7 +15,7 @@ from configure_lean import configure, inspect_environment  # noqa: E402
 
 
 class ConfigureLeanTests(unittest.TestCase):
-    def test_existing_lean_project_is_direct_agent_ready(self) -> None:
+    def test_existing_lean_project_is_numina_agent_ready(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             target = root / "Main.lean"
@@ -28,9 +28,9 @@ class ConfigureLeanTests(unittest.TestCase):
                 result = inspect_environment(root, target=target)
 
             self.assertTrue(result["ok"])
-            self.assertEqual(result["agent"]["mode"], "direct-coding-agent")
-            self.assertEqual(result["agent"]["backend"], "none")
-            self.assertFalse(result["agent"]["numina_required"])
+            self.assertEqual(result["agent"]["mode"], "numina-agent")
+            self.assertEqual(result["agent"]["backend"], "official-numina")
+            self.assertTrue(result["agent"]["numina_required"])
             self.assertEqual(result["missing_config"], [])
             self.assertIn("numina", result)
             self.assertIn("readiness", result["numina"])
@@ -46,8 +46,8 @@ class ConfigureLeanTests(unittest.TestCase):
 
             self.assertFalse(result["ok"])
             self.assertEqual(result["status"], "missing_config")
-            self.assertEqual(local["agent"]["backend"], "none")
-            self.assertEqual(local["agent"]["mode"], "direct-coding-agent")
+            self.assertEqual(local["agent"]["backend"], "official-numina")
+            self.assertEqual(local["agent"]["mode"], "numina-agent")
             self.assertEqual(local["lean"]["preferred_toolchain"], "leanprover/lean4:v4.28.0")
             self.assertIn("lean_agent.local.toml", (root / ".ai4math" / ".gitignore").read_text())
 

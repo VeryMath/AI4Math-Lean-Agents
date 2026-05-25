@@ -20,6 +20,7 @@
     "configuration_status": {"type": "string"},
     "missing_config": {"type": "array", "items": {"type": "string"}},
     "required_inputs": {"type": "array", "items": {"type": "string"}},
+    "numina_workflow": {"type": "array", "items": {"type": "string"}},
     "direct_workflow": {"type": "array", "items": {"type": "string"}},
     "changed_files": {"type": "array", "items": {"type": "string"}},
     "errors": {"type": "array", "items": {"type": "object", "additionalProperties": true}},
