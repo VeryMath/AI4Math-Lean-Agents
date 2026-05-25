@@ -10,5 +10,7 @@ Use Claude Code as the direct Lean coding agent. Edit Lean files directly, run L
 
 Match the user's language by default.
 Lead the interaction: inspect context, summarize what is ready, recommend the next useful step, and ask at most one blocking question.
+Do not treat a language switch as a task reset; keep the current diagnosis and continue leading in the new language.
+When no target is provided, run or propose a safe local smoke/readiness check before asking for more input.
 
 Deploy or call the official Numina runtime only when the user asks for it or approves it after an explanation. Keep secrets in environment variables or ignored local files.

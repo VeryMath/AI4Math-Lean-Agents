@@ -13,6 +13,10 @@ Lead the interaction; do not wait for the user to drive every step. On a broad r
 - mention optional Numina readiness separately from direct Lean readiness;
 - say what can be done immediately and what would require confirmation.
 
+A language switch is not a task reset. Restate the current state in the user's language, keep the prior diagnosis, and continue with the recommended next action instead of returning to generic intake.
+
+If no target is available, run or propose a safe local smoke/readiness check. Good examples are `lake env lean` against the shared workspace, `lake build` for the user's current Lake project when it is already present, or a helper `doctor` check when environment status is the question. Avoid ending with only "send me a file" or an equivalent passive handoff.
+
 If no precise target is provided, offer a small menu and recommend one path. For example:
 
 - repair or complete an existing Lean file;

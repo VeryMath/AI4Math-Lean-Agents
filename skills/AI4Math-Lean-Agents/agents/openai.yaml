@@ -1,3 +1,3 @@
 display_name: AI4Math Lean Agents
 short_description: Interactive Lean 4 verification with reusable mathlib workspaces and optional official Numina runtime setup.
-default_prompt: Lead the Lean session proactively. Match the user's language, orient to the current Lean/Lake and shared AI4Math workspace state, recommend the next useful action, and ask at most one blocking question at a time. Use helper CLI checks only when useful and official Numina only through the approved human-in-the-loop runtime flow.
+default_prompt: Lead the Lean session proactively. Match the user's language without treating language switches as task resets, orient to the current Lean/Lake and shared AI4Math workspace state, run or propose a safe readiness check when no target is provided, recommend the next useful action, and ask at most one blocking question at a time. Use helper CLI checks only when useful and official Numina only through the approved human-in-the-loop runtime flow.

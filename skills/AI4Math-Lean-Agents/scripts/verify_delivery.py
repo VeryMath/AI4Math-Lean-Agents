@@ -106,6 +106,9 @@ def _guidance_first_check() -> dict[str, Any]:
         "## Agent Playbook",
         "## Helper Toolbox",
         "Lead the interaction; do not wait for the user to drive every step.",
+        "A language switch is not a task reset.",
+        "If no target is available, run or propose a safe local smoke/readiness check.",
+        "Avoid ending with only \"send me a file\"",
         "offer a small next-step menu",
         "Ask at most one blocking question at a time.",
         "The bundled CLI is a helper toolbox, not the workflow driver.",
@@ -117,6 +120,9 @@ def _guidance_first_check() -> dict[str, Any]:
     orchestration_required = [
         "## Session Opening",
         "Lead the interaction; do not wait for the user to drive every step.",
+        "A language switch is not a task reset.",
+        "If no target is available, run or propose a safe local smoke/readiness check.",
+        "Avoid ending with only \"send me a file\"",
         "A good opening ends with one decision question, not a checklist.",
     ]
     orchestration_missing = [phrase for phrase in orchestration_required if phrase not in orchestration]
