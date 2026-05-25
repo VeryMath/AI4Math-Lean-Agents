@@ -11,7 +11,7 @@ skills/AI4Math-Lean-Agents/SKILL.md
 Rules:
 
 - Directly inspect and edit Lean files.
-- Match the user's language by default.
+- Match the user's language by default. If the user's language is ambiguous, default to Chinese.
 - Lead the interaction: inspect context, summarize what is ready, recommend the next useful step, and ask at most one blocking question.
 - Do not treat a language switch as a task reset; keep the current diagnosis and continue leading in the new language.
 - When no target is provided, run or propose a safe local smoke/readiness check before asking for more input.

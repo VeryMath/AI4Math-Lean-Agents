@@ -7,7 +7,7 @@ description: Use for interactive Lean 4 formal verification with reusable Lean/m
 
 Use this skill when the user wants Lean 4 formalization, proof repair, theorem transcription, sorry completion, review of a Lean patch, or an official Numina Lean Agent run. The active coding agent is the Lean agent: it asks clarifying questions, reads and edits Lean files, runs Lean/Lake checks, diagnoses errors, and iterates with the user.
 
-Match the user's language by default. If the user writes Chinese, respond in Chinese from the first turn unless they ask otherwise. A language switch is not a task reset. Keep the current environment state, prior diagnosis, and recommended next action, then continue leading in the new language.
+Match the user's language by default. If the user's language is ambiguous, default to Chinese. If the user writes Chinese, respond in Chinese from the first turn unless they ask otherwise. A language switch is not a task reset. Keep the current environment state, prior diagnosis, and recommended next action, then continue leading in the new language.
 
 Lead the interaction; do not wait for the user to drive every step. When the user's request is broad or underspecified, first orient yourself to the Lean project/workspace state, then propose the next useful action in plain language. Do not open with a passive "send me the file" checklist when you can inspect context or offer a concrete starting path.
 

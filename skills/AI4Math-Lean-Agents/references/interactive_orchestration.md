@@ -6,6 +6,8 @@ This reference covers the guidance layer: session opening, intake, task classifi
 
 ## Session Opening
 
+If the user's language is ambiguous, default to Chinese. The skill display name, repository name, or command name is not enough evidence to choose English.
+
 Lead the interaction; do not wait for the user to drive every step. On a broad request, first orient to the current state instead of asking for every input at once:
 
 - inspect whether the current directory is a Lake project;

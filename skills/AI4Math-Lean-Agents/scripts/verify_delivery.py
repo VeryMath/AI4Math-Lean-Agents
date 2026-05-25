@@ -106,6 +106,7 @@ def _guidance_first_check() -> dict[str, Any]:
         "## Agent Playbook",
         "## Helper Toolbox",
         "Lead the interaction; do not wait for the user to drive every step.",
+        "If the user's language is ambiguous, default to Chinese.",
         "A language switch is not a task reset.",
         "If no target is available, run or propose a safe local smoke/readiness check.",
         "Avoid ending with only \"send me a file\"",
@@ -132,10 +133,17 @@ def _guidance_first_check() -> dict[str, Any]:
         "A good opening ends with one decision question, not a checklist.",
     ]
     orchestration_missing = [phrase for phrase in orchestration_required if phrase not in orchestration]
+    openai_yaml = (SKILL_ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8", errors="replace")
+    openai_required = [
+        "请用中文开始",
+        "如果用户明确使用其他语言",
+    ]
+    openai_missing = [phrase for phrase in openai_required if phrase not in openai_yaml]
     return {
-        "ok": not missing and not orchestration_missing and "## Commands" not in text,
+        "ok": not missing and not orchestration_missing and not openai_missing and "## Commands" not in text,
         "missing_phrases": missing,
         "orchestration_missing_phrases": orchestration_missing,
+        "openai_yaml_missing_phrases": openai_missing,
         "commands_section_present": "## Commands" in text,
     }
 
