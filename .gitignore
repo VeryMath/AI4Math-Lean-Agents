@@ -1,1 +1,6 @@
 /.lake
+.env
+.env.*
+!.env.example
+.cursor/cache/
+dist/

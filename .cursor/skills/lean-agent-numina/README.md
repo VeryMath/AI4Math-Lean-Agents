@@ -54,46 +54,26 @@ python --version
 uv --version
 ```
 
-## 3. LiteLLM 配置（DeepSeek 上游）
+## 3. DeepSeek 直连配置（推荐，最稳定）
 
-确保 `~/litellm_config.yaml` 内容如下：
-
-```yaml
-model_list:
-  - model_name: anthropic-claude
-    litellm_params:
-      model: deepseek/deepseek-chat
-      api_key: os.environ/DEEPSEEK_API_KEY
-```
+使用 DeepSeek 的 Anthropic 兼容接口，避免 LiteLLM 映射带来的模型别名问题。
 
 设置 key（不要写进仓库文件）：
 
 ```bash
-export DEEPSEEK_API_KEY='sk-你的key'
+export DEEPSEEK_API_KEY='你的DeepSeek_API_KEY'
 ```
 
-## 4. 标准运行步骤（推荐双终端）
-
-### 终端 A：启动 LiteLLM（常驻）
-
-```bash
-cd ~/numina-lean-agent
-source .venv/bin/activate
-export DEEPSEEK_API_KEY='sk-你的key'
-~/numina-lean-agent/.venv/bin/litellm --config ~/litellm_config.yaml --port 4000
-```
-
-看到 `Uvicorn running on http://0.0.0.0:4000` 后，保持该终端不关闭。
-
-### 终端 B：运行 Numina
+## 4. 标准运行步骤（单终端即可）
 
 ```bash
 cd ~/numina-lean-agent
 source .venv/bin/activate
 export PYTHONPATH="$PWD"
-export ANTHROPIC_BASE_URL="http://localhost:4000"
-export ANTHROPIC_AUTH_TOKEN="dummy"
-export ANTHROPIC_MODEL="anthropic-claude"
+export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
+export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
+export ANTHROPIC_MODEL="deepseek-v4-flash"
 ```
 
 先做基础可用性检查：
@@ -109,7 +89,7 @@ python -m scripts.run_claude --help
 ```bash
 python -m scripts.run_claude run \
   /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises/Week01.lean \
-  --prompt-file prompts/prompt_complete_file.txt \
+  --prompt-file "$HOME/numina-lean-agent/prompts/prompt_complete_file.txt" \
   --max-rounds 3 \
   --cwd /mnt/d/Lean/projects/stat-inference-lean
 ```
@@ -119,7 +99,7 @@ python -m scripts.run_claude run \
 ```bash
 python -m scripts.run_claude from-folder \
   /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises \
-  --prompt-file prompts/prompt_complete_file.txt \
+  --prompt-file "$HOME/numina-lean-agent/prompts/prompt_complete_file.txt" \
   --max-rounds 3 \
   --cwd /mnt/d/Lean/projects/stat-inference-lean
 ```
@@ -151,9 +131,9 @@ opencode
 至少同时满足以下 4 条：
 
 - `run_claude --help` 成功（命令入口可用）。
-- LiteLLM 正在监听 `:4000`。
+- `DEEPSEEK_API_KEY` 已导出，且不为空。
 - 子 Agent 输出出现 `run_claude run` 实际执行结果（不只是环境检查）。
-- 无 `AuthenticationError`、无 `模型不存在`、无 `Connection refused`。
+- 无 `401`、无 `模型不存在`、无网络连接错误。
 
 ## 8. 常见问题与修复
 
@@ -162,16 +142,12 @@ opencode
   - 修复：直接 `cd /mnt/d/Lean/projects/stat-inference-lean`。
 
 - 现象：`模型不存在 (code 1211)`
-  - 原因：`ANTHROPIC_MODEL=anthropic-claude` 未映射到真实上游模型。
-  - 修复：检查 `~/litellm_config.yaml` 中 `model_name: anthropic-claude` 的映射。
+  - 原因：模型名写错或账号无该模型权限。
+  - 修复：确认 `ANTHROPIC_MODEL=deepseek-v4-flash`（或改为 `deepseek-v4-pro`）。
 
 - 现象：`401 Unauthorized`
-  - 原因：上游 key 无效、过期或未导出到当前 shell。
-  - 修复：重新 `export DEEPSEEK_API_KEY='sk-...'`，重启 LiteLLM。
-
-- 现象：`Connection refused`（localhost:4000）
-  - 原因：LiteLLM 没启动或被中断。
-  - 修复：在终端 A 重启 LiteLLM 并保持常驻。
+  - 原因：`DEEPSEEK_API_KEY` 无效、过期或未导出到当前 shell。
+  - 修复：重新 `export DEEPSEEK_API_KEY='...'`，然后重试。
 
 ## 9. 安全建议
 
@@ -182,6 +158,6 @@ opencode
 ## 10. 推荐最小验证命令（复制即用）
 
 ```bash
-cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH="$PWD" && export ANTHROPIC_BASE_URL="http://localhost:4000" && export ANTHROPIC_AUTH_TOKEN="dummy" && export ANTHROPIC_MODEL="anthropic-claude" && python -m scripts.run_claude run /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises/Week01.lean --prompt-file prompts/prompt_complete_file.txt --max-rounds 1 --cwd /mnt/d/Lean/projects/stat-inference-lean
+cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH="$PWD" && export DEEPSEEK_API_KEY='你的DeepSeek_API_KEY' && export ANTHROPIC_BASE_URL='https://api.deepseek.com/anthropic' && export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY" && export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY" && export ANTHROPIC_MODEL='deepseek-v4-flash' && python -m scripts.run_claude run /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises/Week01.lean --prompt-file "$HOME/numina-lean-agent/prompts/prompt_complete_file.txt" --max-rounds 1 --cwd /mnt/d/Lean/projects/stat-inference-lean
 ```
 
