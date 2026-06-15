@@ -1,6 +1,6 @@
 # Agent Instructions
 
-Use the canonical skill at `skills/AI4Math-Lean-Agents/SKILL.md` for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, official Numina Lean Agent runtime deployment/calls, local Lean validation, and minimal failure handoff.
+Use the canonical shared Skill layer at `skills/AI4Math-Lean-Agents/SKILL.md` for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, official Numina Lean Agent runtime deployment/calls, local Lean validation, and minimal failure handoff.
 
 Core rules:
 

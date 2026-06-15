@@ -8,6 +8,40 @@ The canonical skill package lives at:
 skills/AI4Math-Lean-Agents/
 ```
 
+## Installation / Loading
+
+Use the repository checkout first. Ask your coding agent to read:
+
+```text
+AGENTS.md
+SKILL.md
+skills/AI4Math-Lean-Agents/SKILL.md
+```
+
+If your agent supports local Skill discovery, install or link
+`skills/AI4Math-Lean-Agents/` into that agent's Skill path and reload the agent
+if needed. Platform notes live in `CLAUDE.md`, `GEMINI.md`,
+`.codex/INSTALL.md`, and `.opencode/INSTALL.md`.
+
+## Quick Start
+
+```text
+Use this repository's Lean workflow.
+
+Read:
+- AGENTS.md
+- SKILL.md
+- skills/AI4Math-Lean-Agents/SKILL.md
+
+Goal:
+<describe the Lean formalization, repair, transcription, or validation task>
+
+Constraints:
+- inspect the Lean project first;
+- preserve theorem statements unless approved;
+- ask before Numina setup, source edits, or final proof claims.
+```
+
 ## What It Supports
 
 - Lean project/workspace inspection.
@@ -66,6 +100,20 @@ rsync -a --delete skills/AI4Math-Lean-Agents/ ~/.codex/skills/ai4math-lean-agent
 ```
 
 Then ask the coding agent for Lean formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, or minimal failure extraction.
+
+## How To Interact
+
+Use a checkpoint loop:
+
+```text
+Lean task -> project inspection -> plan -> approve / revise / reject / skip
+          -> approved edit or validation -> evidence summary -> next checkpoint
+```
+
+Use `approve` to run a proposed step, `revise` to update the plan, `reject` to
+stop the path, and `skip` to move past a phase. The agent should ask before
+theorem statement changes, optional Numina setup, source edits, or final proof
+claims.
 
 ## Helper Commands
 

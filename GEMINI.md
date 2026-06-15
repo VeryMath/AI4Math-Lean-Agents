@@ -1,6 +1,6 @@
 # Gemini Instructions
 
-For Lean 4 formal verification tasks, use the skill instructions at:
+For Lean 4 formal verification tasks, use the shared Skill layer at:
 
 ```text
 skills/AI4Math-Lean-Agents/SKILL.md

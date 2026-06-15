@@ -65,7 +65,7 @@ class NuminaRuntimeCredentialTests(unittest.TestCase):
             env_path.parent.mkdir(parents=True)
             env_path.write_text(
                 "export ANTHROPIC_AUTH_TOKEN=secret-token\n"
-                "OPENAI_API_KEY=sk-test\n",
+                "OPENAI_API_KEY=placeholder-openai-token\n",
                 encoding="utf-8",
             )
 
@@ -73,12 +73,12 @@ class NuminaRuntimeCredentialTests(unittest.TestCase):
                 values = read_numina_env_local(root)
 
         self.assertEqual(values["ANTHROPIC_AUTH_TOKEN"], "secret-token")
-        self.assertEqual(values["OPENAI_API_KEY"], "sk-test")
+        self.assertEqual(values["OPENAI_API_KEY"], "placeholder-openai-token")
 
     def test_credential_report_redacts_values(self) -> None:
         report = credential_report({
             "ANTHROPIC_AUTH_TOKEN": "secret-token",
-            "OPENAI_API_KEY": "sk-test",
+            "OPENAI_API_KEY": "placeholder-openai-token",
         })
 
         self.assertTrue(report["claude"]["configured"])

@@ -1,6 +1,6 @@
 # Claude Code Instructions
 
-For Lean work in this repository, read and follow:
+For Lean work in this repository, read and follow the shared Skill layer:
 
 ```text
 skills/AI4Math-Lean-Agents/SKILL.md
