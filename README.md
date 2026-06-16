@@ -23,6 +23,13 @@ If your agent supports local Skill discovery, install or link
 if needed. Platform notes live in `CLAUDE.md`, `GEMINI.md`,
 `.codex/INSTALL.md`, and `.opencode/INSTALL.md`.
 
+Codex-style local install example:
+
+```bash
+mkdir -p ~/.codex/skills
+rsync -a --delete skills/AI4Math-Lean-Agents/ ~/.codex/skills/ai4math-lean-agents/
+```
+
 ## Quick Start
 
 ```text
@@ -76,30 +83,6 @@ Numina is optional. The public CLI does not expose a parallel `numina-*` workflo
         ├── scripts/
         └── tests/
 ```
-
-## Use With Coding Agents
-
-Point your coding agent at the canonical workflow:
-
-```text
-skills/AI4Math-Lean-Agents/SKILL.md
-```
-
-The repository also includes lightweight adapters for several agent environments:
-
-- `AGENTS.md` for general repository-aware coding agents.
-- `.cursor/rules/ai4math-lean-agents.mdc` for Cursor.
-- `.opencode/agents/ai4math-lean-agents.md` for OpenCode.
-- `CLAUDE.md` and `GEMINI.md` for agent-specific repository instructions.
-
-For Codex-style skill installation, sync the skill folder into the user skill directory. The repository does not include a repo-local Codex shim, so a workspace that also has the system skill installed will not show two `ai4math-lean-agents` entries.
-
-```bash
-mkdir -p ~/.codex/skills
-rsync -a --delete skills/AI4Math-Lean-Agents/ ~/.codex/skills/ai4math-lean-agents/
-```
-
-Then ask the coding agent for Lean formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, or minimal failure extraction.
 
 ## How To Interact
 
