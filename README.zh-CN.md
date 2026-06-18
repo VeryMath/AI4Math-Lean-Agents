@@ -2,9 +2,25 @@
 
 [English](README.md) | 简体中文
 
+本中文 README 聚焦安装、交互和 AI4Math 角色；完整 helper 和 validation 细节见英文 README。
+
 AI4Math Lean Agents 是一个面向 Lean 4 形式化验证的 guidance-first Skill
-package。coding agent 直接读取、编辑和检查 Lean 代码；附带 CLI 只是用于环境检查、
-Lean validation、可选 Numina runtime 设置、patch review 和最小失败交接的确定性辅助工具。
+package。默认 Lean Agent 路径是编排官方 Numina Lean Agent runtime；当 Numina 不可用、
+用户拒绝或结果不足时，本地 Lean 编辑才是 validation 和 fallback 路径。附带 CLI 只是用于
+环境检查、Lean validation、Numina readiness/setup、patch review 和最小失败交接的确定性辅助工具。
+
+## AI4Math 角色
+
+这个 Skill 是 AI4Math 体系里的 Lean 4 形式化和 proof repair 层。当 theorem statement、
+proof obligation 或生成的 proof candidate 需要机器检查的 Lean 证据，而不是只做非形式化
+proof review 时，使用它。
+
+## 交接
+
+上游可能来自 `agentic-rethlas-proving`、`discover-math-problems`、`paper-to-skill`，
+或用户自己的 Lean project。交接时应包含 intended theorem statement、allowed assumptions、
+imports、当前 Lean errors/goals 和 proof blueprint。完成后返回 validated Lean patch、
+minimized failure 或 blocked proof obligations；除非用户批准，不改变 theorem statement。
 
 ## 安装 / 加载
 

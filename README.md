@@ -1,12 +1,32 @@
 # AI4Math Lean Agents
 
-AI4Math Lean Agents is a guidance-first skill package for Lean 4 formal verification with coding agents. The active coding agent directly reads, edits, and checks Lean code; the bundled CLI is only a deterministic helper toolbox for environment checks, Lean validation, optional official Numina runtime setup, patch review, and minimal failure handoff.
+AI4Math Lean Agents is a guidance-first skill package for Lean 4 formal
+verification with coding agents. The default Lean Agent path orchestrates the
+official Numina Lean Agent runtime; local Lean editing is the validation and
+fallback path when Numina is unavailable, declined, or insufficient. The bundled
+CLI is only a deterministic helper toolbox for environment checks, Lean
+validation, Numina readiness/setup, patch review, and minimal failure handoff.
 
 The canonical skill package lives at:
 
 ```text
 skills/AI4Math-Lean-Agents/
 ```
+
+## AI4Math Role
+
+This skill is the Lean 4 formalization and proof-repair layer in the AI4Math
+stack. Use it when a theorem statement, proof obligation, or generated proof
+candidate needs machine-checked Lean evidence rather than informal proof review.
+
+## Handoff
+
+Upstream inputs may come from `agentic-rethlas-proving`,
+`discover-math-problems`, `paper-to-skill`, or a user Lean project. Handoff
+artifacts should include the intended theorem statement, allowed assumptions,
+imports, current Lean errors or goals, and any proof blueprint. Return validated
+Lean patches, minimized failures, or blocked proof obligations without changing
+the theorem statement unless the user approves.
 
 ## Installation / Loading
 
