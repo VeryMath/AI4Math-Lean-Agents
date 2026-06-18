@@ -1,5 +1,7 @@
 # AI4Math Lean Agents
 
+Chinese guide: [README.zh-CN.md](README.zh-CN.md)
+
 AI4Math Lean Agents is a guidance-first skill package for Lean 4 formal
 verification with coding agents. The default Lean Agent path orchestrates the
 official Numina Lean Agent runtime; local Lean editing is the validation and
