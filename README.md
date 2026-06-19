@@ -27,26 +27,17 @@ want the agent to formalize or validate.
 
 ## Installation / Loading
 
-Clone or open this skill repository in your coding-agent environment. Then ask
-your coding agent to read:
+### One-line Agent Install
+
+Copy this to your coding agent:
 
 ```text
-AGENTS.md
-SKILL.md
-skills/lean-formalization/SKILL.md
+Please install the `lean-formalization` skill from https://github.com/VeryMath/AI4Math-Lean-Agents.git (branch: feature/numina-runtime-delivery). Read `.agent.md`, install the declared Skill entrypoint, verify that `$lean-formalization` is discoverable, and tell me whether I need to restart the agent.
 ```
 
-If your agent supports local Skill discovery, install or link
-`skills/lean-formalization/` into that agent's Skill path and reload the agent
-if needed. Platform notes live in `CLAUDE.md`, `GEMINI.md`,
-`.codex/INSTALL.md`, and `.opencode/INSTALL.md`.
-
-Codex-style local install example:
-
-```bash
-mkdir -p ~/.codex/skills
-rsync -a --delete skills/lean-formalization/ ~/.codex/skills/lean-formalization/
-```
+If you already have this skill repository locally, replace the repository URL
+with the local folder path. The coding agent should handle cloning, linking,
+configuration, reload/restart checks, and verification.
 
 ## Quick Start
 
