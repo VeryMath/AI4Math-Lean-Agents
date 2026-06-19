@@ -2,32 +2,22 @@
 
 Chinese guide: [README.zh-CN.md](README.zh-CN.md)
 
-Lean Formalization is a guidance-first skill package for Lean 4 formal
-verification with coding agents. The default Lean Agent path orchestrates the
-official Numina Lean Agent runtime; local Lean editing is the validation and
-fallback path when Numina is unavailable, declined, or insufficient. The bundled
-CLI is only a deterministic helper toolbox for environment checks, Lean
-validation, Numina readiness/setup, patch review, and minimal failure extraction.
+`lean-formalization` helps a coding agent work with Lean 4 formalization, proof repair, and validation tasks.
 
-The canonical skill package lives at:
+## When To Use It
 
-```text
-skills/lean-formalization/
-```
+Use this skill when you have:
 
-## What This Skill Does
+- a Lean project or Lean file that needs inspection;
+- a theorem statement to transcribe or formalize;
+- a proof with `sorry`, `admit`, errors, or statement drift risk;
+- a need for optional Numina setup mediated by the coding agent.
 
-This standalone skill helps a coding agent work with Lean 4 formalization tasks:
-inspect a Lean project, transcribe theorem statements, repair proofs, complete
-`sorry`s when appropriate, review patches for unsafe proof shortcuts, and record
-machine-checking evidence or a minimized failure.
+## What It Produces
 
-Use it directly with a Lean project, a Lean file, or a theorem statement that you
-want the agent to formalize or validate.
+The agent should produce Lean patches, validation summaries, blocked-goal explanations, minimized failures, and optional Numina setup evidence.
 
-## Installation / Loading
-
-### One-line Agent Install
+## Installation
 
 Copy this to your coding agent:
 

@@ -2,22 +2,22 @@
 
 [English](README.md) | 简体中文
 
-Lean Formalization 是一个面向 Lean 4 形式化验证的 guidance-first Skill
-package。默认 Lean Agent 路径是编排官方 Numina Lean Agent runtime；当 Numina 不可用、
-用户拒绝或结果不足时，本地 Lean 编辑才是 validation 和 fallback 路径。附带 CLI 只是用于
-环境检查、Lean validation、Numina readiness/setup、patch review 和最小失败抽取的确定性辅助工具。
+`lean-formalization` 帮助 coding agent 处理 Lean 4 形式化、proof repair 和 validation 任务。
 
-## 这个 Skill 做什么
+## 适合什么任务
 
-这个独立 Skill 帮助 coding agent 处理 Lean 4 形式化任务：检查 Lean project，转写 theorem statement，
-修复 proof，必要时完成 `sorry`，检查 patch 中不安全的 proof shortcut，并记录 machine-checking evidence
-或最小失败片段。
+当你有这些输入或需求时使用：
 
-当你有 Lean project、Lean 文件，或希望 agent 形式化/验证的 theorem statement 时，可以直接使用它。
+- 需要检查的 Lean project 或 Lean 文件；
+- 需要转写或形式化的 theorem statement；
+- 带有 `sorry`、`admit`、errors 或 statement drift 风险的 proof；
+- 需要由 coding agent 协调的可选 Numina 设置。
 
-## 安装 / 加载
+## 会产出什么
 
-### 一句话安装
+Agent 应产出 Lean patches、validation summaries、blocked-goal explanations、minimized failures 和可选 Numina setup evidence。
+
+## 安装
 
 把下面这句话发给你的 coding agent：
 
