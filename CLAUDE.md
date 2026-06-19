@@ -3,7 +3,7 @@
 For Lean work in this repository, read and follow the shared Skill layer:
 
 ```text
-skills/AI4Math-Lean-Agents/SKILL.md
+skills/lean-formalization/SKILL.md
 ```
 
 Use Claude Code as the Numina orchestrator and local Lean validator. In this skill, Lean Agent means the official Numina Lean Agent runtime. Direct Lean editing is a validation and fallback path, not the default Lean Agent mode.

@@ -283,7 +283,7 @@ def verify(
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Verify AI4Math Lean Agents delivery readiness")
+    parser = argparse.ArgumentParser(description="Verify Lean Formalization delivery readiness")
     parser.add_argument("--cwd", default=".")
     parser.add_argument("--require-environment", action="store_true")
     parser.add_argument("--include-workspace-build", action="store_true")

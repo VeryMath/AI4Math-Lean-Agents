@@ -1,9 +1,9 @@
 ---
-name: ai4math-lean-agents
+name: lean-formalization
 description: Use for interactive Lean 4 formal verification through the official Numina Lean Agent runtime, reusable Lean/mathlib workspaces, Numina deployment/calls, theorem formalization, proof repair, sorry completion, patch review, and minimal failure handoff.
 ---
 
-# AI4Math Lean Agents
+# Lean Formalization
 
 Use this skill when the user wants Lean 4 formalization, proof repair, theorem transcription, sorry completion, review of a Lean patch, or a Lean Agent run.
 

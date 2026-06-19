@@ -3,7 +3,7 @@
 For Lean 4 formal verification tasks, use the shared Skill layer at:
 
 ```text
-skills/AI4Math-Lean-Agents/SKILL.md
+skills/lean-formalization/SKILL.md
 ```
 
 In this skill, Lean Agent means the official Numina Lean Agent runtime. The coding agent orchestrates Numina deployment, configuration, invocation, and local Lean validation. Direct Lean editing is a validation and fallback path, not the default Lean Agent mode.
@@ -17,4 +17,4 @@ Opening readiness should inspect Numina readiness before recommending work.
 Do not say API keys are unnecessary until the Numina mode is clear.
 Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.
 
-The helper CLI under `skills/AI4Math-Lean-Agents/scripts/` is optional tooling. It can report and configure the official Numina runtime, but the agent should still validate final Lean patches locally.
+The helper CLI under `skills/lean-formalization/scripts/` is optional tooling. It can report and configure the official Numina runtime, but the agent should still validate final Lean patches locally.

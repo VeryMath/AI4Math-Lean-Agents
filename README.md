@@ -1,8 +1,8 @@
-# AI4Math Lean Agents
+# Lean Formalization
 
 Chinese guide: [README.zh-CN.md](README.zh-CN.md)
 
-AI4Math Lean Agents is a guidance-first skill package for Lean 4 formal
+Lean Formalization is a guidance-first skill package for Lean 4 formal
 verification with coding agents. The default Lean Agent path orchestrates the
 official Numina Lean Agent runtime; local Lean editing is the validation and
 fallback path when Numina is unavailable, declined, or insufficient. The bundled
@@ -12,7 +12,7 @@ validation, Numina readiness/setup, patch review, and minimal failure handoff.
 The canonical skill package lives at:
 
 ```text
-skills/AI4Math-Lean-Agents/
+skills/lean-formalization/
 ```
 
 ## AI4Math Role
@@ -23,7 +23,7 @@ candidate needs machine-checked Lean evidence rather than informal proof review.
 
 ## Handoff
 
-Upstream inputs may come from `agentic-rethlas-proving`,
+Upstream inputs may come from `rethlas-proving`,
 `discover-math-problems`, `paper-to-skill`, or a user Lean project. Handoff
 artifacts should include the intended theorem statement, allowed assumptions,
 imports, current Lean errors or goals, and any proof blueprint. Return validated
@@ -37,11 +37,11 @@ Use the repository checkout first. Ask your coding agent to read:
 ```text
 AGENTS.md
 SKILL.md
-skills/AI4Math-Lean-Agents/SKILL.md
+skills/lean-formalization/SKILL.md
 ```
 
 If your agent supports local Skill discovery, install or link
-`skills/AI4Math-Lean-Agents/` into that agent's Skill path and reload the agent
+`skills/lean-formalization/` into that agent's Skill path and reload the agent
 if needed. Platform notes live in `CLAUDE.md`, `GEMINI.md`,
 `.codex/INSTALL.md`, and `.opencode/INSTALL.md`.
 
@@ -49,7 +49,7 @@ Codex-style local install example:
 
 ```bash
 mkdir -p ~/.codex/skills
-rsync -a --delete skills/AI4Math-Lean-Agents/ ~/.codex/skills/ai4math-lean-agents/
+rsync -a --delete skills/lean-formalization/ ~/.codex/skills/lean-formalization/
 ```
 
 ## Quick Start
@@ -60,7 +60,7 @@ Use this repository's Lean workflow.
 Read:
 - AGENTS.md
 - SKILL.md
-- skills/AI4Math-Lean-Agents/SKILL.md
+- skills/lean-formalization/SKILL.md
 
 Goal:
 <describe the Lean formalization, repair, transcription, or validation task>
@@ -95,7 +95,7 @@ Numina is optional. The public CLI does not expose a parallel `numina-*` workflo
 ├── .cursor/             # optional Cursor rule
 ├── .opencode/           # optional OpenCode agent
 └── skills/
-    └── AI4Math-Lean-Agents/
+    └── lean-formalization/
         ├── SKILL.md
         ├── agents/
         ├── config/
@@ -125,26 +125,26 @@ claims.
 Run commands from the repository root:
 
 ```bash
-python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py env --cwd .
-python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py doctor --cwd .
-python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py configure --cwd . --create-workspace
-python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs --dry-run
-python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py check --cwd . --skip-build
-python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
+python skills/lean-formalization/scripts/ai4m_lean.py env --cwd .
+python skills/lean-formalization/scripts/ai4m_lean.py doctor --cwd .
+python skills/lean-formalization/scripts/ai4m_lean.py configure --cwd . --create-workspace
+python skills/lean-formalization/scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs --dry-run
+python skills/lean-formalization/scripts/ai4m_lean.py check --cwd . --skip-build
+python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
 ```
 
 The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, choosing proof strategy, and matching the user's language.
 
-For the optional Numina path, read `skills/AI4Math-Lean-Agents/references/numina_runtime.md`. Setup and official runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
+For the optional Numina path, read `skills/lean-formalization/references/numina_runtime.md`. Setup and official runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
 
 ## Validate
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
+PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
 ```
 
 For a full local Lean workspace check:
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python skills/AI4Math-Lean-Agents/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
+PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
 ```

@@ -1,15 +1,15 @@
 ---
-name: ai4math-lean-agents
+name: lean-formalization
 description: Use when a coding agent needs Lean 4 formalization, proof repair, theorem transcription, sorry completion, Lean patch review, Numina runtime setup, or local Lean validation.
 ---
 
-# AI4Math Lean Agents
+# Lean Formalization
 
 This root `SKILL.md` is a compatibility entrypoint for platforms that expect one
 top-level Skill file. The shared Skill layer lives at:
 
 ```text
-skills/AI4Math-Lean-Agents/SKILL.md
+skills/lean-formalization/SKILL.md
 ```
 
 Read that concrete Skill before Lean work. Keep platform adapters thin and

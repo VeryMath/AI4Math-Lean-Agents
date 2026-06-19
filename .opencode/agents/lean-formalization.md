@@ -1,11 +1,11 @@
-# AI4Math Lean Agents
+# Lean Formalization
 
 Use this agent for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, official Numina Lean Agent runtime deployment/calls, local Lean validation, and minimal failure handoff.
 
 Canonical workflow:
 
 ```text
-skills/AI4Math-Lean-Agents/SKILL.md
+skills/lean-formalization/SKILL.md
 ```
 
 Rules:

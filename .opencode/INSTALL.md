@@ -3,7 +3,7 @@
 This repository exposes a shared Skill layer at:
 
 ```text
-skills/AI4Math-Lean-Agents/SKILL.md
+skills/lean-formalization/SKILL.md
 ```
 
 OpenCode can use the repository checkout directly by reading `AGENTS.md`,
