@@ -7,7 +7,7 @@ verification with coding agents. The default Lean Agent path orchestrates the
 official Numina Lean Agent runtime; local Lean editing is the validation and
 fallback path when Numina is unavailable, declined, or insufficient. The bundled
 CLI is only a deterministic helper toolbox for environment checks, Lean
-validation, Numina readiness/setup, patch review, and minimal failure handoff.
+validation, Numina readiness/setup, patch review, and minimal failure extraction.
 
 The canonical skill package lives at:
 
@@ -15,24 +15,20 @@ The canonical skill package lives at:
 skills/lean-formalization/
 ```
 
-## AI4Math Role
+## What This Skill Does
 
-This skill is the Lean 4 formalization and proof-repair layer in the AI4Math
-stack. Use it when a theorem statement, proof obligation, or generated proof
-candidate needs machine-checked Lean evidence rather than informal proof review.
+This standalone skill helps a coding agent work with Lean 4 formalization tasks:
+inspect a Lean project, transcribe theorem statements, repair proofs, complete
+`sorry`s when appropriate, review patches for unsafe proof shortcuts, and record
+machine-checking evidence or a minimized failure.
 
-## Handoff
-
-Upstream inputs may come from `rethlas-proving`,
-`discover-math-problems`, `paper-to-skill`, or a user Lean project. Handoff
-artifacts should include the intended theorem statement, allowed assumptions,
-imports, current Lean errors or goals, and any proof blueprint. Return validated
-Lean patches, minimized failures, or blocked proof obligations without changing
-the theorem statement unless the user approves.
+Use it directly with a Lean project, a Lean file, or a theorem statement that you
+want the agent to formalize or validate.
 
 ## Installation / Loading
 
-Use the repository checkout first. Ask your coding agent to read:
+Clone or open this skill repository in your coding-agent environment. Then ask
+your coding agent to read:
 
 ```text
 AGENTS.md
