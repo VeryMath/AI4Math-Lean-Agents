@@ -1,162 +1,88 @@
-# AI4Math Lean Skills
+<div align="center">
 
-Chinese guide: [README.zh-CN.md](README.zh-CN.md)
+# AI4Math · Lean Agents
 
-This repository provides two AI4Math Lean skills:
+Lean 4 setup, formalization, proof repair, patch review, and optional Numina
+subagent workflows for coding agents.
 
-- `lean-setup`: a setup-only entrypoint for Lean 4, `elan`, `lake`, and reusable mathlib workspace readiness.
-- `lean-formalization`: a coding-agent-first skill package for Lean 4 formalization, proof repair, and validation.
+[中文说明](README.zh-CN.md) · [Skill packages](#skill-packages) · [Quick start](#quick-start) · [Security model](#security-and-scope)
 
-`lean-formalization` is informed by publicly available Lean-specialist agent patterns from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents.
+![version](https://img.shields.io/badge/version-0.1.0-blue)
+![skills](https://img.shields.io/badge/skills-2-2ea44f)
+![license](https://img.shields.io/badge/license-MIT-green)
 
-## When To Use These Skills
+</div>
 
-Use these skills when you have:
+## What This Repository Is
 
-- a need to create or verify a Lean/mathlib workspace before proof work (`lean-setup`);
-- a Lean project or Lean file that needs inspection;
-- a theorem statement to transcribe or formalize;
-- a proof with `sorry`, `admit`, errors, or statement drift risk;
-- a need for optional Numina setup mediated by the coding agent.
+This repository is the AI4Math home for Lean-agent skills. It provides one
+setup-only entrypoint and one formalization entrypoint so a coding agent can
+inspect Lean projects, prepare reusable mathlib workspaces, repair proofs, and
+validate final patches with evidence.
 
-## What They Produce
+`lean-formalization` incorporates public Lean-specialist agent patterns such as
+theorem-state loops, premise retrieval, bounded proof search, validation gates,
+failure memory, and optional official Numina handoff. These patterns are treated
+as workflow mechanisms, not mandatory external services.
 
-The agent should produce Lean patches, validation summaries, blocked-goal explanations, minimized failures, and optional Numina setup evidence.
+## Skill Packages
 
-## Installation
-
-Copy this to your coding agent:
-
-```text
-Please install the `lean-setup` and `lean-formalization` skills from https://github.com/VeryMath/AI4Math-Lean-Agents.git. Read `.agent.md`, install the declared Skill entrypoints, verify that `$lean-setup` and `$lean-formalization` are discoverable, and tell me whether I need to restart the agent.
-```
-
-If you already have this skill repository locally, replace the repository URL
-with the local folder path. The coding agent should handle cloning, linking,
-configuration, reload/restart checks, and verification.
+| Package | Use it for | Start here |
+| --- | --- | --- |
+| [`lean-setup`](skills/lean-setup/) | Install or verify Lean 4, `elan`, `lake`, and reusable mathlib workspace readiness before proof work. | [`README`](skills/lean-setup/README.md) · [`SKILL`](skills/lean-setup/SKILL.md) |
+| [`lean-formalization`](skills/lean-formalization/) | Formalize theorem statements, repair Lean proofs, complete `sorry`, review patches, and optionally coordinate Numina runs. | [`README`](skills/lean-formalization/README.md) · [`SKILL`](skills/lean-formalization/SKILL.md) |
 
 ## Quick Start
 
-Environment-only setup:
+Clone the repository and choose the entrypoint:
 
-```text
-Use this repository's Lean setup workflow.
-
-Read:
-- AGENTS.md
-- skills/lean-setup/SKILL.md
-
-Goal:
-Create or verify a reusable Lean 4/mathlib workspace.
+```bash
+git clone https://github.com/VeryMath/AI4Math-Lean-Agents.git
+cd AI4Math-Lean-Agents
 ```
 
-Formalization or proof work:
+For environment setup only, start with:
 
 ```text
-Use this repository's Lean workflow.
-
-Read:
-- AGENTS.md
-- SKILL.md
-- skills/lean-formalization/SKILL.md
-
-Goal:
-<describe the Lean formalization, repair, transcription, or validation task>
-
-Constraints:
-- inspect the Lean project first;
-- preserve theorem statements unless approved;
-- ask before Numina setup, source edits, or final proof claims.
+skills/lean-setup/SKILL.md
 ```
 
-## What They Support
+For formalization or proof repair, start with:
 
-- Lean project/workspace inspection.
-- Reusable shared `~/.ai4math/lean-workspace` setup for standalone Lean files.
-- Theorem formalization, proof repair, proof completion, and `sorry` completion.
-- Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
-- Minimal failing Lean fragment extraction when a proof is blocked.
-- Related-work-informed Lean-specialist patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
-- Optional official `project-numina/numina-lean-agent` deployment/call flow, mediated by the coding agent.
-
-Numina is optional. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
+```text
+skills/lean-formalization/SKILL.md
+```
 
 ## Repository Layout
 
 ```text
-.
-├── AGENTS.md
-├── CLAUDE.md
-├── GEMINI.md
+AI4Math-Lean-Agents/
 ├── README.md
-├── LICENSE
-├── .github/
-├── .cursor/             # optional Cursor rule
-├── .opencode/           # optional OpenCode agent
+├── README.zh-CN.md
+├── SKILL.md
 └── skills/
-    ├── lean-setup/          # setup-only entrypoint
-    └── lean-formalization/  # proof/formalization implementation
+    ├── lean-setup/
+    └── lean-formalization/
 ```
 
-## How To Interact
+The root `SKILL.md` is a compatibility router. Package-local instructions are
+the source of truth for concrete Lean work.
 
-Use a checkpoint loop:
+## Validation
 
-```text
-Lean task -> project inspection -> plan -> approve / revise / reject / skip
-          -> approved edit or validation -> evidence summary -> next checkpoint
-```
-
-Use `approve` to run a proposed step, `revise` to update the plan, `reject` to
-stop the path, and `skip` to move past a phase. The agent should ask before
-theorem statement changes, optional Numina setup, source edits, or final proof
-claims.
-
-## Helper Commands
-
-Run commands from the repository root:
+Use package-local validation when changing Lean logic. The formalization package
+provides the helper:
 
 ```bash
-python skills/lean-formalization/scripts/ai4m_lean.py env --cwd .
-python skills/lean-formalization/scripts/ai4m_lean.py doctor --cwd .
-python skills/lean-formalization/scripts/ai4m_lean.py configure --cwd . --create-workspace
-python skills/lean-formalization/scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs --dry-run
-python skills/lean-formalization/scripts/ai4m_lean.py check --cwd . --skip-build
-python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
+python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
 ```
 
-The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, choosing proof strategy, and matching the user's language.
+At minimum, run the local skill validator on each changed standard skill
+package and check README links.
 
-For the optional Numina path, read `skills/lean-formalization/references/numina_runtime.md`. Setup and official runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
+## Security and Scope
 
-## Validate
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
-```
-
-For a full local Lean workspace check:
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
-```
-
-## Related Work and Public References
-
-This project is informed by the following public Lean ecosystem projects and
-Lean-agent systems, while maintaining its own coding-agent-first workflow and
-local validation boundary:
-
-- [Lean](https://lean-lang.org/) and [Lean 4](https://github.com/leanprover/lean4)
-- [mathlib4](https://github.com/leanprover-community/mathlib4)
-- [Numina Lean Agent](https://github.com/project-numina/numina-lean-agent)
-- [Numina Putnam 2025](https://github.com/project-numina/Numina-Putnam2025)
-- [LeanDojo](https://github.com/lean-dojo/LeanDojo) and [ReProver](https://github.com/lean-dojo/ReProver)
-- [LeanCopilot](https://github.com/lean-dojo/LeanCopilot)
-- [lean-lsp-mcp](https://github.com/project-numina/lean-lsp-mcp)
-- [COPRA](https://github.com/trishullab/copra)
-
-These references are cited for related-work context and design provenance around
-setup, proof-state loops, retrieval, validation, and failure handoff. Unless
-explicitly stated, this repository does not vendor, reproduce, replace, or claim
-compatibility with the original systems.
+Do not commit Lean build artifacts, downloaded Numina runtime state, API keys,
+`.env` files, machine-specific paths, or private theorem notes. Do not present
+proofs as accepted without local Lean/Lake validation or an explicit approved
+review gate.
