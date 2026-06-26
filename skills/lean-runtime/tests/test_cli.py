@@ -180,6 +180,15 @@ class CliTests(unittest.TestCase):
         self.assertIn("suggest a safe default name", text)
         self.assertIn("use the default if the user has no naming preference", text)
 
+    def test_lean_setup_guides_next_step_after_successful_setup(self) -> None:
+        text = (SKILL_ROOT.parent / "lean-setup" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("After successful setup or smoke-test validation", text)
+        self.assertIn("Offer a short next-step menu", text)
+        self.assertIn("inspect an existing Lean/Lake project", text)
+        self.assertIn("repair a Lean file or complete `sorry`", text)
+        self.assertIn("formalize a natural-language or LaTeX theorem", text)
+        self.assertIn("mention optional Numina only when the user explicitly asks", text)
+
     def test_package_hygiene_scans_lean_setup_entrypoint(self) -> None:
         generated = SKILL_ROOT.parent / "lean-setup" / "__pycache__" / "sentinel.pyc"
         generated.parent.mkdir(exist_ok=True)

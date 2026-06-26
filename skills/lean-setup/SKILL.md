@@ -20,7 +20,20 @@ The shared implementation lives in `../lean-runtime/`. This skill must reuse the
 7. Create the workspace only after explaining that Lean/mathlib artifacts may be downloaded or built.
 8. Run the bundled smoke test after setup.
 9. Report the installed tools, workspace path, Lean toolchain, mathlib revision when available, smoke-test result, and any remaining action.
-10. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
+10. After successful setup or smoke-test validation, do not end passively. Offer a short next-step menu and recommend one default next action.
+11. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
+
+## Post-Setup Guidance
+
+Offer a short next-step menu after setup succeeds:
+
+- inspect an existing Lean/Lake project;
+- run or explain the built-in smoke theorem result;
+- repair a Lean file or complete `sorry`;
+- formalize a natural-language or LaTeX theorem;
+- continue setup-only validation if the user only wants environment readiness.
+
+As a rule, mention optional Numina only when the user explicitly asks for the official Lean Agent, batch proof search, or an external subagent backend; do not make Numina or API keys part of the default next step.
 
 ## Commands
 

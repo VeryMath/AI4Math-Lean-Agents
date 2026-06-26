@@ -239,6 +239,12 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
         "When creating an isolated test directory or workspace",
         "suggest a safe default name",
         "use the default if the user has no naming preference",
+        "After successful setup or smoke-test validation",
+        "Offer a short next-step menu",
+        "inspect an existing Lean/Lake project",
+        "repair a Lean file or complete `sorry`",
+        "formalize a natural-language or LaTeX theorem",
+        "mention optional Numina only when the user explicitly asks",
         "Do not require API keys for Lean/mathlib workspace setup.",
         "hand off to `lean-formalization`",
     ]
@@ -248,8 +254,10 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
     repo_root_command_hits = [phrase for phrase in repo_root_commands if phrase in text]
     openai_required = [
         "不要向用户索要 theorem target",
+        "setup 完成后主动给出下一步菜单",
         "所有实现应复用 lean-runtime",
         "默认 Lean/mathlib 环境配置不需要 API key",
+        "不要把 Numina 放进默认下一步",
         "应交接到 lean-formalization",
     ]
     return {
