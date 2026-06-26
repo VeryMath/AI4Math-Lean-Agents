@@ -234,6 +234,9 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
         "The canonical implementation lives in `../lean-formalization/`.",
         "../lean-formalization/scripts/ai4m_lean.py",
         "Install Lean through the official `elan` channel",
+        "When creating an isolated test directory or workspace",
+        "suggest a safe default name",
+        "use the default if the user has no naming preference",
         "Do not require API keys for Lean/mathlib workspace setup.",
         "hand off to `lean-formalization`",
     ]
@@ -245,6 +248,7 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
         "不要向用户索要 theorem target",
         "所有实现应复用 lean-formalization",
         "默认 Lean/mathlib 环境配置不需要 API key",
+        "先给出安全默认名称并允许用户确认或改名",
         "应交接到 lean-formalization",
     ]
     return {

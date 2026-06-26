@@ -10,6 +10,8 @@ Use this package when you need to:
 
 - check whether Lean, `elan`, and `lake` are available;
 - create or reuse `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`;
+- create an isolated test directory or workspace with a safe default name that
+  the user can confirm or rename;
 - run a Lean/mathlib smoke test;
 - report toolchain, workspace, mathlib revision, and remaining setup work.
 
