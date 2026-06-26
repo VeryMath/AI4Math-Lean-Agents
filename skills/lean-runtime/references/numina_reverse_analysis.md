@@ -8,11 +8,11 @@ This reference records how this coding-agent Lean skill incorporates mechanisms 
 - Result repository: https://github.com/project-numina/Numina-Putnam2025
 - Paper reference: https://arxiv.org/abs/2601.14027
 
-The goal is not to copy Numina prompts or reimplement Numina proof search. The goal is to incorporate reusable Lean-agent mechanisms into a comprehensive coding-agent skill while preserving a deployable path to the official Numina runtime when the user wants a subagent.
+The goal is not to copy Numina prompts or reimplement Numina proof search. The goal is to incorporate reusable Lean-agent mechanisms into a comprehensive coding-agent skill while preserving a deployable path to the official Numina runtime as the currently supported optional backend adapter.
 
 ## Incorporated Patterns
 
-1. Use a coding agent as the primary Lean worker, with Numina available as an optional subagent.
+1. Use a coding agent as the primary Lean worker, with Numina available as the supported optional backend adapter.
 2. Keep Lean/Lake validation as the correctness oracle.
 3. Treat theorem statement preservation as a first-class safety check.
 4. Work in bounded rounds with a clear stopping condition.
@@ -22,7 +22,7 @@ The goal is not to copy Numina prompts or reimplement Numina proof search. The g
 
 ## Optional Runtime State
 
-The default AI4Math coding-agent loop does not require these runtime dependencies, but the optional official Numina subagent path does:
+The default AI4Math coding-agent loop does not require these runtime dependencies, but the supported official Numina backend path does:
 
 - upstream Numina repository checkout;
 - Numina Python environment;
@@ -43,9 +43,9 @@ flowchart TD
   D --> E["Run Lean/Lake check"]
   E --> F{"Verified without unsafe placeholders?"}
   F -->|yes| G["Review patch and return result"]
-  F -->|no| H{"Use local iteration or approved Numina subagent?"}
+  F -->|no| H{"Use local iteration or approved Numina backend?"}
   H -->|yes| D
-  H -->|Numina| N["Call official Numina subagent after approval"]
+  H -->|Numina| N["Call official Numina backend after approval"]
   N --> E
   H -->|blocked| I["Extract minimal failure and report exact errors/goals"]
 ```
@@ -76,5 +76,5 @@ If a future agent reads this file during normal Lean work, the default action it
 1. verify local Lean readiness;
 2. prepare the target in the user's Lake project or shared workspace;
 3. edit/check directly as a coding agent;
-4. use official Numina only if the user asks for the subagent path or it is approved;
+4. use official Numina only if the user asks for the supported backend path or it is approved;
 5. return a verified patch or minimal failure.

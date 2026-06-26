@@ -1,32 +1,29 @@
 # Lean Formalization
 
-`lean-formalization` is the concrete AI4Math skill package for Lean 4
+`lean-formalization` is the concrete AI4Math skill entrypoint for Lean 4
 formalization, proof repair, theorem transcription, `sorry` completion, Lean
-patch review, local validation, and optional official Numina runtime work.
+patch review, local validation, and optional Lean-specialist backend adapter
+work currently implemented for official Numina.
 
 ## Entry Point
 
 Start with [`SKILL.md`](SKILL.md). It defines the coding-agent-first workflow,
-the optional Numina boundary, safety rules, and the reference files to load for
-specific tasks.
+the optional backend boundary, safety rules, and the reference files to load
+for specific tasks.
 
-## Package Layout
+## Runtime Support
 
-- `scripts/`: helper CLI commands for environment checks, validation, patch
-  review, Numina setup, and delivery verification.
-- `references/`: task-specific guidance for direct Lean workflows, runtime
-  configuration, Numina, review, and failure reporting.
-- `prompts/`: reusable task envelopes for formalization, proof repair, and
-  `sorry` completion.
-- `config/` and `schemas/`: example configuration and validation schemas.
-- `tests/`: package-level Python tests for the helper CLI and validation logic.
+The reusable implementation lives in the sibling `../lean-runtime/` support
+layer. It contains helper scripts, task-specific references, prompts, examples,
+schemas, configuration templates, and tests. Keep `lean-runtime` installed next
+to this entrypoint.
 
 ## Validation
 
 Run from the repository root:
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
+PYTHONDONTWRITEBYTECODE=1 python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
 ```
 
 ## Related Work and Public References

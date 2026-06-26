@@ -16,8 +16,8 @@ jobs:
 
       - name: Run unit tests
         run: |
-          PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s skills/lean-formalization/tests
+          PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s skills/lean-runtime/tests
 
       - name: Verify package shape
         run: |
-          PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
+          PYTHONDONTWRITEBYTECODE=1 python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests

@@ -2,8 +2,8 @@
 
 # AI4Math · Lean Agents
 
-Lean 4 setup, formalization, proof repair, patch review, and optional Numina
-subagent workflows for coding agents.
+Lean 4 setup, formalization, proof repair, patch review, and optional
+Lean-specialist backend workflows for coding agents.
 
 [中文说明](README.zh-CN.md) · [Contributors](CONTRIBUTORS.md) · [Skill packages](#skill-packages) · [Quick start](#quick-start) · [Security model](#security-and-scope)
 
@@ -20,10 +20,21 @@ setup-only entrypoint and one formalization entrypoint so a coding agent can
 inspect Lean projects, prepare reusable mathlib workspaces, repair proofs, and
 validate final patches with evidence.
 
+Both public entrypoints share the bundled `skills/lean-runtime/` support layer
+for helper scripts, references, prompts, schemas, examples, and tests. Users
+invoke only `lean-setup` or `lean-formalization`; installers should keep
+`lean-runtime` next to them.
+
 `lean-formalization` incorporates public Lean-specialist agent patterns such as
 theorem-state loops, premise retrieval, bounded proof search, validation gates,
 failure memory, and optional official Numina handoff. These patterns are treated
-as workflow mechanisms, not mandatory external services.
+as workflow mechanisms, not mandatory external services. The optional Lean-specialist backend
+path is explicit: official Numina is the currently supported optional deployable
+backend; other backends remain future adapters until setup, call, validation,
+and failure-triage contracts are documented.
+
+Currently supported optional backend: official Numina Lean Agent runtime.
+Future backend adapters do not claim support until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
 ## Skill Packages
 
@@ -31,6 +42,8 @@ as workflow mechanisms, not mandatory external services.
 | --- | --- | --- |
 | [`lean-setup`](skills/lean-setup/) | Install or verify Lean 4, `elan`, `lake`, and reusable mathlib workspace readiness before proof work. | [`README`](skills/lean-setup/README.md) · [`SKILL`](skills/lean-setup/SKILL.md) |
 | [`lean-formalization`](skills/lean-formalization/) | Formalize theorem statements, repair Lean proofs, complete `sorry`, review patches, and optionally coordinate Numina runs. | [`README`](skills/lean-formalization/README.md) · [`SKILL`](skills/lean-formalization/SKILL.md) |
+
+`skills/lean-runtime/` is a shared implementation layer, not a user-facing skill.
 
 ## Quick Start
 
@@ -62,11 +75,13 @@ AI4Math-Lean-Agents/
 ├── SKILL.md
 └── skills/
     ├── lean-setup/
-    └── lean-formalization/
+    ├── lean-formalization/
+    └── lean-runtime/
 ```
 
 The root `SKILL.md` is a compatibility router. Package-local instructions are
-the source of truth for concrete Lean work.
+the source of truth for concrete Lean work; shared scripts and references live
+under `skills/lean-runtime/`.
 
 ## Validation
 
@@ -74,7 +89,7 @@ Use package-local validation when changing Lean logic. The formalization package
 provides the helper:
 
 ```bash
-python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
+python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
 ```
 
 At minimum, run the local skill validator on each changed standard skill

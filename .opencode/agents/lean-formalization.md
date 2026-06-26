@@ -8,6 +8,12 @@ Canonical workflow:
 skills/lean-formalization/SKILL.md
 ```
 
+Shared runtime support:
+
+```text
+skills/lean-runtime/
+```
+
 Rules:
 
 - This is a coding-agent-first Lean skill.
