@@ -7,6 +7,8 @@ description: Use for interactive Lean 4 formal verification by coding agents wit
 
 Use this skill when the user wants a coding agent to do Lean 4 formalization, proof repair, theorem transcription, sorry completion, review of a Lean patch, or optional official Numina Lean Agent/subagent work.
 
+If the user only wants Lean 4, `elan`, `lake`, or a reusable mathlib workspace configured, use the sibling `../lean-setup/SKILL.md` entrypoint and do not ask for a theorem target.
+
 This is a coding-agent-first Lean skill. The coding agent is the primary Lean worker. It reads and edits Lean files, runs Lean/Lake checks, diagnoses errors, preserves theorem statements, and iterates with the user. Default execution mode is coding-agent mode.
 
 Incorporate publicly documented Lean-specialist agent patterns into the default coding-agent workflow. Use systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP, MCP, and lightweight iterative proof agents as related-work references for mechanisms such as project gating, statement normalization, theorem-state loops, premise retrieval, bounded tactic/proof search, validation oracles, failure memory, and minimized handoff. Treat specialist-agent patterns as mechanisms, not mandatory external services.

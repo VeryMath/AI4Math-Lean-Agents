@@ -18,6 +18,7 @@ from validate_patch import review_files
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
+SKILLS_ROOT = SKILL_ROOT.parent
 REQUIRED_FILES = [
     "SKILL.md",
     "agents/openai.yaml",
@@ -77,9 +78,14 @@ def _load_schema(path: Path) -> dict[str, Any]:
 
 
 def _package_hygiene() -> dict[str, Any]:
+    package_roots = [SKILL_ROOT]
+    setup_root = SKILLS_ROOT / "lean-setup"
+    if setup_root.exists():
+        package_roots.append(setup_root)
     generated = [
-        str(path.relative_to(SKILL_ROOT))
-        for path in SKILL_ROOT.rglob("*")
+        str(path.relative_to(SKILLS_ROOT))
+        for root in package_roots
+        for path in root.rglob("*")
         if "__pycache__" in path.parts or path.suffix == ".pyc"
     ]
     suspicious_secret_patterns = [
@@ -88,17 +94,20 @@ def _package_hygiene() -> dict[str, Any]:
         "BEGIN " + "OPENAI API KEY",
     ]
     secret_hits: list[str] = []
-    for path in SKILL_ROOT.rglob("*"):
-        if not path.is_file() or "__pycache__" in path.parts or path.suffix == ".pyc":
-            continue
-        try:
-            text = path.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        if any(pattern in text for pattern in suspicious_secret_patterns):
-            secret_hits.append(str(path.relative_to(SKILL_ROOT)))
+    for root in package_roots:
+        paths = root.rglob("*")
+        for path in paths:
+            if not path.is_file() or "__pycache__" in path.parts or path.suffix == ".pyc":
+                continue
+            try:
+                text = path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            if any(pattern in text for pattern in suspicious_secret_patterns):
+                secret_hits.append(str(path.relative_to(SKILLS_ROOT)))
     return {
         "ok": not secret_hits,
+        "scanned_roots": [str(path) for path in package_roots],
         "generated_files": generated,
         "generated_files_note": "ignored by .gitignore; remove before packaging if creating an archive" if generated else None,
         "secret_pattern_hits": secret_hits,
@@ -169,6 +178,91 @@ def _guidance_first_check() -> dict[str, Any]:
     }
 
 
+def _root_discovery_boundary_check() -> dict[str, Any]:
+    repo_root = SKILLS_ROOT.parent
+    root_skill = repo_root / "SKILL.md"
+    if not root_skill.exists():
+        return {
+            "ok": True,
+            "root_skill": None,
+            "skipped": True,
+            "root_setup_only_trigger_hits": [],
+        }
+    text = root_skill.read_text(encoding="utf-8", errors="replace")
+    frontmatter = text.split("---", 2)[1] if text.startswith("---") and text.count("---") >= 2 else text
+    setup_only_triggers = [
+        "Lean environment setup",
+        "installing Lean",
+        "install Lean",
+        "checking elan",
+        "elan/lake",
+        "mathlib workspace",
+        "shared Lean environment",
+    ]
+    hits = [phrase for phrase in setup_only_triggers if phrase in frontmatter]
+    return {
+        "ok": not hits,
+        "root_skill": str(root_skill),
+        "skipped": False,
+        "root_setup_only_trigger_hits": hits,
+    }
+
+
+def _lean_setup_entrypoint_check() -> dict[str, Any]:
+    setup_root = SKILLS_ROOT / "lean-setup"
+    readme_path = setup_root / "README.md"
+    skill_path = setup_root / "SKILL.md"
+    openai_path = setup_root / "agents" / "openai.yaml"
+    helper_script = SKILL_ROOT / "scripts" / "ai4m_lean.py"
+    required_files = [readme_path, skill_path, openai_path]
+    if not all(path.exists() for path in required_files):
+        return {
+            "ok": False,
+            "setup_root": str(setup_root),
+            "helper_script": str(helper_script),
+            "helper_script_exists": helper_script.exists(),
+            "missing_files": [str(path) for path in required_files if not path.exists()],
+            "missing_phrases": [],
+            "openai_yaml_missing_phrases": [],
+            "repo_root_command_hits": [],
+        }
+    text = skill_path.read_text(encoding="utf-8", errors="replace")
+    openai_yaml = openai_path.read_text(encoding="utf-8", errors="replace")
+    required_phrases = [
+        "Use this setup-only entrypoint",
+        "Do not ask for a theorem target in setup-only mode.",
+        "The canonical implementation lives in `../lean-formalization/`.",
+        "../lean-formalization/scripts/ai4m_lean.py",
+        "Install Lean through the official `elan` channel",
+        "Do not require API keys for Lean/mathlib workspace setup.",
+        "hand off to `lean-formalization`",
+    ]
+    repo_root_commands = [
+        "python skills/lean-formalization/scripts/ai4m_lean.py",
+    ]
+    repo_root_command_hits = [phrase for phrase in repo_root_commands if phrase in text]
+    openai_required = [
+        "不要向用户索要 theorem target",
+        "所有实现应复用 lean-formalization",
+        "默认 Lean/mathlib 环境配置不需要 API key",
+        "应交接到 lean-formalization",
+    ]
+    return {
+        "ok": (
+            helper_script.exists()
+            and not repo_root_command_hits
+            and all(phrase in text for phrase in required_phrases)
+            and all(phrase in openai_yaml for phrase in openai_required)
+        ),
+        "setup_root": str(setup_root),
+        "helper_script": str(helper_script),
+        "helper_script_exists": helper_script.exists(),
+        "missing_phrases": [phrase for phrase in required_phrases if phrase not in text],
+        "openai_yaml_missing_phrases": [phrase for phrase in openai_required if phrase not in openai_yaml],
+        "repo_root_command_hits": repo_root_command_hits,
+    }
+
+
 def verify(
     cwd: str | Path = ".",
     require_environment: bool = False,
@@ -219,12 +313,16 @@ def verify(
 
     hygiene = _package_hygiene()
     guidance_first = _guidance_first_check()
+    discovery_boundaries = _root_discovery_boundary_check()
+    lean_setup_entrypoint = _lean_setup_entrypoint_check()
     checks = {
         "required_files": all(item["exists"] for item in files),
         "required_commands": REQUIRED_COMMANDS.issubset(commands),
         "no_parallel_numina_commands": not any(command.startswith("numina") for command in commands),
         "schemas": all(item["ok"] for item in schemas),
         "guidance_first_skill": bool(guidance_first.get("ok")),
+        "discovery_boundaries": bool(discovery_boundaries.get("ok")),
+        "lean_setup_entrypoint": bool(lean_setup_entrypoint.get("ok")),
         "dry_run_prove": bool(dry_run.get("ok") and dry_run.get("status") == "dry_run"),
         "patch_guard": bool(not review.get("ok") and review.get("findings")),
         "minimal_failure": bool(failure.get("ok") and failure.get("minimal_failure", {}).get("snippet")),
@@ -255,6 +353,8 @@ def verify(
         },
         "schemas": schemas,
         "guidance_first_skill": guidance_first,
+        "discovery_boundaries": discovery_boundaries,
+        "lean_setup_entrypoint": lean_setup_entrypoint,
         "dry_run_prove": {
             "ok": dry_run.get("ok"),
             "status": dry_run.get("status"),

@@ -1,0 +1,3 @@
+display_name: Lean Setup
+short_description: Lean 4, elan, lake, and reusable mathlib workspace setup for coding agents.
+default_prompt: 请默认使用中文，并主动完成 Lean 环境配置引导；仅当用户明确使用其他语言时切换。该入口仅用于 setup-only 任务：检查或安装 Lean/elan/lake，创建或复用带 mathlib 的共享工作区，运行 smoke-test，并报告 workspace 路径、toolchain、mathlib revision、验证结果与剩余动作。不要向用户索要 theorem target。所有实现应复用 lean-formalization 的 helper CLI 与 runtime references，不复制第二套配置逻辑。默认 Lean/mathlib 环境配置不需要 API key；只有在用户明确要求 optional official Numina backend 时，才说明凭据需求并请求批准。配置完成后，如用户要进行形式化、proof repair、sorry completion 或 Numina proof search，应交接到 lean-formalization。

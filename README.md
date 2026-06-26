@@ -1,19 +1,25 @@
-# Lean Formalization
+# AI4Math Lean Skills
 
 Chinese guide: [README.zh-CN.md](README.zh-CN.md)
 
-`lean-formalization` is a coding-agent-first skill package for Lean 4 formalization, proof repair, and validation. Its design is informed by publicly available Lean-specialist agent patterns from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents.
+This repository provides two AI4Math Lean skills:
 
-## When To Use It
+- `lean-setup`: a setup-only entrypoint for Lean 4, `elan`, `lake`, and reusable mathlib workspace readiness.
+- `lean-formalization`: a coding-agent-first skill package for Lean 4 formalization, proof repair, and validation.
 
-Use this skill when you have:
+`lean-formalization` is informed by publicly available Lean-specialist agent patterns from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents.
 
+## When To Use These Skills
+
+Use these skills when you have:
+
+- a need to create or verify a Lean/mathlib workspace before proof work (`lean-setup`);
 - a Lean project or Lean file that needs inspection;
 - a theorem statement to transcribe or formalize;
 - a proof with `sorry`, `admit`, errors, or statement drift risk;
 - a need for optional Numina setup mediated by the coding agent.
 
-## What It Produces
+## What They Produce
 
 The agent should produce Lean patches, validation summaries, blocked-goal explanations, minimized failures, and optional Numina setup evidence.
 
@@ -22,7 +28,7 @@ The agent should produce Lean patches, validation summaries, blocked-goal explan
 Copy this to your coding agent:
 
 ```text
-Please install the `lean-formalization` skill from https://github.com/VeryMath/AI4Math-Lean-Agents.git. Read `.agent.md`, install the declared Skill entrypoint, verify that `$lean-formalization` is discoverable, and tell me whether I need to restart the agent.
+Please install the `lean-setup` and `lean-formalization` skills from https://github.com/VeryMath/AI4Math-Lean-Agents.git. Read `.agent.md`, install the declared Skill entrypoints, verify that `$lean-setup` and `$lean-formalization` are discoverable, and tell me whether I need to restart the agent.
 ```
 
 If you already have this skill repository locally, replace the repository URL
@@ -30,6 +36,21 @@ with the local folder path. The coding agent should handle cloning, linking,
 configuration, reload/restart checks, and verification.
 
 ## Quick Start
+
+Environment-only setup:
+
+```text
+Use this repository's Lean setup workflow.
+
+Read:
+- AGENTS.md
+- skills/lean-setup/SKILL.md
+
+Goal:
+Create or verify a reusable Lean 4/mathlib workspace.
+```
+
+Formalization or proof work:
 
 ```text
 Use this repository's Lean workflow.
@@ -48,14 +69,14 @@ Constraints:
 - ask before Numina setup, source edits, or final proof claims.
 ```
 
-## What It Supports
+## What They Support
 
 - Lean project/workspace inspection.
 - Reusable shared `~/.ai4math/lean-workspace` setup for standalone Lean files.
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
-- Integrated Lean-specialist agent patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
+- Related-work-informed Lean-specialist patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
 - Optional official `project-numina/numina-lean-agent` deployment/call flow, mediated by the coding agent.
 
 Numina is optional. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
@@ -73,15 +94,8 @@ Numina is optional. The public CLI does not expose a parallel `numina-*` workflo
 ├── .cursor/             # optional Cursor rule
 ├── .opencode/           # optional OpenCode agent
 └── skills/
-    └── lean-formalization/
-        ├── SKILL.md
-        ├── agents/
-        ├── config/
-        ├── prompts/
-        ├── references/
-        ├── schemas/
-        ├── scripts/
-        └── tests/
+    ├── lean-setup/          # setup-only entrypoint
+    └── lean-formalization/  # proof/formalization implementation
 ```
 
 ## How To Interact
