@@ -33,7 +33,7 @@ Offer a short next-step menu after setup succeeds:
 - formalize a natural-language or LaTeX theorem;
 - continue setup-only validation if the user only wants environment readiness.
 
-As a rule, mention optional Numina only when the user explicitly asks for the official Lean Agent, batch proof search, or an external subagent backend; do not make Numina or API keys part of the default next step.
+As a rule, mention optional Numina only when the user explicitly asks for the official Lean Agent, batch proof search, or an external backend adapter; do not make Numina or API keys part of the default next step.
 
 ## Commands
 

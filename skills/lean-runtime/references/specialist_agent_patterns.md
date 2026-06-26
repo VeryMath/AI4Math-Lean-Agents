@@ -29,7 +29,7 @@ Public source anchors:
 5. Use bounded search: try a small number of plausible tactic/proof routes; record failed routes so the agent does not cycle.
 6. Retrieve before inventing: search existing project/mathlib names and nearby proofs before adding helper lemmas.
 7. Validate as oracle: Lean/Lake success is required; final patches must not contain `sorry`, `admit`, new `axiom`, or unapproved statement drift.
-8. Escalate deliberately: call optional Numina or another specialist backend only after explaining target, credentials/proxy/MCP state, result directory, and validation plan.
+8. Escalate deliberately: call the supported official Numina adapter, or a future backend adapter only after that adapter has an explicit contract and validation gates, and only after explaining target, credentials/proxy/MCP state, result directory, and validation plan.
 9. Hand off minimally: when blocked, return the smallest failing Lean fragment, exact goals/errors, tried routes, and the next mathematical decision.
 
 ## Pattern Map
@@ -41,7 +41,7 @@ Public source anchors:
 | Premise retrieval | `rg`, nearby imports/proofs, project declarations, optional external search |
 | Bounded proof attempts | `max_rounds`, local iteration caps, failed-strategy notes |
 | Backtracking/failure memory | Record tried tactic families and rejected statement changes |
-| External proof backend | Optional official Numina subagent, never required for default work |
+| Lean-specialist backend adapter | Optional official Numina adapter is supported; Archon and other backends are future adapters, never required for default work |
 | Validation oracle | Lean/Lake plus `review` and `detect-sorry` |
 | Failure artifact | `minimize-failure` and exact errors/goals |
 
@@ -49,7 +49,7 @@ Public source anchors:
 
 Default to integrated local patterns. Escalate to a real specialist backend only when:
 
-- the user asks for Numina, official Lean Agent, batch proof search, or an external subagent;
+- the user asks for Numina, official Lean Agent, batch proof search, or an approved external subagent;
 - local bounded attempts are cycling and the user approves a backend call;
 - the required credentials, proxy, MCP scope, and target project are understood;
 - all backend output will still be reviewed and checked locally.
@@ -57,7 +57,8 @@ Default to integrated local patterns. Escalate to a real specialist backend only
 ## Anti-Patterns
 
 - Do not replace proof work with a CLI workflow that only asks the user for more input.
-- Do not treat a missing Numina key as blocking ordinary coding-agent Lean work.
+- Do not treat a missing Numina key or backend adapter as blocking ordinary coding-agent Lean work.
 - Do not copy upstream prompts or claim hidden benchmark behavior.
 - Do not add helper lemmas or theorem statement changes just to make a proof easier unless the user approves.
 - Do not let an external backend output bypass local Lean validation and patch review.
+- Do not claim support for a backend adapter unless its setup, call, credential, mutation, and validation contracts are documented.

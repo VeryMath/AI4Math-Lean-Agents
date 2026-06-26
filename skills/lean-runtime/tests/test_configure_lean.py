@@ -31,7 +31,7 @@ class ConfigureLeanTests(unittest.TestCase):
             self.assertEqual(result["agent"]["mode"], "coding-agent")
             self.assertEqual(result["agent"]["backend"], "none")
             self.assertFalse(result["agent"]["numina_required"])
-            self.assertEqual(result["agent"]["numina_runtime"], "optional-subagent-backend")
+            self.assertEqual(result["agent"]["numina_runtime"], "supported-optional-backend-adapter")
             self.assertEqual(result["missing_config"], [])
             self.assertIn("numina", result)
             self.assertIn("readiness", result["numina"])
