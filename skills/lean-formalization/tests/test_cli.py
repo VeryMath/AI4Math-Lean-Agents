@@ -162,6 +162,12 @@ class CliTests(unittest.TestCase):
         self.assertTrue(setup["helper_script_exists"], setup)
         self.assertFalse(setup["repo_root_command_hits"], setup)
 
+    def test_lean_setup_offers_default_names_for_isolated_setup(self) -> None:
+        text = (SKILL_ROOT.parent / "lean-setup" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("When creating an isolated test directory or workspace", text)
+        self.assertIn("suggest a safe default name", text)
+        self.assertIn("use the default if the user has no naming preference", text)
+
     def test_package_hygiene_scans_lean_setup_entrypoint(self) -> None:
         generated = SKILL_ROOT.parent / "lean-setup" / "__pycache__" / "sentinel.pyc"
         generated.parent.mkdir(exist_ok=True)

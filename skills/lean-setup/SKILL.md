@@ -15,11 +15,12 @@ The canonical implementation lives in `../lean-formalization/`. This skill must 
 2. Inspect tool and workspace readiness with `doctor` or `env`.
 3. If `elan`, `lean`, or `lake` is missing, explain the required Lean installation step first. Install Lean through the official `elan` channel appropriate for the user's OS after approval; `lean` and `lake` should come from the `elan` toolchain rather than a repository-local copy.
 4. Prefer an existing Lake project when the user points to one.
-5. For standalone future Lean work, create or reuse `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`.
-6. Create the workspace only after explaining that Lean/mathlib artifacts may be downloaded or built.
-7. Run the bundled smoke test after setup.
-8. Report the installed tools, workspace path, Lean toolchain, mathlib revision when available, smoke-test result, and any remaining action.
-9. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
+5. When creating an isolated test directory or workspace, suggest a safe default name and let the user confirm or rename it; use the default if the user has no naming preference.
+6. For standalone future Lean work, create or reuse `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`.
+7. Create the workspace only after explaining that Lean/mathlib artifacts may be downloaded or built.
+8. Run the bundled smoke test after setup.
+9. Report the installed tools, workspace path, Lean toolchain, mathlib revision when available, smoke-test result, and any remaining action.
+10. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
 
 ## Commands
 
