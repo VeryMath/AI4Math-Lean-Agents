@@ -1,11 +1,13 @@
 # Agent Instructions
 
+Use `skills/lean-setup/SKILL.md` for setup-only tasks such as installing or verifying Lean 4, `elan`, `lake`, or a reusable mathlib workspace.
 Use the canonical shared Skill layer at `skills/lean-formalization/SKILL.md` for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, official Numina Lean Agent runtime deployment/calls, local Lean validation, and minimal failure handoff.
 
 Core rules:
 
 - This is a coding-agent-first Lean skill.
 - The coding agent is the primary Lean worker.
+- Setup-only mode should not ask for a theorem target.
 - Official Numina is an optional deployable subagent backend.
 - Match the user's language by default.
 - If the user's language is ambiguous, default to Chinese.

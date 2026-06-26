@@ -1,12 +1,19 @@
 # Claude Code Instructions
 
-For Lean work in this repository, read and follow the shared Skill layer:
+For Lean setup-only work in this repository, read and follow:
+
+```text
+skills/lean-setup/SKILL.md
+```
+
+For Lean formalization or proof work in this repository, read and follow the shared Skill layer:
 
 ```text
 skills/lean-formalization/SKILL.md
 ```
 
 Use Claude Code as the primary Lean coding agent. Official Numina is an optional deployable subagent backend; preserve that setup/call path but do not make it the default.
+Setup-only mode should create or verify the Lean/mathlib workspace without asking for a theorem target.
 
 Match the user's language by default. If the user's language is ambiguous, default to Chinese.
 Lead the interaction: inspect context, summarize what is ready, recommend the next useful step, and ask at most one blocking question.

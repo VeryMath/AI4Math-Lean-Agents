@@ -1,6 +1,6 @@
 ---
 name: lean-formalization
-description: Use when a coding agent needs Lean 4 formalization, proof repair, theorem transcription, sorry completion, Lean patch review, Numina runtime setup, or local Lean validation.
+description: Use when a coding agent needs Lean 4 formalization, proof repair, theorem transcription, sorry completion, Lean patch review, Lean environment setup, Numina runtime setup, or local Lean validation.
 ---
 
 # Lean Formalization
@@ -14,6 +14,13 @@ skills/lean-formalization/SKILL.md
 
 Read that concrete Skill before Lean work. Keep platform adapters thin and
 improve the shared Skill layer first.
+
+For setup-only tasks such as installing Lean, checking `elan`/`lake`, or creating
+a reusable mathlib workspace, use:
+
+```text
+skills/lean-setup/SKILL.md
+```
 
 ## Operating Boundary
 

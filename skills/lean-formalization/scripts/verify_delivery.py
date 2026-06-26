@@ -169,6 +169,43 @@ def _guidance_first_check() -> dict[str, Any]:
     }
 
 
+def _lean_setup_entrypoint_check() -> dict[str, Any]:
+    setup_root = SKILL_ROOT.parent / "lean-setup"
+    skill_path = setup_root / "SKILL.md"
+    openai_path = setup_root / "agents" / "openai.yaml"
+    required_files = [skill_path, openai_path]
+    if not all(path.exists() for path in required_files):
+        return {
+            "ok": False,
+            "setup_root": str(setup_root),
+            "missing_files": [str(path) for path in required_files if not path.exists()],
+            "missing_phrases": [],
+            "openai_yaml_missing_phrases": [],
+        }
+    text = skill_path.read_text(encoding="utf-8", errors="replace")
+    openai_yaml = openai_path.read_text(encoding="utf-8", errors="replace")
+    required_phrases = [
+        "Use this setup-only entrypoint",
+        "Do not ask for a theorem target in setup-only mode.",
+        "The canonical implementation lives in `../lean-formalization/`.",
+        "python skills/lean-formalization/scripts/ai4m_lean.py configure --cwd . --create-workspace",
+        "Do not require API keys for Lean/mathlib workspace setup.",
+        "hand off to `lean-formalization`",
+    ]
+    openai_required = [
+        "不要向用户索要 theorem target",
+        "所有实现应复用 lean-formalization",
+        "默认 Lean/mathlib 环境配置不需要 API key",
+        "应交接到 lean-formalization",
+    ]
+    return {
+        "ok": all(phrase in text for phrase in required_phrases) and all(phrase in openai_yaml for phrase in openai_required),
+        "setup_root": str(setup_root),
+        "missing_phrases": [phrase for phrase in required_phrases if phrase not in text],
+        "openai_yaml_missing_phrases": [phrase for phrase in openai_required if phrase not in openai_yaml],
+    }
+
+
 def verify(
     cwd: str | Path = ".",
     require_environment: bool = False,
@@ -219,12 +256,14 @@ def verify(
 
     hygiene = _package_hygiene()
     guidance_first = _guidance_first_check()
+    lean_setup_entrypoint = _lean_setup_entrypoint_check()
     checks = {
         "required_files": all(item["exists"] for item in files),
         "required_commands": REQUIRED_COMMANDS.issubset(commands),
         "no_parallel_numina_commands": not any(command.startswith("numina") for command in commands),
         "schemas": all(item["ok"] for item in schemas),
         "guidance_first_skill": bool(guidance_first.get("ok")),
+        "lean_setup_entrypoint": bool(lean_setup_entrypoint.get("ok")),
         "dry_run_prove": bool(dry_run.get("ok") and dry_run.get("status") == "dry_run"),
         "patch_guard": bool(not review.get("ok") and review.get("findings")),
         "minimal_failure": bool(failure.get("ok") and failure.get("minimal_failure", {}).get("snippet")),
@@ -255,6 +294,7 @@ def verify(
         },
         "schemas": schemas,
         "guidance_first_skill": guidance_first,
+        "lean_setup_entrypoint": lean_setup_entrypoint,
         "dry_run_prove": {
             "ok": dry_run.get("ok"),
             "status": dry_run.get("status"),

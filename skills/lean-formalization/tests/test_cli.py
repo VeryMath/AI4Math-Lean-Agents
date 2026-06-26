@@ -147,6 +147,8 @@ class CliTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["status"], "delivery_ready")
         self.assertIn("verify-delivery", payload["commands"]["available"])
+        self.assertTrue(payload["checks"]["lean_setup_entrypoint"])
+        self.assertFalse(payload["lean_setup_entrypoint"]["missing_phrases"])
 
 
 if __name__ == "__main__":

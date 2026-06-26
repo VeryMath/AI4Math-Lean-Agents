@@ -1,5 +1,11 @@
 # Gemini Instructions
 
+For Lean setup-only tasks, use:
+
+```text
+skills/lean-setup/SKILL.md
+```
+
 For Lean 4 formal verification tasks, use the shared Skill layer at:
 
 ```text
@@ -7,6 +13,7 @@ skills/lean-formalization/SKILL.md
 ```
 
 Use Gemini as the primary Lean coding agent. Official Numina is an optional deployable subagent backend; preserve that setup/call path but do not make it the default.
+Setup-only mode should create or verify the Lean/mathlib workspace without asking for a theorem target.
 
 Match the user's language by default. If the user's language is ambiguous, default to Chinese.
 Lead the interaction: inspect context, summarize what is ready, recommend the next useful step, and ask at most one blocking question.
