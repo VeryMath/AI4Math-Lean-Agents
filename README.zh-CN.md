@@ -2,7 +2,7 @@
 
 [English](README.md) | 简体中文
 
-`lean-formalization` 帮助 coding agent 处理 Lean 4 形式化、proof repair 和 validation 任务。它是 coding-agent-first，但会蒸馏 Numina、LeanDojo/ReProver、LeanCopilot、COPRA-style proof search、Lean LSP/MCP 集成和轻量迭代 proof agent 的有效机制。
+`lean-formalization` 帮助 coding agent 处理 Lean 4 形式化、proof repair 和 validation 任务。它是 coding-agent-first，但会学习并整合 Numina、LeanDojo/ReProver、LeanCopilot、COPRA-style proof search、Lean LSP/MCP 集成和轻量迭代 proof agent 的有效机制。
 
 ## 适合什么任务
 
@@ -66,7 +66,7 @@ claim 前都应先问用户。
 - patch review：检查 `sorry`、`admit`、新引入的 `axiom` 和 theorem statement drift。
 - 可选 official `project-numina/numina-lean-agent` runtime 设置和调用。
 - proof blocked 时抽取最小失败 Lean fragment。
-- 蒸馏 Lean 专用 agent 模式：theorem-state loop、premise retrieval、bounded proof search、失败记忆、validation oracle 和 minimal handoff。
+- 学习并整合 Lean 专用 agent 模式：theorem-state loop、premise retrieval、bounded proof search、失败记忆、validation oracle 和 minimal handoff。
 
 ## 维护者检查
 

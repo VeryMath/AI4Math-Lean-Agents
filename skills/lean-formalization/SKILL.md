@@ -9,7 +9,7 @@ Use this skill when the user wants a coding agent to do Lean 4 formalization, pr
 
 This is a coding-agent-first Lean skill. The coding agent is the primary Lean worker. It reads and edits Lean files, runs Lean/Lake checks, diagnoses errors, preserves theorem statements, and iterates with the user. Default execution mode is coding-agent mode.
 
-Distill Lean-specialist agent patterns into the default coding-agent workflow. Learn from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP, MCP, and lightweight iterative proof agents by abstracting their mechanisms: project gating, statement normalization, theorem-state loops, premise retrieval, bounded tactic/proof search, validation oracles, failure memory, and minimized handoff. Use specialist-agent patterns as mechanisms, not mandatory external services.
+Learn from Lean-specialist agent patterns and integrate them into the default coding-agent workflow. Learn from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP, MCP, and lightweight iterative proof agents by abstracting their mechanisms: project gating, statement normalization, theorem-state loops, premise retrieval, bounded tactic/proof search, validation oracles, failure memory, and minimized handoff. Use specialist-agent patterns as mechanisms, not mandatory external services.
 
 Official Numina is an optional deployable subagent backend. Keep the official Numina deployment/call path available for users who ask for the official Lean Agent, batch proof search, or an external subagent run. Use Numina when the user asks for the official Lean Agent, batch proof search, or an external subagent run.
 
@@ -38,7 +38,7 @@ Do not remove the official Numina subagent path. Treat it as an optional backend
 7. When reporting readiness, lead with local Lean readiness, then Numina subagent readiness. If Numina credentials are missing, say that only the optional Numina subagent path needs configuration.
 8. Before a Numina setup or run, inspect `doctor` readiness, explain the deployment/call, target project, prompt, result directory, credential/proxy/MCP state, and local validation plan; proceed only after approval.
 9. For natural-language or LaTeX input, draft the Lean declaration and ask for confirmation before long proof work.
-10. Edit Lean directly in small steps for the default coding-agent path, using distilled specialist-agent patterns such as theorem-state inspection, nearby lemma retrieval, bounded proof attempts, failed-strategy notes, and minimal failure extraction. If Numina is approved, call the official Numina runner for proof search/formalization, then run Lean/Lake validation and patch safety checks before accepting results.
+10. Edit Lean directly in small steps for the default coding-agent path, using learned specialist-agent patterns such as theorem-state inspection, nearby lemma retrieval, bounded proof attempts, failed-strategy notes, and minimal failure extraction. If Numina is approved, call the official Numina runner for proof search/formalization, then run Lean/Lake validation and patch safety checks before accepting results.
 11. Preserve theorem statements unless the user explicitly approves a change.
 12. Reject final patches that contain `sorry`, `admit`, or newly introduced `axiom`.
 13. If blocked, stop cleanly with the smallest useful failing Lean fragment, exact errors/goals, and the next mathematical decision needed.
@@ -85,4 +85,4 @@ When using the official Numina runtime, follow `references/numina_runtime.md`. F
 - Read `references/interactive_orchestration.md` when guiding user intake and task decomposition.
 - Read `references/review_checklist.md` before accepting a Lean patch.
 - Read `references/failure_taxonomy.md` when reporting a blocked proof.
-- Read `references/numina_reverse_analysis.md` when explaining which Numina mechanisms were distilled and which are delegated to the optional official runtime.
+- Read `references/numina_reverse_analysis.md` when explaining which Numina mechanisms were learned and which are delegated to the optional official runtime.

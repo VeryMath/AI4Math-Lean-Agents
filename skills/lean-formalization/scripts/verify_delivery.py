@@ -115,7 +115,7 @@ def _guidance_first_check() -> dict[str, Any]:
         "The coding agent is the primary Lean worker.",
         "Official Numina is an optional deployable subagent backend.",
         "Default execution mode is coding-agent mode.",
-        "Distill Lean-specialist agent patterns into the default coding-agent workflow.",
+        "Learn from Lean-specialist agent patterns and integrate them into the default coding-agent workflow.",
         "Use specialist-agent patterns as mechanisms, not mandatory external services.",
         "Use Numina when the user asks for the official Lean Agent, batch proof search, or an external subagent run.",
         "Use the bundled smoke test when no user target is available.",
@@ -156,7 +156,7 @@ def _guidance_first_check() -> dict[str, Any]:
         "请用中文开始",
         "如果用户明确使用其他语言",
         "默认走 coding agent Lean 工作流",
-        "这个 skill 会蒸馏",
+        "这个 skill 会学习并整合",
         "Numina 是可部署的可选 subagent",
     ]
     openai_missing = [phrase for phrase in openai_required if phrase not in openai_yaml]

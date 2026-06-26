@@ -1,6 +1,6 @@
-# Lean-Specialist Agent Pattern Distillation
+# Lean-Specialist Agent Pattern Learning
 
-This reference explains how the coding-agent-first skill absorbs Lean-specialist agent designs without making any external agent mandatory. Preserve the mechanism, not prompts, benchmark-specific assumptions, or private implementation details.
+This reference explains how the coding-agent-first skill learns from Lean-specialist agent designs without making any external agent mandatory. Preserve the mechanism, not prompts, benchmark-specific assumptions, or private implementation details.
 
 ## Source Families
 
@@ -11,7 +11,7 @@ This reference explains how the coding-agent-first skill absorbs Lean-specialist
 - Lean LSP/MCP-style integration: editor/server feedback, goal inspection, diagnostics, and tool scope tied to the target project.
 - Lightweight iterative agents: small edit/check loops, local context retrieval, and explicit stop conditions.
 
-These sources are patterns to distill. Do not claim parity with a specialist prover unless the original backend is actually called and validated.
+These sources are patterns to learn from and integrate. Do not claim parity with a specialist prover unless the original backend is actually called and validated.
 
 Public source anchors:
 
@@ -20,7 +20,7 @@ Public source anchors:
 - LeanCopilot: `https://github.com/lean-dojo/LeanCopilot`
 - COPRA: `https://github.com/trishullab/copra`
 
-## Distilled Default Workflow
+## Learned Default Workflow
 
 1. Gate the project: identify the Lake root, toolchain, mathlib revision, imports, and build status before proof work.
 2. Normalize the target: locate the authoritative theorem statement, declaration name, hypotheses, namespace, and allowed statement changes.
@@ -47,7 +47,7 @@ Public source anchors:
 
 ## Escalation Rule
 
-Default to distilled local patterns. Escalate to a real specialist backend only when:
+Default to learned local patterns. Escalate to a real specialist backend only when:
 
 - the user asks for Numina, official Lean Agent, batch proof search, or an external subagent;
 - local bounded attempts are cycling and the user approves a backend call;
