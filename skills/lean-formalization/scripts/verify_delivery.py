@@ -30,6 +30,7 @@ REQUIRED_FILES = [
     "references/lean_runtime_configuration.md",
     "references/interactive_orchestration.md",
     "references/direct_lean_workflow.md",
+    "references/specialist_agent_patterns.md",
     "references/numina_runtime.md",
     "references/numina_subagent_troubleshooting.md",
     "references/review_checklist.md",
@@ -114,6 +115,8 @@ def _guidance_first_check() -> dict[str, Any]:
         "The coding agent is the primary Lean worker.",
         "Official Numina is an optional deployable subagent backend.",
         "Default execution mode is coding-agent mode.",
+        "Distill Lean-specialist agent patterns into the default coding-agent workflow.",
+        "Use specialist-agent patterns as mechanisms, not mandatory external services.",
         "Use Numina when the user asks for the official Lean Agent, batch proof search, or an external subagent run.",
         "Use the bundled smoke test when no user target is available.",
         "Lead the interaction; do not wait for the user to drive every step.",
@@ -136,6 +139,7 @@ def _guidance_first_check() -> dict[str, Any]:
         "## Session Opening",
         "This is a coding-agent-first Lean skill.",
         "Official Numina is an optional deployable subagent backend.",
+        "The default coding-agent path should still absorb Lean-specialist agent mechanisms:",
         "Use the bundled smoke test when no user target is available.",
         "Lead the interaction; do not wait for the user to drive every step.",
         "A language switch is not a task reset.",
@@ -152,6 +156,7 @@ def _guidance_first_check() -> dict[str, Any]:
         "请用中文开始",
         "如果用户明确使用其他语言",
         "默认走 coding agent Lean 工作流",
+        "这个 skill 会蒸馏",
         "Numina 是可部署的可选 subagent",
     ]
     openai_missing = [phrase for phrase in openai_required if phrase not in openai_yaml]

@@ -2,7 +2,7 @@
 
 Chinese guide: [README.zh-CN.md](README.zh-CN.md)
 
-`lean-formalization` helps a coding agent work with Lean 4 formalization, proof repair, and validation tasks.
+`lean-formalization` helps a coding agent work with Lean 4 formalization, proof repair, and validation tasks. It is coding-agent-first, but it distills useful patterns from Lean-specialist agents such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents.
 
 ## When To Use It
 
@@ -55,6 +55,7 @@ Constraints:
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
+- Distilled Lean-specialist agent patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
 - Optional official `project-numina/numina-lean-agent` deployment/call flow, mediated by the coding agent.
 
 Numina is optional. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.

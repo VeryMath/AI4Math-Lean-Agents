@@ -1,14 +1,16 @@
 # Interactive Orchestration
 
-The coordinating coding agent owns user interaction, Lean proof/formalization work, optional Numina orchestration, and final validation. It can delegate proof search/formalization to the official Numina subagent when the user asks for that backend.
+The coordinating coding agent owns user interaction, Lean proof/formalization work, distilled Lean-specialist agent patterns, optional Numina orchestration, and final validation. It can delegate proof search/formalization to the official Numina subagent when the user asks for that backend.
 
-This reference covers the guidance layer: session opening, intake, task classification, direct coding-agent Lean work, optional Numina deployment/calls, local Lean validation, result review, bounded iteration, and minimal failure handoff.
+This reference covers the guidance layer: session opening, intake, task classification, direct coding-agent Lean work, specialist-agent pattern selection, optional Numina deployment/calls, local Lean validation, result review, bounded iteration, and minimal failure handoff.
 
 ## Session Opening
 
 If the user's language is ambiguous, default to Chinese. The skill display name, repository name, or command name is not enough evidence to choose English.
 
 This is a coding-agent-first Lean skill. Official Numina is an optional deployable subagent backend.
+
+The default coding-agent path should still absorb Lean-specialist agent mechanisms: project gating, statement normalization, theorem-state loops, premise retrieval, bounded proof search, failed-strategy memory, Lean/Lake validation, and minimized failure handoff.
 
 Lead the interaction; do not wait for the user to drive every step. On a broad request, first orient to the current state instead of asking for every input at once:
 
