@@ -233,6 +233,9 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
         "The canonical implementation lives in `../lean-formalization/`.",
         "../lean-formalization/scripts/ai4m_lean.py",
         "Install Lean through the official `elan` channel",
+        "When creating an isolated test directory or workspace",
+        "suggest a safe default name",
+        "use the default if the user has no naming preference",
         "Do not require API keys for Lean/mathlib workspace setup.",
         "hand off to `lean-formalization`",
     ]
