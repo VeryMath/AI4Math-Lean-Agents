@@ -69,14 +69,14 @@ Constraints:
 - ask before Numina setup, source edits, or final proof claims.
 ```
 
-## What It Supports
+## What They Support
 
 - Lean project/workspace inspection.
 - Reusable shared `~/.ai4math/lean-workspace` setup for standalone Lean files.
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
-- Integrated Lean-specialist agent patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
+- Related-work-informed Lean-specialist patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
 - Optional official `project-numina/numina-lean-agent` deployment/call flow, mediated by the coding agent.
 
 Numina is optional. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
