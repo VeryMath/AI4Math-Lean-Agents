@@ -73,3 +73,20 @@ claim 前都应先问用户。
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
 ```
+
+## 参考来源
+
+这个 skill 会学习公开 Lean 生态和 Lean-agent 系统中的有效机制，同时保持自己的
+coding-agent-first 工作流和本地 Lean 验证边界：
+
+- [Lean](https://lean-lang.org/) 和 [Lean 4](https://github.com/leanprover/lean4)
+- [mathlib4](https://github.com/leanprover-community/mathlib4)
+- [Numina Lean Agent](https://github.com/project-numina/numina-lean-agent)
+- [Numina Putnam 2025](https://github.com/project-numina/Numina-Putnam2025)
+- [LeanDojo](https://github.com/lean-dojo/LeanDojo) 和 [ReProver](https://github.com/lean-dojo/ReProver)
+- [LeanCopilot](https://github.com/lean-dojo/LeanCopilot)
+- [lean-lsp-mcp](https://github.com/project-numina/lean-lsp-mcp)
+- [COPRA](https://github.com/trishullab/copra)
+
+这些项目是公开设计参考，主要用于学习 setup、proof-state loop、retrieval、
+validation 和 failure handoff 等机制；本项目不声称复刻或替代原系统。

@@ -126,3 +126,21 @@ For a full local Lean workspace check:
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
 ```
+
+## References
+
+This skill learns from public Lean and Lean-agent systems, while keeping its own
+coding-agent-first workflow and local validation boundary:
+
+- [Lean](https://lean-lang.org/) and [Lean 4](https://github.com/leanprover/lean4)
+- [mathlib4](https://github.com/leanprover-community/mathlib4)
+- [Numina Lean Agent](https://github.com/project-numina/numina-lean-agent)
+- [Numina Putnam 2025](https://github.com/project-numina/Numina-Putnam2025)
+- [LeanDojo](https://github.com/lean-dojo/LeanDojo) and [ReProver](https://github.com/lean-dojo/ReProver)
+- [LeanCopilot](https://github.com/lean-dojo/LeanCopilot)
+- [lean-lsp-mcp](https://github.com/project-numina/lean-lsp-mcp)
+- [COPRA](https://github.com/trishullab/copra)
+
+These references are used as public design inspiration for setup, proof-state
+loops, retrieval, validation, and failure handoff. This project does not claim to
+reproduce or replace the original systems.

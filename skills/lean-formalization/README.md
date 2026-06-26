@@ -28,3 +28,16 @@ Run from the repository root:
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
 ```
+
+## References
+
+This package learns from public Lean ecosystem and Lean-agent projects:
+
+- [Lean](https://lean-lang.org/) and [mathlib4](https://github.com/leanprover-community/mathlib4)
+- [Numina Lean Agent](https://github.com/project-numina/numina-lean-agent)
+- [LeanDojo](https://github.com/lean-dojo/LeanDojo), [ReProver](https://github.com/lean-dojo/ReProver), and [LeanCopilot](https://github.com/lean-dojo/LeanCopilot)
+- [lean-lsp-mcp](https://github.com/project-numina/lean-lsp-mcp)
+- [COPRA](https://github.com/trishullab/copra)
+
+They are public design references, not bundled dependencies or claims of
+compatibility.
