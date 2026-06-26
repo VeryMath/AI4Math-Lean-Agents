@@ -12,6 +12,7 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SKILL_ROOT / "scripts"))
 
 from ai4m_lean import EXIT_LEAN_FAILED, _exit_code  # noqa: E402
+from verify_delivery import _lean_setup_entrypoint_check, _package_hygiene, _root_discovery_boundary_check  # noqa: E402
 
 CLI = SKILL_ROOT / "scripts" / "ai4m_lean.py"
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
@@ -147,6 +148,33 @@ class CliTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["status"], "delivery_ready")
         self.assertIn("verify-delivery", payload["commands"]["available"])
+        self.assertTrue(payload["checks"]["lean_setup_entrypoint"])
+        self.assertFalse(payload["lean_setup_entrypoint"]["missing_phrases"])
+
+    def test_root_discovery_does_not_steal_setup_only_tasks(self) -> None:
+        boundary = _root_discovery_boundary_check()
+        self.assertTrue(boundary["ok"], boundary)
+        self.assertFalse(boundary["root_setup_only_trigger_hits"])
+
+    def test_lean_setup_entrypoint_uses_sibling_helper_layout(self) -> None:
+        setup = _lean_setup_entrypoint_check()
+        self.assertTrue(setup["ok"], setup)
+        self.assertTrue(setup["helper_script_exists"], setup)
+        self.assertFalse(setup["repo_root_command_hits"], setup)
+
+    def test_package_hygiene_scans_lean_setup_entrypoint(self) -> None:
+        generated = SKILL_ROOT.parent / "lean-setup" / "__pycache__" / "sentinel.pyc"
+        generated.parent.mkdir(exist_ok=True)
+        try:
+            generated.write_bytes(b"placeholder")
+            hygiene = _package_hygiene()
+            self.assertIn("lean-setup/__pycache__/sentinel.pyc", hygiene["generated_files"])
+        finally:
+            generated.unlink(missing_ok=True)
+            try:
+                generated.parent.rmdir()
+            except OSError:
+                pass
 
 
 if __name__ == "__main__":
