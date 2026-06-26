@@ -1,6 +1,6 @@
 # Interactive Orchestration
 
-The coordinating coding agent owns user interaction, Lean proof/formalization work, learned Lean-specialist agent patterns, optional Numina orchestration, and final validation. It can delegate proof search/formalization to the official Numina subagent when the user asks for that backend.
+The coordinating coding agent owns user interaction, Lean proof/formalization work, incorporated Lean-specialist agent patterns, optional Numina orchestration, and final validation. It can delegate proof search/formalization to the official Numina subagent when the user asks for that backend.
 
 This reference covers the guidance layer: session opening, intake, task classification, direct coding-agent Lean work, specialist-agent pattern selection, optional Numina deployment/calls, local Lean validation, result review, bounded iteration, and minimal failure handoff.
 

@@ -2,7 +2,7 @@
 
 Chinese guide: [README.zh-CN.md](README.zh-CN.md)
 
-`lean-formalization` helps a coding agent work with Lean 4 formalization, proof repair, and validation tasks. It is coding-agent-first, but it learns from and integrates useful patterns from Lean-specialist agents such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents.
+`lean-formalization` is a coding-agent-first skill package for Lean 4 formalization, proof repair, and validation. Its design is informed by publicly available Lean-specialist agent patterns from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents.
 
 ## When To Use It
 
@@ -55,7 +55,7 @@ Constraints:
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
-- Learned Lean-specialist agent patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
+- Integrated Lean-specialist agent patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
 - Optional official `project-numina/numina-lean-agent` deployment/call flow, mediated by the coding agent.
 
 Numina is optional. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
@@ -127,10 +127,11 @@ For a full local Lean workspace check:
 PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
 ```
 
-## References
+## Related Work and Public References
 
-This skill learns from public Lean and Lean-agent systems, while keeping its own
-coding-agent-first workflow and local validation boundary:
+This project is informed by the following public Lean ecosystem projects and
+Lean-agent systems, while maintaining its own coding-agent-first workflow and
+local validation boundary:
 
 - [Lean](https://lean-lang.org/) and [Lean 4](https://github.com/leanprover/lean4)
 - [mathlib4](https://github.com/leanprover-community/mathlib4)
@@ -141,6 +142,7 @@ coding-agent-first workflow and local validation boundary:
 - [lean-lsp-mcp](https://github.com/project-numina/lean-lsp-mcp)
 - [COPRA](https://github.com/trishullab/copra)
 
-These references are used as public design inspiration for setup, proof-state
-loops, retrieval, validation, and failure handoff. This project does not claim to
-reproduce or replace the original systems.
+These references are cited for related-work context and design provenance around
+setup, proof-state loops, retrieval, validation, and failure handoff. Unless
+explicitly stated, this repository does not vendor, reproduce, replace, or claim
+compatibility with the original systems.

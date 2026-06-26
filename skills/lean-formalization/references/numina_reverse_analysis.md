@@ -1,6 +1,6 @@
-# Numina and Lean-Specialist Agent Learning
+# Numina and Lean-Specialist Agent Pattern Integration
 
-This reference records what this coding-agent Lean skill learns from the public Numina Lean Agent workflow, and how those lessons fit the broader Lean-specialist agent pattern library in `specialist_agent_patterns.md`. For deployment/call instructions, use `numina_runtime.md`.
+This reference records how this coding-agent Lean skill incorporates mechanisms from the public Numina Lean Agent workflow, and how those mechanisms fit the broader Lean-specialist agent pattern library in `specialist_agent_patterns.md`. For deployment/call instructions, use `numina_runtime.md`.
 
 ## Source Scope
 
@@ -8,9 +8,9 @@ This reference records what this coding-agent Lean skill learns from the public 
 - Result repository: https://github.com/project-numina/Numina-Putnam2025
 - Paper reference: https://arxiv.org/abs/2601.14027
 
-The goal is not to copy Numina prompts or reimplement Numina proof search. The goal is to learn reusable Lean-agent mechanisms and integrate them into a comprehensive coding-agent skill while preserving a deployable path to the official Numina runtime when the user wants a subagent.
+The goal is not to copy Numina prompts or reimplement Numina proof search. The goal is to incorporate reusable Lean-agent mechanisms into a comprehensive coding-agent skill while preserving a deployable path to the official Numina runtime when the user wants a subagent.
 
-## Learned Patterns
+## Incorporated Patterns
 
 1. Use a coding agent as the primary Lean worker, with Numina available as an optional subagent.
 2. Keep Lean/Lake validation as the correctness oracle.
