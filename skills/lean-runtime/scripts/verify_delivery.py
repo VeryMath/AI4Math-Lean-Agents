@@ -17,11 +17,15 @@ from tool_status import doctor, find_tool
 from validate_patch import review_files
 
 
-SKILL_ROOT = Path(__file__).resolve().parents[1]
-SKILLS_ROOT = SKILL_ROOT.parent
-REQUIRED_FILES = [
+RUNTIME_ROOT = Path(__file__).resolve().parents[1]
+SKILLS_ROOT = RUNTIME_ROOT.parent
+FORMALIZATION_ROOT = SKILLS_ROOT / "lean-formalization"
+SETUP_ROOT = SKILLS_ROOT / "lean-setup"
+REQUIRED_FORMALIZATION_FILES = [
     "SKILL.md",
     "agents/openai.yaml",
+]
+REQUIRED_RUNTIME_FILES = [
     "config/lean_agent.example.toml",
     "config/numina_runtime.example.toml",
     "examples/smoke/NuminaSmoke.lean",
@@ -29,6 +33,7 @@ REQUIRED_FILES = [
     "schemas/result.schema.json",
     "schemas/config.schema.json",
     "references/lean_runtime_configuration.md",
+    "references/backend_adapter_checklist.md",
     "references/interactive_orchestration.md",
     "references/direct_lean_workflow.md",
     "references/specialist_agent_patterns.md",
@@ -78,10 +83,10 @@ def _load_schema(path: Path) -> dict[str, Any]:
 
 
 def _package_hygiene() -> dict[str, Any]:
-    package_roots = [SKILL_ROOT]
-    setup_root = SKILLS_ROOT / "lean-setup"
-    if setup_root.exists():
-        package_roots.append(setup_root)
+    package_roots = [RUNTIME_ROOT]
+    for root in (FORMALIZATION_ROOT, SETUP_ROOT):
+        if root.exists():
+            package_roots.append(root)
     generated = [
         str(path.relative_to(SKILLS_ROOT))
         for root in package_roots
@@ -115,31 +120,39 @@ def _package_hygiene() -> dict[str, Any]:
 
 
 def _guidance_first_check() -> dict[str, Any]:
-    text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8", errors="replace")
-    orchestration = (SKILL_ROOT / "references" / "interactive_orchestration.md").read_text(encoding="utf-8", errors="replace")
+    text = (FORMALIZATION_ROOT / "SKILL.md").read_text(encoding="utf-8", errors="replace")
+    orchestration = (RUNTIME_ROOT / "references" / "interactive_orchestration.md").read_text(encoding="utf-8", errors="replace")
     required_phrases = [
         "## Agent Playbook",
         "## Helper Toolbox",
         "This is a coding-agent-first Lean skill.",
         "The coding agent is the primary Lean worker.",
-        "Official Numina is an optional deployable subagent backend.",
+        "Lean-specialist backend adapters are optional escalation paths.",
+        "optional Lean-specialist backend",
+        "Currently supported optional backend: official Numina Lean Agent runtime",
+        "Official Numina is the only currently supported deployable backend adapter",
+        "Archon and other backends are future adapters",
+        "future adapters until an adapter contract, setup path, call path, and local validation gates are implemented",
+        "do not claim support until deployment, readiness checks, invocation, validation, and failure triage are documented",
+        "Default coding-agent Lean work must not require any backend adapter.",
+        "Use the official Numina adapter only when the user asks for the official Lean Agent, Numina, batch proof search, or an approved external subagent run.",
         "Default execution mode is coding-agent mode.",
         "Incorporate publicly documented Lean-specialist agent patterns into the default coding-agent workflow.",
         "Treat specialist-agent patterns as mechanisms, not mandatory external services.",
-        "Use Numina when the user asks for the official Lean Agent, batch proof search, or an external subagent run.",
         "Use the bundled smoke test when no user target is available.",
         "Lead the interaction; do not wait for the user to drive every step.",
         "If the user's language is ambiguous, default to Chinese.",
         "A language switch is not a task reset.",
         "If no target is available, run or propose a safe local smoke/readiness check.",
         "Avoid ending with only \"send me a file\"",
-        "Opening readiness should inspect local Lean readiness and Numina subagent readiness separately.",
+        "Opening readiness should inspect local Lean readiness first",
+        "inspect Numina or another backend readiness only when the user asks for an optional Lean-specialist backend",
         "Do not require API keys for the default coding-agent path.",
         "Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.",
         "offer a small next-step menu",
         "Ask at most one blocking question at a time.",
         "The bundled CLI is a helper toolbox, not the workflow driver.",
-        "Use official Numina through a human-in-the-loop subagent workflow.",
+        "Use official Numina through a human-in-the-loop backend adapter workflow.",
         "Do not turn helper commands into a closed proof workflow.",
         "Do not remove the official Numina subagent path.",
     ]
@@ -147,26 +160,31 @@ def _guidance_first_check() -> dict[str, Any]:
     orchestration_required = [
         "## Session Opening",
         "This is a coding-agent-first Lean skill.",
-        "Official Numina is an optional deployable subagent backend.",
+        "Official Numina is the only currently supported deployable backend adapter",
+        "Archon and other backends are future adapters",
         "The default coding-agent path should still absorb Lean-specialist agent mechanisms:",
         "Use the bundled smoke test when no user target is available.",
         "Lead the interaction; do not wait for the user to drive every step.",
         "A language switch is not a task reset.",
         "If no target is available, run or propose a safe local smoke/readiness check.",
         "Avoid ending with only \"send me a file\"",
-        "Opening readiness should inspect local Lean readiness and Numina subagent readiness separately.",
+        "Opening readiness should inspect local Lean readiness first",
+        "Inspect Numina or another backend readiness only when the user asks for an optional Lean-specialist backend.",
         "Do not require API keys for the default coding-agent path.",
         "Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.",
         "A good opening ends with one decision question, not a checklist.",
     ]
     orchestration_missing = [phrase for phrase in orchestration_required if phrase not in orchestration]
-    openai_yaml = (SKILL_ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8", errors="replace")
+    openai_yaml = (FORMALIZATION_ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8", errors="replace")
     openai_required = [
         "请用中文开始",
         "如果用户明确使用其他语言",
         "默认走 coding agent Lean 工作流",
         "该 skill 参考并整合",
-        "Numina 是可部署的可选 subagent",
+        "目前只承诺 official Numina adapter 已支持",
+        "Archon 和其他 backend 只能作为 future adapters",
+        "默认开场检查本地 Lean/shared workspace readiness",
+        "仅当用户要求 optional backend 时再检查 Numina readiness",
     ]
     openai_missing = [phrase for phrase in openai_required if phrase not in openai_yaml]
     return {
@@ -209,16 +227,14 @@ def _root_discovery_boundary_check() -> dict[str, Any]:
 
 
 def _lean_setup_entrypoint_check() -> dict[str, Any]:
-    setup_root = SKILLS_ROOT / "lean-setup"
-    readme_path = setup_root / "README.md"
-    skill_path = setup_root / "SKILL.md"
-    openai_path = setup_root / "agents" / "openai.yaml"
-    helper_script = SKILL_ROOT / "scripts" / "ai4m_lean.py"
-    required_files = [readme_path, skill_path, openai_path]
+    skill_path = SETUP_ROOT / "SKILL.md"
+    openai_path = SETUP_ROOT / "agents" / "openai.yaml"
+    helper_script = RUNTIME_ROOT / "scripts" / "ai4m_lean.py"
+    required_files = [skill_path, openai_path]
     if not all(path.exists() for path in required_files):
         return {
             "ok": False,
-            "setup_root": str(setup_root),
+            "setup_root": str(SETUP_ROOT),
             "helper_script": str(helper_script),
             "helper_script_exists": helper_script.exists(),
             "missing_files": [str(path) for path in required_files if not path.exists()],
@@ -231,24 +247,31 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
     required_phrases = [
         "Use this setup-only entrypoint",
         "Do not ask for a theorem target in setup-only mode.",
-        "The canonical implementation lives in `../lean-formalization/`.",
-        "../lean-formalization/scripts/ai4m_lean.py",
+        "The shared implementation lives in `../lean-runtime/`.",
+        "../lean-runtime/scripts/ai4m_lean.py",
         "Install Lean through the official `elan` channel",
         "When creating an isolated test directory or workspace",
         "suggest a safe default name",
         "use the default if the user has no naming preference",
+        "After successful setup or smoke-test validation",
+        "Offer a short next-step menu",
+        "inspect an existing Lean/Lake project",
+        "repair a Lean file or complete `sorry`",
+        "formalize a natural-language or LaTeX theorem",
+        "mention optional Numina only when the user explicitly asks",
         "Do not require API keys for Lean/mathlib workspace setup.",
         "hand off to `lean-formalization`",
     ]
     repo_root_commands = [
-        "python skills/lean-formalization/scripts/ai4m_lean.py",
+        "python skills/" + "lean-formalization/scripts/ai4m_lean.py",
     ]
     repo_root_command_hits = [phrase for phrase in repo_root_commands if phrase in text]
     openai_required = [
         "不要向用户索要 theorem target",
-        "所有实现应复用 lean-formalization",
+        "setup 完成后主动给出下一步菜单",
+        "所有实现应复用 lean-runtime",
         "默认 Lean/mathlib 环境配置不需要 API key",
-        "先给出安全默认名称并允许用户确认或改名",
+        "不要把 Numina 放进默认下一步",
         "应交接到 lean-formalization",
     ]
     return {
@@ -258,7 +281,7 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
             and all(phrase in text for phrase in required_phrases)
             and all(phrase in openai_yaml for phrase in openai_required)
         ),
-        "setup_root": str(setup_root),
+        "setup_root": str(SETUP_ROOT),
         "helper_script": str(helper_script),
         "helper_script_exists": helper_script.exists(),
         "missing_phrases": [phrase for phrase in required_phrases if phrase not in text],
@@ -274,18 +297,24 @@ def verify(
     run_tests: bool = False,
 ) -> dict[str, Any]:
     cwd_path = Path(cwd).resolve()
-    files = [{"path": item, "exists": (SKILL_ROOT / item).exists()} for item in REQUIRED_FILES]
+    files = [
+        {"path": f"lean-formalization/{item}", "exists": (FORMALIZATION_ROOT / item).exists()}
+        for item in REQUIRED_FORMALIZATION_FILES
+    ] + [
+        {"path": f"lean-runtime/{item}", "exists": (RUNTIME_ROOT / item).exists()}
+        for item in REQUIRED_RUNTIME_FILES
+    ]
     commands = _parser_commands()
     schemas = []
     for name in ("task.schema.json", "result.schema.json", "config.schema.json"):
-        path = SKILL_ROOT / "schemas" / name
+        path = RUNTIME_ROOT / "schemas" / name
         try:
             _load_schema(path)
             schemas.append({"path": f"schemas/{name}", "ok": True})
         except Exception as exc:  # noqa: BLE001 - report schema parse failure in JSON
             schemas.append({"path": f"schemas/{name}", "ok": False, "error": str(exc)})
 
-    fixtures = SKILL_ROOT / "tests" / "fixtures"
+    fixtures = RUNTIME_ROOT / "tests" / "fixtures"
     with tempfile.TemporaryDirectory() as tmp:
         dry_root = Path(tmp)
         dry_target = dry_root / "Failure.lean"
@@ -313,7 +342,7 @@ def verify(
 
     tests = None
     if run_tests:
-        tests = run_command([sys.executable, "-m", "unittest", "discover", "-s", str(SKILL_ROOT / "tests")], cwd=SKILL_ROOT, timeout=300)
+        tests = run_command([sys.executable, "-m", "unittest", "discover", "-s", str(RUNTIME_ROOT / "tests")], cwd=RUNTIME_ROOT, timeout=300)
 
     hygiene = _package_hygiene()
     guidance_first = _guidance_first_check()
@@ -347,7 +376,9 @@ def verify(
         "ok": ok,
         "status": "delivery_ready" if ok else "delivery_blocked",
         "cwd": str(cwd_path),
-        "skill_root": str(SKILL_ROOT),
+        "runtime_root": str(RUNTIME_ROOT),
+        "formalization_root": str(FORMALIZATION_ROOT),
+        "setup_root": str(SETUP_ROOT),
         "checks": checks,
         "files": files,
         "commands": {

@@ -75,7 +75,7 @@ def inspect_environment(cwd: str | Path = ".", config_path: str | Path | None = 
             "mode": "coding-agent",
             "backend": "none",
             "numina_required": False,
-            "numina_runtime": "optional-subagent-backend",
+            "numina_runtime": "supported-optional-backend-adapter",
         },
         "lean": {
             "target": str(target_path),

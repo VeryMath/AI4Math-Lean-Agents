@@ -39,7 +39,7 @@ def run_smoke_test(
                 "ai4math_numina_smoke_le_succ",
             ],
             "external_api_call": False,
-            "recommended_next_action": "run the bundled smoke target, then start the coding-agent Lean task or discuss the optional Numina subagent path",
+            "recommended_next_action": "run the bundled smoke target, then start the coding-agent Lean task or discuss the supported optional Numina backend path",
         }
     if not workspace_root:
         return {
@@ -64,12 +64,12 @@ def run_smoke_test(
             "ai4math_numina_smoke_le_succ",
         ],
         "external_api_call": False,
-        "recommended_next_action": "use this verified workspace for the next coding-agent Lean task; call official Numina only if the optional subagent path is approved",
+        "recommended_next_action": "use this verified workspace for the next coding-agent Lean task; call official Numina only if the optional backend path is approved",
     }
     lean_result = run_command(command, cwd=workspace_root, timeout=timeout)
     result["lean"] = lean_result
     result["ok"] = bool(lean_result.get("ok"))
     result["status"] = "ok" if result["ok"] else "lean_smoke_failed"
     if not result["ok"]:
-        result["recommended_next_action"] = "inspect the Lean smoke error, then repair the shared workspace before any Lean task or optional Numina call"
+        result["recommended_next_action"] = "inspect the Lean smoke error, then repair the shared workspace before any Lean task or optional backend call"
     return result
