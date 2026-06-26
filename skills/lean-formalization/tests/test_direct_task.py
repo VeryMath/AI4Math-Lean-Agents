@@ -14,7 +14,7 @@ from direct_task import build_direct_task, run_direct_task  # noqa: E402
 
 
 class DirectTaskTests(unittest.TestCase):
-    def test_managed_workspace_routes_standalone_file_to_numina_agent(self) -> None:
+    def test_managed_workspace_routes_standalone_file_to_coding_agent(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             workspace = root / ".ai4math" / "lean-workspace"
@@ -28,9 +28,9 @@ class DirectTaskTests(unittest.TestCase):
                 result = build_direct_task("prove", root, target)
 
             self.assertTrue(result["ok"])
-            self.assertEqual(result["status"], "numina_task_ready")
-            self.assertEqual(result["agent_mode"], "numina-agent")
-            self.assertEqual(result["backend"], "official-numina")
+            self.assertEqual(result["status"], "coding_agent_task_ready")
+            self.assertEqual(result["agent_mode"], "coding-agent")
+            self.assertEqual(result["backend"], "none")
             self.assertEqual(result["workspace_mode"], "managed_workspace")
             self.assertEqual(result["missing_config"], [])
 
@@ -46,7 +46,7 @@ class DirectTaskTests(unittest.TestCase):
             self.assertFalse(result["ok"])
             self.assertEqual(result["status"], "missing_config")
             self.assertIn("lean_workspace", result["missing_config"])
-            self.assertEqual(result["backend"], "official-numina")
+            self.assertEqual(result["backend"], "none")
 
     def test_dry_run_marks_ready_task_without_external_command(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -60,7 +60,8 @@ class DirectTaskTests(unittest.TestCase):
 
             self.assertTrue(result["ok"])
             self.assertEqual(result["status"], "dry_run")
-            self.assertEqual(result["backend"], "official-numina")
+            self.assertEqual(result["backend"], "none")
+            self.assertIn("direct_workflow", result)
             self.assertNotIn("command", result)
 
 

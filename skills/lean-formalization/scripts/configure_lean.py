@@ -72,10 +72,10 @@ def inspect_environment(cwd: str | Path = ".", config_path: str | Path | None = 
         "configuration_status": "configured" if not missing else "missing_config",
         "cwd": str(cwd_path),
         "agent": {
-            "mode": "numina-agent",
-            "backend": "official-numina",
-            "numina_required": True,
-            "numina_runtime": "default-official-runtime",
+            "mode": "coding-agent",
+            "backend": "none",
+            "numina_required": False,
+            "numina_runtime": "optional-subagent-backend",
         },
         "lean": {
             "target": str(target_path),
@@ -175,8 +175,8 @@ def configure(
                 "allow_user_project_version_changes": False,
             },
             "agent": {
-                "mode": "numina-agent",
-                "backend": "official-numina",
+                "mode": "coding-agent",
+                "backend": "none",
             },
         })
 

@@ -8,8 +8,8 @@
       "type": "string",
       "enum": ["check", "configure", "prove_theorem", "formalize_statement", "repair_file", "complete_sorries", "batch", "review", "minimize_failure"]
     },
-    "agent_mode": {"type": "string", "enum": ["numina-agent", "direct-validation-fallback"], "default": "numina-agent"},
-    "backend": {"type": "string", "enum": ["official-numina", "none"], "default": "official-numina"},
+    "agent_mode": {"type": "string", "enum": ["coding-agent", "numina-subagent", "hybrid"], "default": "coding-agent"},
+    "backend": {"type": "string", "enum": ["none", "official-numina"], "default": "none"},
     "cwd": {"type": "string"},
     "file": {"type": "string"},
     "folder": {"type": "string"},

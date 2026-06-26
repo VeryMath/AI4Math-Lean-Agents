@@ -18,7 +18,7 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
 
 class CliTests(unittest.TestCase):
-    def test_dry_run_prove_outputs_numina_task(self) -> None:
+    def test_dry_run_prove_outputs_coding_agent_task(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             workspace = root / ".ai4math" / "lean-workspace"
@@ -47,9 +47,9 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
         self.assertEqual(payload["status"], "dry_run")
-        self.assertEqual(payload["agent_mode"], "numina-agent")
-        self.assertEqual(payload["backend"], "official-numina")
-        self.assertIn("numina_workflow", payload)
+        self.assertEqual(payload["agent_mode"], "coding-agent")
+        self.assertEqual(payload["backend"], "none")
+        self.assertIn("direct_workflow", payload)
         self.assertNotIn("command", payload)
 
     def test_check_skip_build_outputs_json(self) -> None:

@@ -14,8 +14,8 @@ preferred_mathlib_rev = "auto"
 allow_user_project_version_changes = false
 
 [agent]
-mode = "numina-agent"
-backend = "official-numina"
+mode = "coding-agent"
+backend = "none"
 max_local_iterations = 5
 require_user_statement_confirmation = true
 

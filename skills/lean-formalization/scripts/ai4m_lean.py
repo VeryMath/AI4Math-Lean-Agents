@@ -52,10 +52,10 @@ def add_common(parser: argparse.ArgumentParser) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="AI4Math Numina Lean Agent orchestration CLI")
+    parser = argparse.ArgumentParser(description="AI4Math coding-agent Lean skill CLI with optional Numina subagent orchestration")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    env = sub.add_parser("env", help="Inspect Lean workspace and Numina Agent environment")
+    env = sub.add_parser("env", help="Inspect Lean workspace and optional Numina subagent environment")
     add_common(env)
     env.add_argument("--target", default=None)
 
@@ -84,7 +84,7 @@ def build_parser() -> argparse.ArgumentParser:
     configure_parser.add_argument("--project-name", default=None, help="Lean project name for official Numina tutorial setup")
 
     for name in ("prove", "formalize", "repair", "complete-sorries"):
-        proof = sub.add_parser(name, help=f"Prepare a Numina Agent {name} task")
+        proof = sub.add_parser(name, help=f"Prepare a coding-agent {name} task")
         add_common(proof)
         proof.add_argument("--file", required=True)
         proof.add_argument("--target", default=None)
@@ -95,7 +95,7 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "formalize":
             proof.add_argument("--statement-file", default=None)
 
-    batch = sub.add_parser("batch", help="Prepare a Numina Agent folder task")
+    batch = sub.add_parser("batch", help="Prepare a coding-agent folder task")
     add_common(batch)
     batch.add_argument("--folder", required=True)
     batch.add_argument("--max-rounds", type=int, default=5)
