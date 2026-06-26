@@ -22,7 +22,7 @@ The agent should produce Lean patches, validation summaries, blocked-goal explan
 Copy this to your coding agent:
 
 ```text
-Please install the `lean-formalization` skill from https://github.com/VeryMath/AI4Math-Lean-Agents.git (branch: feature/numina-runtime-delivery). Read `.agent.md`, install the declared Skill entrypoint, verify that `$lean-formalization` is discoverable, and tell me whether I need to restart the agent.
+Please install the `lean-formalization` skill from https://github.com/VeryMath/AI4Math-Lean-Agents.git. Read `.agent.md`, install the declared Skill entrypoint, verify that `$lean-formalization` is discoverable, and tell me whether I need to restart the agent.
 ```
 
 If you already have this skill repository locally, replace the repository URL
