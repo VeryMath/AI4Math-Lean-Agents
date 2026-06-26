@@ -7,6 +7,8 @@ This repository provides two AI4Math Lean skills:
 - `lean-setup`: a setup-only entrypoint for Lean 4, `elan`, `lake`, and reusable mathlib workspace readiness.
 - `lean-formalization`: a coding-agent-first skill package for Lean 4 formalization, proof repair, and validation.
 
+Both public skills share the bundled `skills/lean-runtime/` support layer for helper scripts, references, prompts, schemas, examples, and tests. Users invoke only the two public skills; installers should keep `lean-runtime` next to them.
+
 `lean-formalization` is informed by publicly available Lean-specialist agent patterns from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents.
 
 ## When To Use These Skills
@@ -28,7 +30,7 @@ The agent should produce Lean patches, validation summaries, blocked-goal explan
 Copy this to your coding agent:
 
 ```text
-Please install the `lean-setup` and `lean-formalization` skills from https://github.com/VeryMath/AI4Math-Lean-Agents.git. Read `.agent.md`, install the declared Skill entrypoints, verify that `$lean-setup` and `$lean-formalization` are discoverable, and tell me whether I need to restart the agent.
+Please install the `lean-setup` and `lean-formalization` skills from https://github.com/VeryMath/AI4Math-Lean-Agents.git. Read `.agent.md`, install the declared Skill entrypoints together with their sibling `lean-runtime` support directory, verify that `$lean-setup` and `$lean-formalization` are discoverable, and tell me whether I need to restart the agent.
 ```
 
 If you already have this skill repository locally, replace the repository URL
@@ -95,7 +97,8 @@ Numina is optional. The public CLI does not expose a parallel `numina-*` workflo
 ├── .opencode/           # optional OpenCode agent
 └── skills/
     ├── lean-setup/          # setup-only entrypoint
-    └── lean-formalization/  # proof/formalization implementation
+    ├── lean-formalization/  # proof/formalization entrypoint
+    └── lean-runtime/        # shared support layer, not a user-invoked skill
 ```
 
 ## How To Interact
@@ -117,28 +120,28 @@ claims.
 Run commands from the repository root:
 
 ```bash
-python skills/lean-formalization/scripts/ai4m_lean.py env --cwd .
-python skills/lean-formalization/scripts/ai4m_lean.py doctor --cwd .
-python skills/lean-formalization/scripts/ai4m_lean.py configure --cwd . --create-workspace
-python skills/lean-formalization/scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs --dry-run
-python skills/lean-formalization/scripts/ai4m_lean.py check --cwd . --skip-build
-python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
+python skills/lean-runtime/scripts/ai4m_lean.py env --cwd .
+python skills/lean-runtime/scripts/ai4m_lean.py doctor --cwd .
+python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --create-workspace
+python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs --dry-run
+python skills/lean-runtime/scripts/ai4m_lean.py check --cwd . --skip-build
+python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
 ```
 
 The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, choosing proof strategy, and matching the user's language.
 
-For the optional Numina path, read `skills/lean-formalization/references/numina_runtime.md`. Setup and official runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
+For the optional Numina path, read `skills/lean-runtime/references/numina_runtime.md`. Setup and official runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
 
 ## Validate
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
+PYTHONDONTWRITEBYTECODE=1 python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
 ```
 
 For a full local Lean workspace check:
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
+PYTHONDONTWRITEBYTECODE=1 python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
 ```
 
 ## Related Work and Public References

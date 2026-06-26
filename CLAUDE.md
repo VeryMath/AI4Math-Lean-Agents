@@ -12,6 +12,12 @@ For Lean formalization or proof work in this repository, read and follow the sha
 skills/lean-formalization/SKILL.md
 ```
 
+Shared helper scripts, references, prompts, schemas, examples, and tests live in:
+
+```text
+skills/lean-runtime/
+```
+
 Use Claude Code as the primary Lean coding agent. Official Numina is an optional deployable subagent backend; preserve that setup/call path but do not make it the default.
 Setup-only mode should create or verify the Lean/mathlib workspace without asking for a theorem target.
 

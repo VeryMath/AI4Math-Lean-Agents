@@ -20,8 +20,8 @@ Repository-local machine settings still live under `<repo>/.ai4math/` and should
 Use:
 
 ```bash
-python scripts/ai4m_lean.py doctor --cwd .
-python scripts/ai4m_lean.py env --cwd .
+python skills/lean-runtime/scripts/ai4m_lean.py doctor --cwd .
+python skills/lean-runtime/scripts/ai4m_lean.py env --cwd .
 ```
 
 Required default workflow tools are `git`, `python3`, `elan`, `lean`, and `lake`. Numina setup additionally reports `curl`, `uv`, and `claude` readiness. Official Numina subagent calls need a working Claude CLI/auth path and may need additional API keys for search/tool skills.
@@ -31,7 +31,7 @@ Required default workflow tools are `git`, `python3`, `elan`, `lean`, and `lake`
 For standalone tasks, prefer `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`. Create it once with:
 
 ```bash
-python scripts/ai4m_lean.py configure --cwd . --create-workspace --toolchain leanprover/lean4:v4.28.0
+python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --create-workspace --toolchain leanprover/lean4:v4.28.0
 ```
 
 Equivalent Lake commands:

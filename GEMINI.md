@@ -25,4 +25,4 @@ Setup-only readiness should focus on local Lean/mathlib state, and should mentio
 Do not require API keys for the default coding-agent path.
 Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.
 
-The helper CLI under `skills/lean-formalization/scripts/` is optional tooling. It can report and configure the official Numina subagent runtime, but the agent should still validate final Lean patches locally.
+The helper CLI under `skills/lean-runtime/scripts/` is optional tooling shared by the two public Skill entrypoints. It can report and configure the official Numina subagent runtime, but the agent should still validate final Lean patches locally.

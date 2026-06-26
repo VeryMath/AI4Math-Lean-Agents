@@ -2,6 +2,7 @@
 
 Use `skills/lean-setup/SKILL.md` for setup-only tasks such as installing or verifying Lean 4, `elan`, `lake`, or a reusable mathlib workspace.
 Use the canonical shared Skill layer at `skills/lean-formalization/SKILL.md` for Lean 4 formalization, proof repair, theorem transcription, `sorry` completion, Lean patch review, official Numina Lean Agent runtime deployment/calls, local Lean validation, and minimal failure handoff.
+Reusable scripts, examples, prompts, schemas, and references live in the non-user-facing support layer at `skills/lean-runtime/`; install it alongside the two public Skill entrypoints.
 
 Core rules:
 
@@ -27,5 +28,5 @@ Core rules:
 Useful validation:
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python skills/lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
+PYTHONDONTWRITEBYTECODE=1 python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests
 ```

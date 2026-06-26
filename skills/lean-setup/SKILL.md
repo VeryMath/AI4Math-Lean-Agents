@@ -7,7 +7,7 @@ description: Use when a coding agent needs to install or verify Lean 4, elan, la
 
 Use this setup-only entrypoint when the user only wants a Lean 4 environment, `elan`/`lake` readiness, or a reusable mathlib workspace. Do not ask for a theorem target in setup-only mode.
 
-The canonical implementation lives in `../lean-formalization/`. This skill must reuse the same helper CLI, configuration rules, and runtime references rather than duplicating setup logic.
+The shared implementation lives in `../lean-runtime/`. This skill must reuse the same helper CLI, configuration rules, and runtime references rather than duplicating setup logic or depending on the formalization entrypoint.
 
 ## Setup-Only Flow
 
@@ -24,13 +24,13 @@ The canonical implementation lives in `../lean-formalization/`. This skill must 
 
 ## Commands
 
-Resolve the helper from the sibling skill path `../lean-formalization/scripts/ai4m_lean.py`, then run it with `--cwd <target-project-or-workspace>`. In a source checkout this is the same helper under `skills/lean-formalization/scripts/ai4m_lean.py`.
+Resolve the helper from the shared runtime path `../lean-runtime/scripts/ai4m_lean.py`, then run it with `--cwd <target-project-or-workspace>`. In a source checkout this is the same helper under `skills/lean-runtime/scripts/ai4m_lean.py`.
 
 ```bash
-python ../lean-formalization/scripts/ai4m_lean.py doctor --cwd <target-project-or-workspace>
-python ../lean-formalization/scripts/ai4m_lean.py env --cwd <target-project-or-workspace>
-python ../lean-formalization/scripts/ai4m_lean.py configure --cwd <target-project-or-workspace> --create-workspace
-python ../lean-formalization/scripts/ai4m_lean.py smoke-test --cwd <target-project-or-workspace>
+python ../lean-runtime/scripts/ai4m_lean.py doctor --cwd <target-project-or-workspace>
+python ../lean-runtime/scripts/ai4m_lean.py env --cwd <target-project-or-workspace>
+python ../lean-runtime/scripts/ai4m_lean.py configure --cwd <target-project-or-workspace> --create-workspace
+python ../lean-runtime/scripts/ai4m_lean.py smoke-test --cwd <target-project-or-workspace>
 ```
 
 Use `--dry-run` before setup when the user wants to review commands.
@@ -45,6 +45,6 @@ Use `--dry-run` before setup when the user wants to review commands.
 
 ## References
 
-- Read `../lean-formalization/references/lean_runtime_configuration.md` for shared workspace layout, local configuration, and version policy.
-- Read `../lean-formalization/references/numina_runtime.md` only when the user asks for optional official Numina setup.
-- Use `../lean-formalization/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests` for package validation.
+- Read `../lean-runtime/references/lean_runtime_configuration.md` for shared workspace layout, local configuration, and version policy.
+- Read `../lean-runtime/references/numina_runtime.md` only when the user asks for optional official Numina setup.
+- Use `../lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --run-tests` for package validation.

@@ -15,6 +15,12 @@ skills/lean-formalization/SKILL.md
 Read that concrete Skill before formalization or proof work. Keep platform
 adapters thin and improve the shared Skill layer first.
 
+Reusable scripts, prompts, examples, references, schemas, and tests live in:
+
+```text
+skills/lean-runtime/
+```
+
 For setup-only tasks such as installing Lean, checking `elan`/`lake`, or creating
 a reusable mathlib workspace, use:
 

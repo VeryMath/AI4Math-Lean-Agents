@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
+SKILLS_ROOT = SKILL_ROOT.parent
 sys.path.insert(0, str(SKILL_ROOT / "scripts"))
 
 from ai4m_lean import EXIT_LEAN_FAILED, _exit_code  # noqa: E402
@@ -161,6 +162,17 @@ class CliTests(unittest.TestCase):
         self.assertTrue(setup["ok"], setup)
         self.assertTrue(setup["helper_script_exists"], setup)
         self.assertFalse(setup["repo_root_command_hits"], setup)
+
+    def test_two_public_skills_share_hidden_runtime_layer(self) -> None:
+        runtime_root = SKILLS_ROOT / "lean-runtime"
+        runtime_cli = runtime_root / "scripts" / "ai4m_lean.py"
+        setup_text = (SKILLS_ROOT / "lean-setup" / "SKILL.md").read_text(encoding="utf-8")
+        formalization_text = (SKILLS_ROOT / "lean-formalization" / "SKILL.md").read_text(encoding="utf-8")
+
+        self.assertTrue(runtime_cli.exists())
+        self.assertIn("../lean-runtime/scripts/ai4m_lean.py", setup_text)
+        self.assertIn("../lean-runtime/scripts/ai4m_lean.py", formalization_text)
+        self.assertNotIn("../lean-formalization/scripts/ai4m_lean.py", setup_text)
 
     def test_lean_setup_offers_default_names_for_isolated_setup(self) -> None:
         text = (SKILL_ROOT.parent / "lean-setup" / "SKILL.md").read_text(encoding="utf-8")

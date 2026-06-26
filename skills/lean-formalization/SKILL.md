@@ -9,6 +9,8 @@ Use this skill when the user wants a coding agent to do Lean 4 formalization, pr
 
 If the user only wants Lean 4, `elan`, `lake`, or a reusable mathlib workspace configured, use the sibling `../lean-setup/SKILL.md` entrypoint and do not ask for a theorem target.
 
+Shared scripts, prompts, schemas, examples, and references live in the non-user-facing `../lean-runtime/` support layer. Treat `lean-setup` and `lean-formalization` as the two public entrypoints; do not ask users to invoke `lean-runtime` directly.
+
 This is a coding-agent-first Lean skill. The coding agent is the primary Lean worker. It reads and edits Lean files, runs Lean/Lake checks, diagnoses errors, preserves theorem statements, and iterates with the user. Default execution mode is coding-agent mode.
 
 Incorporate publicly documented Lean-specialist agent patterns into the default coding-agent workflow. Use systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP, MCP, and lightweight iterative proof agents as related-work references for mechanisms such as project gating, statement normalization, theorem-state loops, premise retrieval, bounded tactic/proof search, validation oracles, failure memory, and minimized handoff. Treat specialist-agent patterns as mechanisms, not mandatory external services.
@@ -47,12 +49,12 @@ Do not remove the official Numina subagent path. Treat it as an optional backend
 
 ## Helper Toolbox
 
-Use `python scripts/ai4m_lean.py <command>` when it saves effort or reduces risk:
+Use `python ../lean-runtime/scripts/ai4m_lean.py <command>` when it saves effort or reduces risk:
 
 - `env` / `doctor`: inspect Lean workspace, local tool availability, and Numina subagent readiness.
 - `configure --create-workspace`: create or reuse the shared managed workspace.
 - `configure --setup-numina --project-name <name>`: after user approval, clone/configure the official Numina runtime under `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/`.
-- `smoke-test`: run the bundled `examples/smoke/NuminaSmoke.lean` target in the shared workspace without external API calls.
+- `smoke-test`: run the bundled `../lean-runtime/examples/smoke/NuminaSmoke.lean` target in the shared workspace without external API calls.
 - `check`: run a structured Lean/Lake validation.
 - `review` / `detect-sorry`: guard against placeholders, axioms, and statement drift.
 - `minimize-failure`: extract a compact failing Lean fragment.
@@ -63,7 +65,7 @@ All helper commands emit machine-readable JSON on stdout. Human-readable diagnos
 
 ## Numina Runtime
 
-When using the official Numina runtime, follow `references/numina_runtime.md`. For auth/proxy/MCP/failure triage, follow `references/numina_subagent_troubleshooting.md`. Proof strategy is a human-in-the-loop process with the user, the coding agent, local Lean checks, and, when approved, the official Numina runner as an optional subagent backend.
+When using the official Numina runtime, follow `../lean-runtime/references/numina_runtime.md`. For auth/proxy/MCP/failure triage, follow `../lean-runtime/references/numina_subagent_troubleshooting.md`. Proof strategy is a human-in-the-loop process with the user, the coding agent, local Lean checks, and, when approved, the official Numina runner as an optional subagent backend.
 
 ## Safety Rules
 
@@ -79,12 +81,12 @@ When using the official Numina runtime, follow `references/numina_runtime.md`. F
 
 ## References
 
-- Read `references/direct_lean_workflow.md` for the default coding-agent proof/repair/formalization loop.
-- Read `references/specialist_agent_patterns.md` when adapting ideas from Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP, or other Lean-specialist agents.
-- Read `references/lean_runtime_configuration.md` when setting up or diagnosing the reusable Lean workspace.
-- Read `references/numina_runtime.md` when the user wants the official Numina deployment/call path.
-- Read `references/numina_subagent_troubleshooting.md` when Numina auth, proxy, MCP, or runner failures appear.
-- Read `references/interactive_orchestration.md` when guiding user intake and task decomposition.
-- Read `references/review_checklist.md` before accepting a Lean patch.
-- Read `references/failure_taxonomy.md` when reporting a blocked proof.
-- Read `references/numina_reverse_analysis.md` when explaining which Numina mechanisms are incorporated locally and which are delegated to the optional official runtime.
+- Read `../lean-runtime/references/direct_lean_workflow.md` for the default coding-agent proof/repair/formalization loop.
+- Read `../lean-runtime/references/specialist_agent_patterns.md` when adapting ideas from Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP, or other Lean-specialist agents.
+- Read `../lean-runtime/references/lean_runtime_configuration.md` when setting up or diagnosing the reusable Lean workspace.
+- Read `../lean-runtime/references/numina_runtime.md` when the user wants the official Numina deployment/call path.
+- Read `../lean-runtime/references/numina_subagent_troubleshooting.md` when Numina auth, proxy, MCP, or runner failures appear.
+- Read `../lean-runtime/references/interactive_orchestration.md` when guiding user intake and task decomposition.
+- Read `../lean-runtime/references/review_checklist.md` before accepting a Lean patch.
+- Read `../lean-runtime/references/failure_taxonomy.md` when reporting a blocked proof.
+- Read `../lean-runtime/references/numina_reverse_analysis.md` when explaining which Numina mechanisms are incorporated locally and which are delegated to the optional official runtime.
