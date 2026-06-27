@@ -19,8 +19,9 @@ Core rules:
 - Formalization/proof readiness should inspect local Lean readiness first; inspect Numina/backend readiness only when the user asks for an optional Lean-specialist backend.
 - Setup-only readiness should focus on local Lean/mathlib state, and should mention or inspect Numina only when the user asks for the optional official backend.
 - Do not require API keys for the default coding-agent path.
-- Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.
-- Prefer the user's existing Lake project. Use the shared `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` only when a standalone file needs project context.
+- Shared workspace is the default Lean project context for standalone work; Numina may target it instead of upstream examples.
+- Prefer the user's existing Lake project. Use the shared `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` only when a standalone file needs project context, and default that managed workspace to `leanprover/lean4:v4.28.0` unless the user explicitly overrides it.
+- Use `${AI4MATH_HOME:-~/.ai4math}/lean-workspaces/<version-key>/` for standalone tasks that need a different Lean/mathlib revision; do not overwrite the canonical managed workspace for version drift.
 - Preserve theorem statements unless the user explicitly approves a change.
 - Reject final patches containing `sorry`, `admit`, or newly introduced `axiom`.
 - Do not commit API keys, local runtime state, or machine-specific Numina paths.

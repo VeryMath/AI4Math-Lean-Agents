@@ -77,7 +77,7 @@ def build_parser() -> argparse.ArgumentParser:
     add_common(configure_parser)
     configure_parser.add_argument("--target", default=None)
     configure_parser.add_argument("--create-workspace", action="store_true")
-    configure_parser.add_argument("--toolchain", default=None, help="Optional Lean toolchain for managed workspace")
+    configure_parser.add_argument("--toolchain", default=None, help="Override the default AI4Math managed workspace toolchain")
     configure_parser.add_argument("--save-local", action="store_true")
     configure_parser.add_argument("--dry-run", action="store_true")
     configure_parser.add_argument("--setup-numina", action="store_true", help="Install/configure official Numina runtime after review")

@@ -52,6 +52,23 @@ skills/lean-setup/SKILL.md
 skills/lean-formalization/SKILL.md
 ```
 
+`approve` 表示执行下一步，`revise` 表示先修改计划，`reject` 表示停止当前路线，
+`skip` 表示跳过当前阶段。修改 theorem statement、设置 Numina、编辑源码和接受最终 proof
+claim 前都应先请求用户确认。
+
+## 支持范围
+
+- Lean project/workspace inspection。
+- 只配置环境时，可创建或复用共享 `~/.ai4math/lean-workspace`；默认使用 AI4Math managed baseline `leanprover/lean4:v4.28.0`，除非用户明确覆盖。
+- theorem formalization、proof repair、proof completion 和 `sorry` completion。
+- patch review：检查 `sorry`、`admit`、新引入的 `axiom` 和 theorem statement drift。
+- 可选 Lean 专用 agent backend adapter 流程；当前实现的是由 coding agent 协调的 official `project-numina/numina-lean-agent` runtime 设置和调用。
+- proof blocked 时抽取最小失败 Lean fragment。
+- 借鉴 Lean 专用 agent 模式：theorem-state loop、premise retrieval、bounded proof search、失败记忆、validation oracle 和 minimal handoff。
+
+Numina 是可选链路，也是当前唯一内置可部署 backend adapter。公共 CLI 不提供并行的 `numina-*` workflow；`doctor` 用于报告 readiness，`configure --setup-numina --project-name <name>` 用于在 review 后执行本地设置，默认位置为 `~/.ai4math/numina-runtime/`。只有当用户明确要求 `Numina`、`official Lean Agent`、批量 proof search 或外部 subagent run 时，才应进入 official Numina backend。
+
+未来 backend adapter 可参考 `skills/lean-runtime/references/backend_adapter_checklist.md`，但在 deployment、readiness checks、调用、validation 和 failure triage 文档化前，不要写成已支持。
 ## 仓库结构
 
 ```text

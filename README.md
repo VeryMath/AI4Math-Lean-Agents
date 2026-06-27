@@ -66,6 +66,20 @@ For formalization or proof repair, start with:
 skills/lean-formalization/SKILL.md
 ```
 
+## Supported Scope
+
+- Lean project/workspace inspection.
+- Reusable shared `~/.ai4math/lean-workspace` setup for standalone Lean files, using the AI4Math managed baseline `leanprover/lean4:v4.28.0` unless explicitly overridden.
+- Theorem formalization, proof repair, proof completion, and `sorry` completion.
+- Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
+- Minimal failing Lean fragment extraction when a proof is blocked.
+- Related-work-informed Lean-specialist patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
+- Optional Lean-specialist backend adapter flow, currently implemented for official `project-numina/numina-lean-agent` deployment/calls mediated by the coding agent.
+
+Numina is optional and is the only built-in deployable backend adapter. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
+
+Future backend adapters can follow `skills/lean-runtime/references/backend_adapter_checklist.md`, but should not be described as supported until deployment, readiness checks, invocation, validation, and failure triage are documented.
+
 ## Repository Layout
 
 ```text

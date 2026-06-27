@@ -253,6 +253,11 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
         "When creating an isolated test directory or workspace",
         "suggest a safe default name",
         "use the default if the user has no naming preference",
+        "canonical managed workspace",
+        "AI4Math managed baseline toolchain `leanprover/lean4:v4.28.0`",
+        "reuse it instead of rebuilding or downloading again",
+        "Do not overwrite the canonical managed workspace",
+        "lean-workspaces/<version-key>/",
         "After successful setup or smoke-test validation",
         "Offer a short next-step menu",
         "inspect an existing Lean/Lake project",
@@ -268,6 +273,10 @@ def _lean_setup_entrypoint_check() -> dict[str, Any]:
     repo_root_command_hits = [phrase for phrase in repo_root_commands if phrase in text]
     openai_required = [
         "不要向用户索要 theorem target",
+        "已有 Lake 项目优先沿用项目自己的 lean-toolchain 和 lake-manifest",
+        "standalone 任务默认复用 ~/.ai4math/lean-workspace",
+        "AI4Math managed baseline leanprover/lean4:v4.28.0",
+        "避免重复下载和路径分裂",
         "setup 完成后主动给出下一步菜单",
         "所有实现应复用 lean-runtime",
         "默认 Lean/mathlib 环境配置不需要 API key",

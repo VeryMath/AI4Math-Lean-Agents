@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from check_lean_project import find_project_root, read_mathlib_revision, read_toolchain
-from common import ai4math_home, ensure_ai4math_gitignore, expand_path, read_config, run_command, update_local_toml
+from common import CANONICAL_LEAN_TOOLCHAIN, ai4math_home, ensure_ai4math_gitignore, expand_path, read_config, run_command, update_local_toml
 from numina_runtime import execute_configure_plan, numina_readiness
 from tool_status import find_tool
 
@@ -34,6 +34,19 @@ def _workspace_setup_commands(lake: str, toolchain: str | None, workspace: Path)
         _lake_command(lake, toolchain, ["build"]),
     ])
     return commands
+
+
+def _effective_managed_toolchain(config: dict[str, Any], requested_toolchain: str | None) -> str:
+    if requested_toolchain is not None:
+        return requested_toolchain.strip() or CANONICAL_LEAN_TOOLCHAIN
+    configured = str(config.get("lean", {}).get("preferred_toolchain") or "").strip()
+    if configured and configured != "auto":
+        return configured
+    return CANONICAL_LEAN_TOOLCHAIN
+
+
+def _workspace_needs_setup(workspace: Path) -> bool:
+    return not ((workspace / "lake-manifest.json").exists() and (workspace / ".lake").exists())
 
 
 def _action_failed(action: dict[str, Any]) -> bool:
@@ -113,6 +126,7 @@ def configure(
 
     config = read_config(cwd_path, config_path)
     lean = config.get("lean", {})
+    effective_toolchain = _effective_managed_toolchain(config, toolchain)
     workspace = expand_path(lean.get("managed_workspace_path"), cwd_path) or (ai4math_home(cwd_path) / "lean-workspace")
     workspace_root_config = expand_path(lean.get("managed_workspace_root"), cwd_path) or (workspace.parent / "lean-workspaces")
     workspace_actions: list[dict[str, Any]] = []
@@ -123,14 +137,14 @@ def configure(
         created_path = parent / lake_project_name
         if dry_run:
             workspace_actions.append({
-                "command": _lake_command(lake, toolchain, ["new", lake_project_name, "math"]),
+                "command": _lake_command(lake, effective_toolchain, ["new", lake_project_name, "math"]),
                 "cwd": str(parent),
                 "skipped": True,
                 "reason": "dry_run",
             })
         elif not workspace.exists():
             parent.mkdir(parents=True, exist_ok=True)
-            created = run_command(_lake_command(lake, toolchain, ["new", lake_project_name, "math"]), cwd=parent)
+            created = run_command(_lake_command(lake, effective_toolchain, ["new", lake_project_name, "math"]), cwd=parent)
             if not created.get("ok") and find_project_root(created_path):
                 created["recoverable"] = True
                 created["recovered_by"] = "lake_project_files_created"
@@ -153,8 +167,8 @@ def configure(
                 "stdout": "",
                 "stderr": "",
             })
-        if not dry_run and find_project_root(workspace):
-            for command in _workspace_setup_commands(lake, toolchain, workspace):
+        if not dry_run and find_project_root(workspace) and _workspace_needs_setup(workspace):
+            for command in _workspace_setup_commands(lake, effective_toolchain, workspace):
                 workspace_actions.append(run_command(command, cwd=workspace, timeout=1800))
 
     workspace_info = _workspace_info(workspace)
@@ -170,7 +184,7 @@ def configure(
                 "reuse_managed_workspace": True,
                 "workspace_key": "lean-toolchain",
                 "align_workspace_versions": True,
-                "preferred_toolchain": toolchain or "auto",
+                "preferred_toolchain": effective_toolchain,
                 "preferred_mathlib_rev": "auto",
                 "allow_user_project_version_changes": False,
             },
