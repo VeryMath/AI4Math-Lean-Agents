@@ -28,22 +28,22 @@ Required default workflow tools are `git`, `python3`, `elan`, `lean`, and `lake`
 
 ## Reusable Lean Workspace
 
-For standalone tasks, prefer `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`. Create it once with:
+For standalone tasks, prefer `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`. This canonical managed workspace defaults to the AI4Math baseline toolchain `leanprover/lean4:v4.28.0`; use `--toolchain` only as an explicit override. Create it once with:
 
 ```bash
-python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --create-workspace --toolchain leanprover/lean4:v4.28.0
+python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --create-workspace
 ```
 
 Equivalent Lake commands:
 
 ```bash
-lake new lean_workspace math
-lake update
-lake exe cache get
-lake build
+elan run leanprover/lean4:v4.28.0 lake new lean_workspace math
+elan run leanprover/lean4:v4.28.0 lake update
+elan run leanprover/lean4:v4.28.0 lake exe cache get
+elan run leanprover/lean4:v4.28.0 lake build
 ```
 
-If a user project already has `lean-toolchain` and `lakefile.{lean,toml}`, use that project and do not change versions without approval. If a standalone task needs a different Lean/mathlib revision than the shared managed workspace, use a versioned workspace under `${AI4MATH_HOME:-~/.ai4math}/lean-workspaces/`.
+If a user project already has `lean-toolchain` and `lakefile.{lean,toml}`, use that project and do not change versions without approval. If the canonical workspace already has `lake-manifest.json` and `.lake/`, reuse it instead of rerunning cache/build. If a standalone task needs a different Lean/mathlib revision than the shared managed workspace, use a versioned workspace under `${AI4MATH_HOME:-~/.ai4math}/lean-workspaces/` instead of overwriting `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`.
 
 ## Local Config
 
@@ -54,7 +54,7 @@ Machine-specific settings live in `.ai4math/lean_agent.local.toml` and should no
 workspace_mode = "reuse-managed"
 managed_workspace_path = "~/.ai4math/lean-workspace"
 align_workspace_versions = true
-preferred_toolchain = "auto"
+preferred_toolchain = "leanprover/lean4:v4.28.0"
 
 [agent]
 mode = "coding-agent"

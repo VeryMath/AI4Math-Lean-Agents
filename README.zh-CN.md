@@ -87,7 +87,7 @@ claim 前都应先请求用户确认。
 ## 支持范围
 
 - Lean project/workspace inspection。
-- 只配置环境时，可创建或复用共享 `~/.ai4math/lean-workspace`。
+- 只配置环境时，可创建或复用共享 `~/.ai4math/lean-workspace`；默认使用 AI4Math managed baseline `leanprover/lean4:v4.28.0`，除非用户明确覆盖。
 - theorem formalization、proof repair、proof completion 和 `sorry` completion。
 - patch review：检查 `sorry`、`admit`、新引入的 `axiom` 和 theorem statement drift。
 - 可选 Lean 专用 agent backend adapter 流程；当前实现的是由 coding agent 协调的 official `project-numina/numina-lean-agent` runtime 设置和调用。

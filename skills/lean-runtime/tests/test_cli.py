@@ -13,6 +13,7 @@ SKILLS_ROOT = SKILL_ROOT.parent
 sys.path.insert(0, str(SKILL_ROOT / "scripts"))
 
 from ai4m_lean import EXIT_LEAN_FAILED, _exit_code  # noqa: E402
+from common import CANONICAL_LEAN_TOOLCHAIN  # noqa: E402
 from verify_delivery import _lean_setup_entrypoint_check, _package_hygiene, _root_discovery_boundary_check  # noqa: E402
 
 CLI = SKILL_ROOT / "scripts" / "ai4m_lean.py"
@@ -130,6 +131,34 @@ class CliTests(unittest.TestCase):
         commands = [action["command"] for action in payload["numina"]["actions"]]
         self.assertIn("https://github.com/project-numina/numina-lean-agent", str(commands))
         self.assertIn(["./setup.sh", "demo_project"], commands)
+
+    def test_configure_create_workspace_dry_run_defaults_to_canonical_toolchain(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(CLI),
+                    "configure",
+                    "--cwd",
+                    str(root),
+                    "--create-workspace",
+                    "--dry-run",
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+                env={
+                    **os.environ,
+                    "AI4MATH_HOME": str(root / "shared-ai4math"),
+                    "AI4MATH_LEAN_WORKSPACE": "",
+                    "AI4MATH_LEAN_TOOLCHAIN": "",
+                },
+            )
+        self.assertIn(result.returncode, {0, 4}, result.stderr)
+        payload = json.loads(result.stdout)
+        command = payload["workspace_actions"][0]["command"]
+        self.assertEqual(command[1:4], ["run", CANONICAL_LEAN_TOOLCHAIN, "lake"])
 
     def test_lean_workspace_deploy_failure_uses_lean_exit_code(self) -> None:
         self.assertEqual(

@@ -76,7 +76,7 @@ Constraints:
 ## What They Support
 
 - Lean project/workspace inspection.
-- Reusable shared `~/.ai4math/lean-workspace` setup for standalone Lean files.
+- Reusable shared `~/.ai4math/lean-workspace` setup for standalone Lean files, using the AI4Math managed baseline `leanprover/lean4:v4.28.0` unless explicitly overridden.
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.

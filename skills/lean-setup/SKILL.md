@@ -16,8 +16,8 @@ The shared implementation lives in `../lean-runtime/`. This skill must reuse the
 3. If `elan`, `lean`, or `lake` is missing, explain the required Lean installation step first. Install Lean through the official `elan` channel appropriate for the user's OS after approval; `lean` and `lake` should come from the `elan` toolchain rather than a repository-local copy.
 4. Prefer an existing Lake project when the user points to one.
 5. When creating an isolated test directory or workspace, suggest a safe default name and let the user confirm or rename it; use the default if the user has no naming preference.
-6. For standalone future Lean work, create or reuse `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`.
-7. Create the workspace only after explaining that Lean/mathlib artifacts may be downloaded or built.
+6. For standalone future Lean work, create or reuse the canonical managed workspace `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` with the AI4Math managed baseline toolchain `leanprover/lean4:v4.28.0`.
+7. Create the workspace only after explaining that Lean/mathlib artifacts may be downloaded or built. If the canonical workspace already exists and is complete, reuse it instead of rebuilding or downloading again.
 8. Run the bundled smoke test after setup.
 9. Report the installed tools, workspace path, Lean toolchain, mathlib revision when available, smoke-test result, and any remaining action.
 10. After successful setup or smoke-test validation, do not end passively. Offer a short next-step menu and recommend one default next action.
@@ -52,6 +52,7 @@ Use `--dry-run` before setup when the user wants to review commands.
 
 - Do not create a second setup implementation.
 - Do not change a user project's `lean-toolchain` or mathlib revision without approval.
+- Do not overwrite the canonical managed workspace for a different Lean/mathlib revision. Use `${AI4MATH_HOME:-~/.ai4math}/lean-workspaces/<version-key>/` only when the user explicitly needs a different standalone version.
 - Do not require API keys for Lean/mathlib workspace setup.
 - Do not configure or call official Numina unless the user explicitly asks for that optional backend.
 - Do not commit machine-specific paths, downloaded runtime state, or secrets.
