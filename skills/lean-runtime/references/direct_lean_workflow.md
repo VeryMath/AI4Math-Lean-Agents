@@ -1,6 +1,6 @@
 # Direct Coding-Agent Lean Workflow
 
-This is the default workflow. The coding agent reads and edits Lean directly, runs Lean/Lake checks, and iterates from concrete errors/goals. It incorporates Lean-specialist agent patterns into local work: theorem-state loops, premise retrieval, bounded proof attempts, failed-strategy memory, and minimal failure handoff. Official Numina remains available as the currently supported optional Lean-specialist backend adapter, but it is not required for ordinary Lean formalization, proof repair, or sorry completion.
+This is the default workflow. The coding agent reads and edits Lean directly, runs Lean/Lake checks, and iterates from concrete errors/goals. It incorporates Lean-specialist agent patterns into local work: theorem-state loops, premise retrieval, bounded proof attempts, failed-strategy memory, and minimal failure handoff. Backend adapters remain optional and adapter-first; Numina and Archon are recommended adapter candidates, but no backend is required for ordinary Lean formalization, proof repair, or sorry completion.
 
 ## Guidance-First Loop
 

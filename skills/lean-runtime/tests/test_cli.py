@@ -218,7 +218,7 @@ class CliTests(unittest.TestCase):
         self.assertIn("formalize a natural-language or LaTeX theorem", text)
         self.assertIn("mention optional Numina only when the user explicitly asks", text)
 
-    def test_optional_backend_language_distinguishes_current_and_future_adapters(self) -> None:
+    def test_optional_backend_language_is_adapter_first_and_not_numina_locked(self) -> None:
         repo_root = SKILLS_ROOT.parent
         texts = [
             (SKILLS_ROOT / "lean-formalization" / "SKILL.md").read_text(encoding="utf-8"),
@@ -230,18 +230,21 @@ class CliTests(unittest.TestCase):
             texts.append(readme_path.read_text(encoding="utf-8"))
 
         for text in texts:
-            self.assertIn("optional Lean-specialist backend", text)
-            self.assertIn("Currently supported optional backend: official Numina Lean Agent runtime", text)
-            self.assertIn("Future backend adapters", text)
-            self.assertIn("do not claim support until deployment, readiness checks, invocation, validation, and failure triage are documented", text)
-            self.assertNotIn("Currently supported optional backend: Archon", text)
+            self.assertIn("adapter-first", text)
+            self.assertIn("Built-in recommended adapter: official Numina Lean Agent runtime", text)
+            self.assertIn("Numina and Archon are recommended adapter candidates, not defaults or hard requirements", text)
+            self.assertIn("Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist", text)
+            self.assertIn("do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented", text)
+            self.assertNotIn("Official Numina is the only currently supported deployable backend adapter", text)
+            self.assertNotIn("Currently supported optional backend: official Numina Lean Agent runtime", text)
 
         if readme_zh_path.exists():
             readme_zh = readme_zh_path.read_text(encoding="utf-8")
-            self.assertIn("可选 Lean 专用 agent backend", readme_zh)
-            self.assertIn("当前支持的可选 backend：official Numina Lean Agent runtime", readme_zh)
-            self.assertIn("未来 backend adapter", readme_zh)
-            self.assertIn("不要写成已支持", readme_zh)
+            self.assertIn("adapter-first", readme_zh)
+            self.assertIn("当前内置推荐 adapter：official Numina Lean Agent runtime", readme_zh)
+            self.assertIn("Numina 和 Archon 是推荐 adapter candidates，不是默认项或硬依赖", readme_zh)
+            self.assertIn("其他 Lean-specialist backend 可由 coding agent 按 backend adapter checklist 接入", readme_zh)
+            self.assertIn("不要调用任何 backend", readme_zh)
 
     def test_package_hygiene_scans_lean_setup_entrypoint(self) -> None:
         generated = SKILL_ROOT.parent / "lean-setup" / "__pycache__" / "sentinel.pyc"

@@ -18,7 +18,7 @@ Shared helper scripts, references, prompts, schemas, examples, and tests live in
 skills/lean-runtime/
 ```
 
-Use Claude Code as the primary Lean coding agent. Official Numina is the only currently supported deployable backend adapter; preserve that setup/call path but do not make it the default. Archon and other backends are future adapters until their setup, call, credential, mutation, and validation contracts are documented.
+Use Claude Code as the primary Lean coding agent. Backend integration is adapter-first: Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Preserve the built-in official Numina adapter recipe, and connect other Lean-specialist backends only through the backend adapter checklist after setup, call, credential, mutation, validation, and failure contracts are documented.
 Setup-only mode should create or verify the Lean/mathlib workspace without asking for a theorem target.
 
 Match the user's language by default. If the user's language is ambiguous, default to Chinese.
@@ -27,8 +27,8 @@ Do not treat a language switch as a task reset; keep the current diagnosis and c
 When no target is provided, run or propose a safe local smoke/readiness check before asking for more input.
 Use the bundled smoke test when no user target is available.
 Formalization/proof readiness should inspect local Lean readiness first; inspect Numina/backend readiness only when the user asks for an optional Lean-specialist backend.
-Setup-only readiness should focus on local Lean/mathlib state, and should mention or inspect Numina only when the user asks for the optional official backend.
+Setup-only readiness should focus on local Lean/mathlib state, and should mention or inspect a backend only when the user asks for an optional backend adapter.
 Do not require API keys for the default coding-agent path.
 Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.
 
-Deploy or call the official Numina backend runtime only after explanation and approval. Keep secrets in environment variables or ignored local files.
+Deploy or call a backend adapter only after explanation and approval. Keep secrets in environment variables or ignored local files.

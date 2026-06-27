@@ -11,7 +11,7 @@ Both public skills share the bundled `skills/lean-runtime/` support layer for he
 
 `lean-formalization` is informed by publicly available Lean-specialist agent patterns from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents. These are workflow patterns and related work references, not claims that every backend is implemented.
 
-Currently supported optional backend: official Numina Lean Agent runtime. Future backend adapters may include Archon or other Lean-specialist systems, but do not claim support until deployment, readiness checks, invocation, validation, and failure triage are documented.
+Backend integration is adapter-first. Built-in recommended adapter: official Numina Lean Agent runtime. Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist; do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
 ## When To Use These Skills
 
@@ -21,11 +21,11 @@ Use these skills when you have:
 - a Lean project or Lean file that needs inspection;
 - a theorem statement to transcribe or formalize;
 - a proof with `sorry`, `admit`, errors, or statement drift risk;
-- a need for an optional Lean-specialist backend mediated by the coding agent; the currently supported deployable backend is official Numina.
+- a need for an optional Lean-specialist backend mediated by the coding agent through an adapter contract.
 
 ## What They Produce
 
-The agent should produce Lean patches, validation summaries, blocked-goal explanations, minimized failures, and optional backend setup evidence when the supported official Numina path is requested.
+The agent should produce Lean patches, validation summaries, blocked-goal explanations, minimized failures, and optional backend setup evidence when an approved adapter path is requested.
 
 ## Installation
 
@@ -81,11 +81,11 @@ Constraints:
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
 - Related-work-informed Lean-specialist patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
-- Optional Lean-specialist backend adapter flow, currently implemented for official `project-numina/numina-lean-agent` deployment/calls mediated by the coding agent.
+- Optional Lean-specialist backend adapter flow, with a built-in recommended recipe for official `project-numina/numina-lean-agent` deployment/calls mediated by the coding agent.
 
-Numina is optional and is the only built-in deployable backend adapter. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
+Numina is optional and provided as a recommended built-in adapter recipe. Archon and other Lean-specialist systems can be connected by the coding agent through `skills/lean-runtime/references/backend_adapter_checklist.md`; they are not default dependencies. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
 
-Future backend adapters can follow `skills/lean-runtime/references/backend_adapter_checklist.md`, but should not be described as supported until deployment, readiness checks, invocation, validation, and failure triage are documented.
+Do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
 ## Repository Layout
 
@@ -134,7 +134,7 @@ python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --requir
 
 The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, choosing proof strategy, and matching the user's language.
 
-For the supported official Numina backend path, read `skills/lean-runtime/references/numina_runtime.md`. Setup and official runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
+For the built-in recommended Numina adapter path, read `skills/lean-runtime/references/numina_runtime.md`. For any other backend, read `skills/lean-runtime/references/backend_adapter_checklist.md` first. Setup and runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
 
 ## Validate
 

@@ -1,6 +1,6 @@
 ---
 name: lean-formalization
-description: Use when a coding agent needs Lean 4 formalization, proof repair, theorem transcription, sorry completion, Lean patch review, optional Lean-specialist backend adapter work currently implemented for official Numina deployment/calls, or local Lean validation.
+description: Use when a coding agent needs Lean 4 formalization, proof repair, theorem transcription, sorry completion, Lean patch review, optional adapter-first Lean-specialist backend work, or local Lean validation.
 ---
 
 # Lean Formalization
@@ -32,5 +32,5 @@ skills/lean-setup/SKILL.md
 
 - Preserve theorem statements unless the user approves a change.
 - Reject final patches containing `sorry`, `admit`, or newly introduced `axiom`.
-- Explain and approve optional backend runtime setup before executing it; currently supported optional backend: official Numina Lean Agent runtime.
+- Explain and approve optional backend runtime setup before executing it; use an adapter-first contract, with official Numina and Archon treated as recommended adapter candidates rather than hard requirements.
 - Validate final Lean patches locally when possible.

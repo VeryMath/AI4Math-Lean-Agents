@@ -39,7 +39,7 @@ def run_smoke_test(
                 "ai4math_numina_smoke_le_succ",
             ],
             "external_api_call": False,
-            "recommended_next_action": "run the bundled smoke target, then start the coding-agent Lean task or discuss the supported optional Numina backend path",
+            "recommended_next_action": "run the bundled smoke target, then start the coding-agent Lean task or discuss an adapter-first optional backend path",
         }
     if not workspace_root:
         return {

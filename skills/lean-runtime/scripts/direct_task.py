@@ -79,7 +79,7 @@ def build_direct_task(
         "max_rounds": max_rounds,
         "missing_config": missing,
         "required_inputs": ["existing Lake project or shared reusable managed workspace"] if "lean_workspace" in missing else [],
-        "recommended_next_action": "run configure --create-workspace for the shared workspace or move target into a Lake project" if missing else "coding agent should edit/check directly; use Numina only if the supported optional backend path is approved",
+        "recommended_next_action": "run configure --create-workspace for the shared workspace or move target into a Lake project" if missing else "coding agent should edit/check directly; use a backend adapter only if the optional adapter path is approved",
         "direct_workflow": next_actions,
     }
 

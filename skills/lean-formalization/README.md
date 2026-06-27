@@ -2,8 +2,8 @@
 
 `lean-formalization` is the concrete AI4Math skill entrypoint for Lean 4
 formalization, proof repair, theorem transcription, `sorry` completion, Lean
-patch review, local validation, and optional Lean-specialist backend adapter
-work currently implemented for official Numina.
+patch review, local validation, and adapter-first optional Lean-specialist
+backend work.
 
 ## Entry Point
 

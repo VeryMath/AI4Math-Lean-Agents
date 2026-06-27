@@ -1,14 +1,14 @@
 # Interactive Orchestration
 
-The coordinating coding agent owns user interaction, Lean proof/formalization work, incorporated Lean-specialist agent patterns, optional Lean-specialist backend adapter orchestration, and final validation. It can delegate proof search/formalization to the official Numina adapter when the user asks for that currently supported backend.
+The coordinating coding agent owns user interaction, Lean proof/formalization work, incorporated Lean-specialist agent patterns, adapter-first optional backend orchestration, and final validation. It can delegate proof search/formalization to a documented backend adapter when the user asks for that path.
 
-This reference covers the guidance layer: session opening, intake, task classification, direct coding-agent Lean work, specialist-agent pattern selection, optional Lean-specialist backend adapter deployment/calls currently only for official Numina, local Lean validation, result review, bounded iteration, and minimal failure handoff.
+This reference covers the guidance layer: session opening, intake, task classification, direct coding-agent Lean work, specialist-agent pattern selection, optional Lean-specialist backend adapter deployment/calls, local Lean validation, result review, bounded iteration, and minimal failure handoff.
 
 ## Session Opening
 
 If the user's language is ambiguous, default to Chinese. The skill display name, repository name, or command name is not enough evidence to choose English.
 
-This is a coding-agent-first Lean skill. Official Numina is the only currently supported deployable backend adapter; Archon and other backends are future adapters until an adapter contract, setup path, call path, and local validation gates are implemented.
+This is a coding-agent-first Lean skill. Backend integration is adapter-first. Built-in recommended adapter: official Numina Lean Agent runtime. Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist; do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
 The default coding-agent path should still absorb Lean-specialist agent mechanisms: project gating, statement normalization, theorem-state loops, premise retrieval, bounded proof search, failed-strategy memory, Lean/Lake validation, and minimized failure handoff.
 
@@ -17,7 +17,7 @@ Lead the interaction; do not wait for the user to drive every step. On a broad r
 - inspect whether the current directory is a Lake project;
 - check whether the shared `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` exists;
 - inspect local Lean/Lake readiness and shared workspace state;
-- inspect Numina runtime, upstream checkout, tools, and credential/auth readiness only when the user asks for the optional official backend;
+- inspect backend runtime, upstream checkout, tools, and credential/auth readiness only when the user asks for an optional backend adapter;
 - say what can be done immediately and what would require confirmation.
 
 Opening readiness should inspect local Lean readiness first. Inspect Numina or another backend readiness only when the user asks for an optional Lean-specialist backend. Do not require API keys for the default coding-agent path. Shared workspace is the default Lean project context; Numina may target it instead of upstream examples.
@@ -34,10 +34,10 @@ If no precise target is provided, offer a small menu and recommend one path. For
 - repair or complete an existing Lean file with the coding agent;
 - formalize a natural-language or LaTeX theorem with the coding agent;
 - inspect a Lean/Lake project and summarize readiness;
-- if the user asks for the optional official backend, configure missing Numina credentials/auth;
-- if the user asks for the optional official backend, run a Numina readiness check;
-- if the user asks for the optional official backend, prepare the shared workspace as the Numina target project;
-- if the user asks for the optional official backend, call Numina on a natural-language/LaTeX theorem or Lean file.
+- if the user asks for an optional backend adapter, configure missing credentials/auth for that adapter;
+- if the user asks for an optional backend adapter, run an adapter readiness check;
+- if the user asks for an optional backend adapter, prepare the shared workspace as the target project;
+- if the user asks for an optional backend adapter, call the approved adapter on a natural-language/LaTeX theorem or Lean file.
 
 Ask at most one blocking question at a time. A good opening ends with one decision question, not a checklist.
 
@@ -49,7 +49,7 @@ Ask only when not inferable:
 - What target file/folder and declaration should be used?
 - Is changing the theorem statement allowed?
 - Should standalone work use the reusable managed workspace?
-- If you want the optional official backend, should we configure/call Numina now, or only inspect readiness?
+- If you want an optional backend adapter, should we configure/call it now, or only inspect readiness?
 - For natural-language or LaTeX input, what statement should be considered authoritative?
 
 Prefer asking these only after orientation. If the repository already reveals the likely next step, state the recommendation and ask for confirmation.
@@ -62,11 +62,11 @@ For natural-language or LaTeX statements, draft the Lean declaration first and a
 
 ## Backend Run
 
-Before an official Numina call, state the target project/file, prompt file, max rounds, result directory, credential/proxy/MCP state, and validation plan. Ask for approval before any external model call or runtime mutation.
+Before any backend adapter call, state the target project/file, prompt file, max rounds, result directory, credential/proxy/MCP state, and validation plan. Ask for approval before any external model call or runtime mutation.
 
-After Numina returns, inspect changed Lean files, run local Lean/Lake validation, and reject results containing `sorry`, `admit`, new `axiom`, or unapproved theorem statement changes.
+After the adapter returns, inspect changed Lean files, run local Lean/Lake validation, and reject results containing `sorry`, `admit`, new `axiom`, or unapproved theorem statement changes.
 
-Future backend adapters must satisfy `backend_adapter_checklist.md` before they are described as supported or called.
+Backend adapters must satisfy `backend_adapter_checklist.md` before they are called.
 
 ## Iteration Policy
 
@@ -75,7 +75,7 @@ Stop when:
 - validation succeeds without `sorry`, `admit`, or new `axiom`;
 - max local iterations are reached;
 - Lean workspace setup is missing or broken;
-- official Numina backend credentials/auth are missing and the user specifically requires Numina;
+- backend adapter credentials/auth are missing and the user specifically requires that adapter;
 - the remaining error requires a human mathematical decision;
 - the only path forward would weaken the theorem statement without approval.
 
