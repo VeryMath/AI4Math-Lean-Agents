@@ -21,6 +21,7 @@ except ModuleNotFoundError:  # pragma: no cover
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = SKILL_ROOT / "config" / "lean_agent.example.toml"
 ENV_KEY_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.28.0"
 
 
 def deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:

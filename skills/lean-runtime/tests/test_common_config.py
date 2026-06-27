@@ -9,7 +9,7 @@ from unittest.mock import patch
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from common import ai4math_home, expand_path, load_toml, read_env_local, write_env_local  # noqa: E402
+from common import CANONICAL_LEAN_TOOLCHAIN, ai4math_home, expand_path, load_toml, read_config, read_env_local, write_env_local  # noqa: E402
 
 
 class CommonConfigTests(unittest.TestCase):
@@ -46,6 +46,25 @@ class CommonConfigTests(unittest.TestCase):
                 result = ai4math_home(root)
 
             self.assertEqual(result, custom)
+
+    def test_default_config_uses_canonical_toolchain(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+
+            with patch.dict("os.environ", {"AI4MATH_LEAN_TOOLCHAIN": ""}, clear=False):
+                config = read_config(root)
+
+            self.assertEqual(config["lean"]["preferred_toolchain"], CANONICAL_LEAN_TOOLCHAIN)
+
+    def test_environment_can_override_canonical_toolchain(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            override = "leanprover/lean4:v4.26.0"
+
+            with patch.dict("os.environ", {"AI4MATH_LEAN_TOOLCHAIN": override}, clear=False):
+                config = read_config(root)
+
+            self.assertEqual(config["lean"]["preferred_toolchain"], override)
 
     def test_write_env_local_updates_values_and_is_ignored(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

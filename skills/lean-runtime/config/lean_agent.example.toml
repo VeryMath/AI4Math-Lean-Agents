@@ -9,7 +9,7 @@ managed_workspace_template = "math"
 reuse_managed_workspace = true
 workspace_key = "lean-toolchain"
 align_workspace_versions = true
-preferred_toolchain = "auto"
+preferred_toolchain = "leanprover/lean4:v4.28.0"
 preferred_mathlib_rev = "auto"
 allow_user_project_version_changes = false
 
