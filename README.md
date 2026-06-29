@@ -73,6 +73,10 @@ Constraints:
 - ask before Numina setup, source edits, or final proof claims.
 ```
 
+Complete interaction example:
+
+- [From installing Lean skills to verifying a first theorem](examples/lean-setup-add-zero.md): shows how a coding agent installs `lean-setup` / `lean-formalization`, creates or reuses the shared Lean workspace, and verifies a minimal `Nat` theorem.
+
 ## What They Support
 
 - Lean project/workspace inspection.
