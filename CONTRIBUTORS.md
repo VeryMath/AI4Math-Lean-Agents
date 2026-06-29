@@ -1,13 +1,31 @@
 # Contributors
 
-This file records people whose work appears in this repository's git history or
-imported skill packages. GitHub's contributor graph is generated from commit
-metadata; this file is the human-readable credit ledger for the repository.
+This file records people whose work appears in this repository through direct
+commits, imported modules, or archived source repositories. GitHub's contributor
+graph is generated from commit metadata; this file is the human-readable
+attribution ledger.
 
-## Maintainer
+## Maintainers
 
-- [Conan Xu](https://github.com/ConanXu-math)
+| Contributor | Role | Scope |
+| --- | --- | --- |
+| [Conan Xu](https://github.com/ConanXu-math) | Maintainer | Repository organization, package integration, release structure |
 
-## Historical Contributors
+## Module Contributors
 
-- rain37233 - Lean skill contributions recorded in the repository history.
+| Module | Source | Contributor(s) | Contribution scope | Attribution record |
+| --- | --- | --- | --- | --- |
+| Root repository router | Current `VeryMath/AI4Math-Lean-Agents` repository | [Conan Xu](https://github.com/ConanXu-math), conanxu <1845830029@qq.com> | Root README, bilingual repository map, package routing layer, and public repository structure. | Preserved through repository commit history. |
+| Lean skill packages | Repository history and imported Lean work | rain37233 | Lean skill contributions recorded in repository history. | Preserved through existing contributor ledger and this file. |
+| `skills/lean-setup`, `skills/lean-formalization`, `skills/lean-runtime` | Current package structure | [Conan Xu](https://github.com/ConanXu-math) | Lean setup, formalization workflow, runtime support, backend-adapter boundaries, and package normalization. | Preserved through repository commit history. |
+
+## Policy
+
+- Keep attribution factual: name the module, source repository, contributor,
+  and contribution scope.
+- Do not duplicate long attribution prose in each package README. Link to this
+  file from root documentation instead.
+- When importing substantial work from another repository, preserve commit
+  history where practical. If history is not preserved, add an attribution row
+  here and include an appropriate `Co-authored-by` trailer in the import or
+  attribution commit.
