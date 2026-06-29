@@ -89,6 +89,10 @@ skills/lean-setup/SKILL.md
 skills/lean-formalization/SKILL.md
 ```
 
+完整交互案例：
+
+- [从安装 Lean skills 到验证第一个定理](examples/lean-setup-add-zero.zh-CN.md)：展示 coding agent 如何安装 `lean-setup` / `lean-formalization`，创建或复用共享 Lean workspace，并验证一个最小 `Nat` 定理。
+
 `approve` 表示执行下一步，`revise` 表示先修改计划，`reject` 表示停止当前路线，
 `skip` 表示跳过当前阶段。修改 theorem statement、设置 Numina、编辑源码和接受最终 proof
 claim 前都应先请求用户确认。

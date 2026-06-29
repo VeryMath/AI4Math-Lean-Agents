@@ -103,6 +103,10 @@ For formalization or proof repair, start with:
 skills/lean-formalization/SKILL.md
 ```
 
+Complete interaction example:
+
+- [From installing Lean skills to verifying a first theorem](examples/lean-setup-add-zero.md): shows how a coding agent installs `lean-setup` / `lean-formalization`, creates or reuses the shared Lean workspace, and verifies a minimal `Nat` theorem.
+
 ## Supported Scope
 
 - Lean project/workspace inspection.
