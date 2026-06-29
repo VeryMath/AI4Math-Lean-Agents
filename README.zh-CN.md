@@ -4,7 +4,7 @@
 
 面向 Lean 4 环境准备、形式化、proof repair、patch review 和可选 Lean-specialist backend 的 AI4Math 技能集合。
 
-[English](README.md) · [贡献者](CONTRIBUTORS.md) · [技能包](#技能包) · [快速开始](#快速开始) · [安全边界](#安全边界)
+[English](README.md) · [贡献者](CONTRIBUTORS.md) · [技能包](#技能包) · [安装](#安装) · [快速开始](#快速开始) · [安全边界](#安全边界)
 
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
 ![skills](https://img.shields.io/badge/skills-2-2ea44f)
@@ -30,6 +30,43 @@
 | [`lean-formalization`](skills/lean-formalization/) | 形式化 theorem statement、修复 Lean proof、完成 `sorry`、审查 patch，并在需要时协调 Numina。 | [`README`](skills/lean-formalization/README.md) · [`SKILL`](skills/lean-formalization/SKILL.md) |
 
 `skills/lean-runtime/` 是共享实现层，不是用户直接调用的 skill。
+
+## 安装
+
+推荐方式是 AI 自动安装：让你的 coding agent 自己 clone 或更新仓库、读取 Skill 说明、安装入口并验证 discovery。
+
+```text
+请帮我安装这些 AI4Math Skills。
+
+仓库：https://github.com/VeryMath/AI4Math-Lean-Agents.git
+分支：main
+Skill 路径：
+- skills/lean-setup
+- skills/lean-formalization
+
+请执行：
+1. 本地 clone 或更新仓库。
+2. 读取 README.md、SKILL.md、AGENTS.md（如果存在）以及每个目标 Skill 入口。
+3. 如果当前环境支持本地 Skill discovery，把每个包含 SKILL.md 的目录链接到本地 skills 目录。
+4. 如果某个 Skill 依赖相邻的共享支持目录，请保留这些 sibling 目录。
+5. 验证安装后的 Skills 是否可被发现。
+6. 告诉我安装路径、是否需要重启 agent，并给我一个测试 prompt。
+```
+
+Lean skills 需要把 `skills/lean-runtime` 保持为相邻支持目录。它不是公开入口，但 `lean-setup` 和 `lean-formalization` 会依赖它。
+
+Codex 风格本地 discovery 的手工 fallback：
+
+```bash
+git clone https://github.com/VeryMath/AI4Math-Lean-Agents.git
+cd AI4Math-Lean-Agents
+mkdir -p ~/.codex/skills
+ln -s "$PWD/skills/lean-setup" ~/.codex/skills/lean-setup
+ln -s "$PWD/skills/lean-formalization" ~/.codex/skills/lean-formalization
+ln -s "$PWD/skills/lean-runtime" ~/.codex/skills/lean-runtime
+```
+
+如果你的 agent 使用别的本地 Skill 目录，把 `~/.codex/skills` 替换成对应配置路径。
 
 ## 快速开始
 

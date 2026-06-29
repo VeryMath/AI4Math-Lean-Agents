@@ -5,7 +5,7 @@
 Lean 4 setup, formalization, proof repair, patch review, and optional
 Lean-specialist backend workflows for coding agents.
 
-[中文说明](README.zh-CN.md) · [Contributors](CONTRIBUTORS.md) · [Skill packages](#skill-packages) · [Quick start](#quick-start) · [Security model](#security-and-scope)
+[中文说明](README.zh-CN.md) · [Contributors](CONTRIBUTORS.md) · [Skill packages](#skill-packages) · [Installation](#installation) · [Quick start](#quick-start) · [Security model](#security-and-scope)
 
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
 ![skills](https://img.shields.io/badge/skills-2-2ea44f)
@@ -44,6 +44,43 @@ Future backend adapters do not claim support until deployment, readiness checks,
 | [`lean-formalization`](skills/lean-formalization/) | Formalize theorem statements, repair Lean proofs, complete `sorry`, review patches, and optionally coordinate Numina runs. | [`README`](skills/lean-formalization/README.md) · [`SKILL`](skills/lean-formalization/SKILL.md) |
 
 `skills/lean-runtime/` is a shared implementation layer, not a user-facing skill.
+
+## Installation
+
+The recommended path is AI-assisted installation: ask your coding agent to clone or update this repository, read the Skill instructions, install the entrypoints, and verify discovery.
+
+```text
+Please install these AI4Math Skills for me.
+
+Repository: https://github.com/VeryMath/AI4Math-Lean-Agents.git
+Branch: main
+Skill paths:
+- skills/lean-setup
+- skills/lean-formalization
+
+Steps:
+1. Clone or update the repository locally.
+2. Read README.md, SKILL.md, AGENTS.md if present, and each target Skill entrypoint.
+3. If this environment supports local Skill discovery, link each directory that contains SKILL.md into the local skills directory.
+4. Keep shared sibling support directories in place when a Skill depends on them.
+5. Verify that the installed Skills are discoverable.
+6. Tell me the installed paths, whether a restart is needed, and give me one test prompt.
+```
+
+For Lean skills, keep `skills/lean-runtime` installed as a sibling support directory. It is not a public entrypoint, but `lean-setup` and `lean-formalization` depend on it.
+
+Manual fallback for Codex-style local discovery:
+
+```bash
+git clone https://github.com/VeryMath/AI4Math-Lean-Agents.git
+cd AI4Math-Lean-Agents
+mkdir -p ~/.codex/skills
+ln -s "$PWD/skills/lean-setup" ~/.codex/skills/lean-setup
+ln -s "$PWD/skills/lean-formalization" ~/.codex/skills/lean-formalization
+ln -s "$PWD/skills/lean-runtime" ~/.codex/skills/lean-runtime
+```
+
+If your agent uses a different local Skill directory, replace `~/.codex/skills` with that configured path.
 
 ## Quick Start
 
