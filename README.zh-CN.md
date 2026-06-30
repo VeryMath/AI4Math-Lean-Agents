@@ -89,6 +89,27 @@ skills/lean-setup/SKILL.md
 skills/lean-formalization/SKILL.md
 ```
 
+可选 IDE 前端配置：
+
+```text
+当本地 Lean/Lake setup 和 smoke test 通过后，请继续引导我完成 Lean 的
+VS Code 前端配置。
+
+请告诉我：
+- 如何安装或确认 official Lean 4 VS Code extension；
+- 我应该打开哪个 Lake project 或共享 workspace 目录；
+- 我应该先打开哪个 `.lean` 文件；
+- 如何确认 Lean InfoView 使用的是刚才命令行 smoke test 通过的同一套 toolchain。
+```
+
+coding-agent 路径通过 `lake env lean`、`lake build` 或内置 smoke test
+验证 Lean。[VS Code](https://code.visualstudio.com/) 和
+[official Lean 4 extension](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4)
+是推荐的人类编辑前端，用于查看 goals、diagnostics、hovers 和 InfoView；
+但它不能替代本地 Lean/Lake 验证。[Lean 官方安装说明](https://lean-lang.org/install/)
+推荐使用 VS Code 和 Lean 4 extension 作为完整开发环境；IDE 与命令行检查
+应使用同一套 `elan`/`lake` toolchain。
+
 完整交互案例：
 
 - [从安装 Lean skills 到验证第一个定理](examples/lean-setup-add-zero.zh-CN.md)：展示 coding agent 如何安装 `lean-setup` / `lean-formalization`，创建或复用共享 Lean workspace，并验证一个最小 `Nat` 定理。
@@ -101,6 +122,7 @@ claim 前都应先请求用户确认。
 
 - Lean project/workspace inspection。
 - 只配置环境时，可创建或复用共享 `~/.ai4math/lean-workspace`；默认使用 AI4Math managed baseline `leanprover/lean4:v4.28.0`，除非用户明确覆盖。
+- 本地 Lean/Lake readiness 通过后，可继续引导用户配置 VS Code / Lean 4 extension 前端。
 - theorem formalization、proof repair、proof completion 和 `sorry` completion。
 - patch review：检查 `sorry`、`admit`、新引入的 `axiom` 和 theorem statement drift。
 - 可选 Lean 专用 agent backend adapter 流程；当前实现的是由 coding agent 协调的 official `project-numina/numina-lean-agent` runtime 设置和调用。
