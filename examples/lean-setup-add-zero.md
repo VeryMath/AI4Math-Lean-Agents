@@ -43,6 +43,17 @@ Once the agent reports that Lean/Lake are available and the shared workspace exi
 Formalize `forall n : Nat, n + 0 = n` in Lean 4 and verify it in the shared workspace you just prepared.
 ```
 
+After command-line validation succeeds, optionally ask the agent to guide the human IDE frontend setup:
+
+```text
+Now guide me through the VS Code frontend setup for this same Lean workspace.
+
+Please tell me which directory to open in VS Code, which `.lean` file to open
+first, how to install or verify the Lean 4 extension, and what I should see in
+Lean InfoView to know the IDE is connected to the same toolchain that passed
+the smoke test.
+```
+
 ## Expected Agent Behavior
 
 1. Read `AGENTS.md` and the relevant skill entrypoint.
@@ -51,7 +62,8 @@ Formalize `forall n : Nat, n + 0 = n` in Lean 4 and verify it in the shared work
 4. Use the managed standalone baseline `leanprover/lean4:v4.28.0` unless the user explicitly overrides it.
 5. Explain the target path and purpose before writing or compiling a Lean file.
 6. Run Lean/Lake validation and report the concrete result.
-7. Do not commit machine-local temp paths, download caches, API keys, or Numina runtime state.
+7. If the user wants the IDE frontend, guide them to open the verified Lake project or shared workspace in VS Code with the Lean 4 extension and confirm Lean InfoView is connected.
+8. Do not commit machine-local temp paths, download caches, API keys, or Numina runtime state.
 
 ## Minimal Lean File
 
@@ -83,5 +95,6 @@ A good result should report:
 - Setup-only tasks use `lean-setup` and do not require a theorem target.
 - Formalization and proof repair hand off to `lean-formalization`.
 - The default coding-agent path does not need API keys and does not call Numina by default.
+- VS Code and Lean InfoView are recommended for human inspection after local Lean/Lake validation, not a replacement for that validation.
 - Numina, Archon, or another backend is used only when the user explicitly asks for an optional backend adapter.
 - Final delivery is grounded in local Lean/Lake validation.

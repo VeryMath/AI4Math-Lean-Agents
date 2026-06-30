@@ -21,7 +21,8 @@ The shared implementation lives in `../lean-runtime/`. This skill must reuse the
 8. Run the bundled smoke test after setup.
 9. Report the installed tools, workspace path, Lean toolchain, mathlib revision when available, smoke-test result, and any remaining action.
 10. After successful setup or smoke-test validation, do not end passively. Offer a short next-step menu and recommend one default next action.
-11. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
+11. Include an optional IDE frontend path in that menu: guide the user to install or verify VS Code with the Lean 4 extension, open the verified Lake project or shared workspace, open a known passing `.lean` file, and confirm Lean InfoView is connected to the same toolchain that passed local validation.
+12. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
 
 ## Post-Setup Guidance
 
@@ -29,6 +30,7 @@ Offer a short next-step menu after setup succeeds:
 
 - inspect an existing Lean/Lake project;
 - run or explain the built-in smoke theorem result;
+- configure the VS Code / Lean 4 extension frontend for the verified project and confirm Lean InfoView works;
 - repair a Lean file or complete `sorry`;
 - formalize a natural-language or LaTeX theorem;
 - continue setup-only validation if the user only wants environment readiness.
@@ -54,6 +56,7 @@ Use `--dry-run` before setup when the user wants to review commands.
 - Do not change a user project's `lean-toolchain` or mathlib revision without approval.
 - Do not overwrite the canonical managed workspace for a different Lean/mathlib revision. Use `${AI4MATH_HOME:-~/.ai4math}/lean-workspaces/<version-key>/` only when the user explicitly needs a different standalone version.
 - Do not require API keys for Lean/mathlib workspace setup.
+- Do not require VS Code, Lean InfoView, or any IDE frontend for headless setup validation; offer it as a recommended human-facing follow-up after Lean/Lake readiness is confirmed.
 - Do not configure or call official Numina unless the user explicitly asks for that optional backend.
 - Do not commit machine-specific paths, downloaded runtime state, or secrets.
 

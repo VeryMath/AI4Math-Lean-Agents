@@ -54,6 +54,29 @@ Goal:
 Create or verify a reusable Lean 4/mathlib workspace.
 ```
 
+Optional IDE frontend setup:
+
+```text
+After the local Lean/Lake setup and smoke test pass, guide me through the
+VS Code frontend setup for Lean.
+
+Please tell me:
+- how to install or verify the official Lean 4 VS Code extension;
+- which Lake project or shared workspace directory I should open;
+- which `.lean` file I should open first;
+- how to confirm the Lean InfoView is connected to the same toolchain that
+  passed the command-line smoke test.
+```
+
+The coding-agent path validates Lean through `lake env lean`, `lake build`, or
+the bundled smoke test. [VS Code](https://code.visualstudio.com/) and the
+[official Lean 4 extension](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4)
+are the recommended human frontend for editing, goals, diagnostics, hovers, and
+InfoView, but they are not a replacement for local Lean/Lake validation. The
+[official Lean installer](https://lean-lang.org/install/) recommends VS Code
+plus the Lean 4 extension for the rich development environment; the same
+`elan`/`lake` toolchain should be used by both the IDE and command-line checks.
+
 Formalization or proof work:
 
 ```text
@@ -81,6 +104,7 @@ Complete interaction example:
 
 - Lean project/workspace inspection.
 - Reusable shared `~/.ai4math/lean-workspace` setup for standalone Lean files, using the AI4Math managed baseline `leanprover/lean4:v4.28.0` unless explicitly overridden.
+- Optional VS Code / Lean 4 extension frontend guidance after local Lean/Lake readiness is confirmed.
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
