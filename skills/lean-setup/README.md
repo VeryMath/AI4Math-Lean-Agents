@@ -13,6 +13,8 @@ Use this package when you need to:
 - create an isolated test directory or workspace with a safe default name that
   the user can confirm or rename;
 - run a Lean/mathlib smoke test;
+- after local validation succeeds, guide optional VS Code / Lean 4 extension
+  frontend setup for the verified project;
 - report toolchain, workspace, mathlib revision, and remaining setup work.
 
 Do not ask for a theorem target in setup-only mode. For theorem formalization,
@@ -22,14 +24,14 @@ hand off to `lean-formalization`.
 ## Implementation Boundary
 
 This package does not duplicate Lean runtime logic. It reuses the helper CLI and
-runtime references from `../lean-formalization/`.
+runtime references from the sibling `../lean-runtime/` support layer.
 
 Useful commands from this package directory:
 
 ```bash
-python ../lean-formalization/scripts/ai4m_lean.py doctor --cwd <target-project-or-workspace>
-python ../lean-formalization/scripts/ai4m_lean.py configure --cwd <target-project-or-workspace> --create-workspace
-python ../lean-formalization/scripts/ai4m_lean.py smoke-test --cwd <target-project-or-workspace>
+python ../lean-runtime/scripts/ai4m_lean.py doctor --cwd <target-project-or-workspace>
+python ../lean-runtime/scripts/ai4m_lean.py configure --cwd <target-project-or-workspace> --create-workspace
+python ../lean-runtime/scripts/ai4m_lean.py smoke-test --cwd <target-project-or-workspace>
 ```
 
 Use `--dry-run` when the user wants to review setup actions before downloads,
