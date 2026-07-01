@@ -9,9 +9,9 @@ This repository provides two AI4Math Lean skills:
 
 Both public skills share the bundled `skills/lean-runtime/` support layer for helper scripts, references, prompts, schemas, examples, and tests. Users invoke only the two public skills; installers should keep `lean-runtime` next to them.
 
-`lean-formalization` is informed by publicly available Lean-specialist agent patterns from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents. These are workflow patterns and related work references, not claims that every backend is implemented.
+`lean-formalization` distills publicly available Lean-specialist agent patterns from systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP integrations, and small iterative proof agents. The default coding-agent path implements a distilled Lean-agent loop: project gating, statement normalization, local context packs, retrieve-before-inventing, bounded proof attempts, failed-route memory, Lean/Lake validation, and minimal failure handoff. See `skills/lean-runtime/references/lean_agent_capability_map.md` for the capability map.
 
-Backend integration is adapter-first. Built-in recommended adapter: official Numina Lean Agent runtime. Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist; do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
+Backend integration is adapter-first. Built-in recommended adapter: official Numina Lean Agent runtime. Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Lean LSP/MCP is documented as an optional adapter recipe for goal-state tooling and MCP-backed theorem search. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist; do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
 ## When To Use These Skills
 
@@ -111,10 +111,11 @@ Complete interaction example:
 - Theorem formalization, proof repair, proof completion, and `sorry` completion.
 - Patch review for `sorry`, `admit`, newly introduced `axiom`, and theorem statement drift.
 - Minimal failing Lean fragment extraction when a proof is blocked.
-- Related-work-informed Lean-specialist patterns: theorem-state loops, premise retrieval, bounded proof search, failure memory, validation oracles, and minimal handoff.
+- Distilled Lean-agent patterns: theorem-state loops, premise retrieval, bounded proof search, failed-route memory, validation oracles, and minimal handoff.
 - Optional Lean-specialist backend adapter flow, with a built-in recommended recipe for official `project-numina/numina-lean-agent` deployment/calls mediated by the coding agent.
+- Optional Lean LSP/MCP adapter recipe for goal state, diagnostics, hover/declaration lookup, local search, MCP theorem search, and multi-attempt screening when explicitly requested.
 
-Numina is optional and provided as a recommended built-in adapter recipe. Archon and other Lean-specialist systems can be connected by the coding agent through `skills/lean-runtime/references/backend_adapter_checklist.md`; they are not default dependencies. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
+Numina is optional and provided as a recommended built-in adapter recipe. Lean LSP/MCP is optional and documented in `skills/lean-runtime/references/lean_lsp_mcp_adapter.md`. Archon and other Lean-specialist systems can be connected by the coding agent through `skills/lean-runtime/references/backend_adapter_checklist.md`; they are not default dependencies. The public CLI does not expose a parallel `numina-*` workflow; `doctor` reports readiness and `configure --setup-numina --project-name <name>` performs the reviewed local setup under `~/.ai4math/numina-runtime/` by default.
 
 Do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
@@ -165,7 +166,7 @@ python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --requir
 
 The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, choosing proof strategy, and matching the user's language.
 
-For the built-in recommended Numina adapter path, read `skills/lean-runtime/references/numina_runtime.md`. For any other backend, read `skills/lean-runtime/references/backend_adapter_checklist.md` first. Setup and runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
+For the distilled capability contract, read `skills/lean-runtime/references/lean_agent_capability_map.md`. For the built-in recommended Numina adapter path, read `skills/lean-runtime/references/numina_runtime.md`. For Lean LSP/MCP, read `skills/lean-runtime/references/lean_lsp_mcp_adapter.md`. For any other backend, read `skills/lean-runtime/references/backend_adapter_checklist.md` first. Setup and runner calls may clone repositories, install tools, or use external model/API credentials, so they should be explained before execution.
 
 ## Validate
 
@@ -195,6 +196,7 @@ local validation boundary:
 - [COPRA](https://github.com/trishullab/copra)
 
 These references are cited for related-work context and design provenance around
-setup, proof-state loops, retrieval, validation, and failure handoff. Unless
+setup, proof-state loops, retrieval, validation, and failure handoff. The default
+skill distills selected mechanisms into a coding-agent workflow; unless
 explicitly stated, this repository does not vendor, reproduce, replace, or claim
 compatibility with the original systems.

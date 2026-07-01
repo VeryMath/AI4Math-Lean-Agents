@@ -1,6 +1,6 @@
 # Lean-Specialist Agent Pattern Integration
 
-This reference explains how the coding-agent-first skill incorporates publicly documented Lean-specialist agent designs without making any external agent mandatory. Preserve the mechanism, not prompts, benchmark-specific assumptions, or private implementation details.
+This reference explains how the coding-agent-first skill incorporates publicly documented Lean-specialist agent designs without making any external agent mandatory. Preserve the mechanism, not prompts, benchmark-specific assumptions, or private implementation details. For the capability-by-capability distillation contract, read `lean_agent_capability_map.md`; for Lean LSP/MCP setup and tool policy, read `lean_lsp_mcp_adapter.md`.
 
 ## Source Families
 
@@ -41,7 +41,8 @@ Public source anchors:
 | Premise retrieval | `rg`, nearby imports/proofs, project declarations, optional external search |
 | Bounded proof attempts | `max_rounds`, local iteration caps, failed-strategy notes |
 | Backtracking/failure memory | Record tried tactic families and rejected statement changes |
-| Lean-specialist backend adapter | Adapter-first optional escalation; Numina and Archon are recommended adapter candidates, never required for default work |
+| Lean LSP/MCP goal tooling | Optional adapter recipe for goal state, diagnostics, hover, local search, external search, and multi-attempt screening |
+| Lean-specialist backend adapter | Adapter-first optional escalation; Numina, Lean LSP/MCP, Archon, and LeanCopilot are adapter candidates, never required for default work |
 | Validation oracle | Lean/Lake plus `review` and `detect-sorry` |
 | Failure artifact | `minimize-failure` and exact errors/goals |
 

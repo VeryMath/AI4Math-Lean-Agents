@@ -10,7 +10,7 @@ If the user's language is ambiguous, default to Chinese. The skill display name,
 
 This is a coding-agent-first Lean skill. Backend integration is adapter-first. Built-in recommended adapter: official Numina Lean Agent runtime. Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist; do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
-The default coding-agent path should still absorb Lean-specialist agent mechanisms: project gating, statement normalization, theorem-state loops, premise retrieval, bounded proof search, failed-strategy memory, Lean/Lake validation, and minimized failure handoff.
+The default coding-agent path should still absorb Lean-specialist agent mechanisms as a distilled Lean-agent loop: project gating, statement normalization, local context packs, theorem-state loops, retrieve-before-inventing, bounded proof search, failed-strategy memory, Lean/Lake validation, and minimized failure handoff. Use `lean_agent_capability_map.md` to distinguish default distilled capabilities from adapter-only capabilities.
 
 Lead the interaction; do not wait for the user to drive every step. On a broad request, first orient to the current state instead of asking for every input at once:
 
@@ -38,6 +38,7 @@ If no precise target is provided, offer a small menu and recommend one path. For
 - if the user asks for an optional backend adapter, run an adapter readiness check;
 - if the user asks for an optional backend adapter, prepare the shared workspace as the target project;
 - if the user asks for an optional backend adapter, call the approved adapter on a natural-language/LaTeX theorem or Lean file.
+- if the user asks for Lean LSP/MCP, read `lean_lsp_mcp_adapter.md`, explain MCP scope and security, then configure only after approval.
 
 Ask at most one blocking question at a time. A good opening ends with one decision question, not a checklist.
 

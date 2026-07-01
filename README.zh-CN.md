@@ -9,9 +9,9 @@
 
 两个公开 skill 共享随仓库提供的 `skills/lean-runtime/` 支持层，其中包含 helper scripts、references、prompts、schemas、examples 和 tests。用户只调用两个公开 skill；安装时应让 `lean-runtime` 保持在它们的 sibling 位置。
 
-`lean-formalization` 采用 coding-agent-first 定位，设计借鉴了 Numina、LeanDojo/ReProver、LeanCopilot、COPRA-style proof search、Lean LSP/MCP 集成和轻量迭代 proof agent 等公开 Lean 专用 agent 的机制。这些是 workflow patterns 和相关工作参考，不表示所有 backend 都已经实现。
+`lean-formalization` 采用 coding-agent-first 定位，并蒸馏 Numina、LeanDojo/ReProver、LeanCopilot、COPRA-style proof search、Lean LSP/MCP 集成和轻量迭代 proof agent 等公开 Lean 专用 agent 的机制。默认 coding-agent 路径应执行 distilled Lean-agent loop：project gating、statement normalization、local context pack、retrieve-before-inventing、bounded proof attempts、failed-route memory、Lean/Lake validation 和 minimal failure handoff。能力地图见 `skills/lean-runtime/references/lean_agent_capability_map.md`。
 
-Backend 集成采用 adapter-first。当前内置推荐 adapter：official Numina Lean Agent runtime。Numina 和 Archon 是推荐 adapter candidates，不是默认项或硬依赖。其他 Lean-specialist backend 可由 coding agent 按 backend adapter checklist 接入；在 deployment、readiness checks、调用、validation 和 failure triage 文档化前，不要调用任何 backend。
+Backend 集成采用 adapter-first。当前内置推荐 adapter：official Numina Lean Agent runtime。Numina 和 Archon 是推荐 adapter candidates，不是默认项或硬依赖。Lean LSP/MCP 作为可选 adapter recipe，用于用户明确要求 goal-state tooling 或 MCP-backed theorem search 的场景。其他 Lean-specialist backend 可由 coding agent 按 backend adapter checklist 接入；在 deployment、readiness checks、调用、validation 和 failure triage 文档化前，不要调用任何 backend。
 
 ## 适合什么任务
 
@@ -120,9 +120,10 @@ claim 前都应先请求用户确认。
 - patch review：检查 `sorry`、`admit`、新引入的 `axiom` 和 theorem statement drift。
 - 可选 Lean 专用 agent backend adapter 流程；内置推荐 recipe 是由 coding agent 协调的 official `project-numina/numina-lean-agent` runtime 设置和调用。
 - proof blocked 时抽取最小失败 Lean fragment。
-- 借鉴 Lean 专用 agent 模式：theorem-state loop、premise retrieval、bounded proof search、失败记忆、validation oracle 和 minimal handoff。
+- 蒸馏 Lean 专用 agent 模式：theorem-state loop、premise retrieval、bounded proof search、failed-route memory、validation oracle 和 minimal handoff。
+- 可选 Lean LSP/MCP adapter recipe：在用户明确要求时，用于 goal state、diagnostics、hover/declaration lookup、local search、MCP theorem search 和 multi-attempt screening。
 
-Numina 是可选链路，并作为内置推荐 adapter recipe 提供。Archon 和其他 Lean-specialist systems 可由 coding agent 按 `skills/lean-runtime/references/backend_adapter_checklist.md` 接入；它们不是默认依赖。公共 CLI 不提供并行的 `numina-*` workflow；`doctor` 用于报告 readiness，`configure --setup-numina --project-name <name>` 用于在 review 后执行本地设置，默认位置为 `~/.ai4math/numina-runtime/`。只有当用户明确要求 `Numina`、`official Lean Agent`、批量 proof search 或外部 subagent run 时，才应进入 Numina adapter。
+Numina 是可选链路，并作为内置推荐 adapter recipe 提供。Lean LSP/MCP 是可选链路，文档位于 `skills/lean-runtime/references/lean_lsp_mcp_adapter.md`。Archon 和其他 Lean-specialist systems 可由 coding agent 按 `skills/lean-runtime/references/backend_adapter_checklist.md` 接入；它们不是默认依赖。公共 CLI 不提供并行的 `numina-*` workflow；`doctor` 用于报告 readiness，`configure --setup-numina --project-name <name>` 用于在 review 后执行本地设置，默认位置为 `~/.ai4math/numina-runtime/`。只有当用户明确要求 `Numina`、`official Lean Agent`、批量 proof search、Lean LSP/MCP 或外部 subagent run 时，才应进入 adapter。
 
 不要调用任何 backend，除非 deployment、readiness checks、调用、validation 和 failure triage 已经文档化。
 
@@ -159,7 +160,7 @@ python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --requir
 
 辅助 CLI 不是 proof engine。coding agent 仍负责读取 Lean errors、编辑 proofs、选择 proof strategy，并匹配用户语言。
 
-内置推荐 Numina adapter 路径请读取 `skills/lean-runtime/references/numina_runtime.md`；其他 backend 请先读取 `skills/lean-runtime/references/backend_adapter_checklist.md`。setup 和 runner calls 可能 clone repositories、安装工具或使用外部 model/API credentials，因此执行前应先说明。
+distilled capability contract 请读取 `skills/lean-runtime/references/lean_agent_capability_map.md`；内置推荐 Numina adapter 路径请读取 `skills/lean-runtime/references/numina_runtime.md`；Lean LSP/MCP 请读取 `skills/lean-runtime/references/lean_lsp_mcp_adapter.md`；其他 backend 请先读取 `skills/lean-runtime/references/backend_adapter_checklist.md`。setup 和 runner calls 可能 clone repositories、安装工具或使用外部 model/API credentials，因此执行前应先说明。
 
 ## 维护者检查
 
@@ -188,5 +189,6 @@ coding-agent-first 工作流和本地 Lean 验证边界：
 - [COPRA](https://github.com/trishullab/copra)
 
 这些项目用于说明相关工作和设计来源，主要涉及 setup、proof-state loop、
-retrieval、validation 和 failure handoff 等机制。除非另有明确说明，本仓库不
-内置、不复刻、不替代，也不声称兼容原系统。
+retrieval、validation 和 failure handoff 等机制。默认 skill 会蒸馏其中一部分机制
+进入 coding-agent workflow；除非另有明确说明，本仓库不内置、不复刻、不替代，
+也不声称兼容原系统。

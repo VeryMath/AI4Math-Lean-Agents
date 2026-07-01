@@ -11,7 +11,7 @@ Use this checklist before connecting any Lean-specialist backend. Backend integr
 
 Built-in recommended adapter: official Numina Lean Agent runtime.
 
-Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist, but do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
+Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Lean LSP/MCP is a documented adapter recipe in `lean_lsp_mcp_adapter.md` for goal-state tooling and MCP-backed theorem search when the user explicitly asks for it. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist, but do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
 ## Adapter Contract
 

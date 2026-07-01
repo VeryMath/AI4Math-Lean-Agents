@@ -246,6 +246,44 @@ class CliTests(unittest.TestCase):
             self.assertIn("其他 Lean-specialist backend 可由 coding agent 按 backend adapter checklist 接入", readme_zh)
             self.assertIn("不要调用任何 backend", readme_zh)
 
+    def test_distilled_lean_agent_capability_layer_is_documented(self) -> None:
+        capability_map = SKILL_ROOT / "references" / "lean_agent_capability_map.md"
+        mcp_adapter = SKILL_ROOT / "references" / "lean_lsp_mcp_adapter.md"
+        formalization_text = (SKILLS_ROOT / "lean-formalization" / "SKILL.md").read_text(encoding="utf-8")
+        direct_workflow = (SKILL_ROOT / "references" / "direct_lean_workflow.md").read_text(encoding="utf-8")
+
+        self.assertTrue(capability_map.exists())
+        self.assertTrue(mcp_adapter.exists())
+        cap_text = capability_map.read_text(encoding="utf-8")
+        mcp_text = mcp_adapter.read_text(encoding="utf-8")
+
+        for phrase in [
+            "distilled Lean-agent capability layer",
+            "distilled default",
+            "adapter recipe",
+            "retrieve-before-inventing",
+            "bounded proof attempts",
+            "failed-route memory",
+            "lean_lsp_mcp_adapter.md",
+        ]:
+            self.assertIn(phrase, cap_text)
+
+        for phrase in [
+            "Support status: `adapter recipe`",
+            "project-numina/lean-lsp-mcp",
+            "LEAN_PROJECT_PATH",
+            "lean_multi_attempt",
+            "Never accept an MCP result as final proof",
+            "lake build",
+        ]:
+            self.assertIn(phrase, mcp_text)
+
+        self.assertIn("This skill must act as a distilled Lean-agent capability layer", formalization_text)
+        self.assertIn("lean_agent_capability_map.md", formalization_text)
+        self.assertIn("lean_lsp_mcp_adapter.md", formalization_text)
+        self.assertIn("default distilled Lean-agent workflow", direct_workflow)
+        self.assertIn("Retrieve before inventing", direct_workflow)
+
     def test_package_hygiene_scans_lean_setup_entrypoint(self) -> None:
         generated = SKILL_ROOT.parent / "lean-setup" / "__pycache__" / "sentinel.pyc"
         generated.parent.mkdir(exist_ok=True)

@@ -15,6 +15,8 @@ This is a coding-agent-first Lean skill. The coding agent is the primary Lean wo
 
 Incorporate publicly documented Lean-specialist agent patterns into the default coding-agent workflow. Use systems such as Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP, MCP, and lightweight iterative proof agents as related-work references for mechanisms such as project gating, statement normalization, theorem-state loops, premise retrieval, bounded tactic/proof search, validation oracles, failure memory, and minimized handoff. Treat specialist-agent patterns as mechanisms, not mandatory external services.
 
+This skill must act as a distilled Lean-agent capability layer, not only as a list of related projects. The default path should execute the distilled loop from `../lean-runtime/references/lean_agent_capability_map.md`: project gate, statement normalization, local context pack, retrieve-before-inventing, bounded tactic/proof attempts, failed-route memory, local validation, and minimal failure handoff. Use `../lean-runtime/references/lean_lsp_mcp_adapter.md` when the user explicitly asks for Lean LSP/MCP, richer goal-state tooling, or MCP-backed theorem search.
+
 Lean-specialist backend adapters are adapter-first optional escalation paths. Built-in recommended adapter: official Numina Lean Agent runtime. Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist; do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented. Use a backend adapter only when the user asks for the official Lean Agent, Numina, Archon, batch proof search, or an approved external subagent run.
 
 Match the user's language by default. If the user's language is ambiguous, default to Chinese. If the user writes Chinese, respond in Chinese from the first turn unless they ask otherwise. A language switch is not a task reset. Keep the current environment state, prior diagnosis, and recommended next action, then continue leading in the new language.
@@ -42,7 +44,7 @@ Do not remove the built-in official Numina adapter recipe. Treat Numina and Arch
 7. When reporting readiness, lead with local Lean readiness. Report backend readiness only when the optional backend adapter path is requested. If backend credentials are missing, say that only the optional backend adapter path needs configuration.
 8. Before any backend adapter setup or run, inspect readiness, explain the deployment/call, target project, prompt, result directory, credential/proxy/MCP state, and local validation plan; proceed only after approval.
 9. For natural-language or LaTeX input, draft the Lean declaration and ask for confirmation before long proof work.
-10. Edit Lean directly in small steps for the default coding-agent path, using incorporated specialist-agent patterns such as theorem-state inspection, nearby lemma retrieval, bounded proof attempts, failed-strategy notes, and minimal failure extraction. If a backend adapter is approved, call it for proof search/formalization, then run Lean/Lake validation and patch safety checks before accepting results.
+10. Edit Lean directly in small steps for the default coding-agent path, using the distilled Lean-agent loop: inspect theorem state, build a local context pack, retrieve nearby lemmas before inventing, run bounded proof attempts, record failed routes, and extract minimal failures when blocked. If a backend adapter is approved, call it for proof search/formalization, then run Lean/Lake validation and patch safety checks before accepting results.
 11. Preserve theorem statements unless the user explicitly approves a change.
 12. Reject final patches that contain `sorry`, `admit`, or newly introduced `axiom`.
 13. If blocked, stop cleanly with the smallest useful failing Lean fragment, exact errors/goals, and the next mathematical decision needed.
@@ -82,6 +84,8 @@ When using the built-in recommended Numina adapter, follow `../lean-runtime/refe
 ## References
 
 - Read `../lean-runtime/references/direct_lean_workflow.md` for the default coding-agent proof/repair/formalization loop.
+- Read `../lean-runtime/references/lean_agent_capability_map.md` when checking whether Lean-agent abilities have been distilled into the default workflow or delegated to adapters.
+- Read `../lean-runtime/references/lean_lsp_mcp_adapter.md` when the user asks to connect Lean LSP/MCP, goal-state MCP tooling, or MCP-backed theorem search.
 - Read `../lean-runtime/references/specialist_agent_patterns.md` when adapting ideas from Numina, LeanDojo/ReProver, LeanCopilot, COPRA-style proof search, Lean LSP/MCP, or other Lean-specialist agents.
 - Read `../lean-runtime/references/lean_runtime_configuration.md` when setting up or diagnosing the reusable Lean workspace.
 - Read `../lean-runtime/references/numina_runtime.md` when the user wants the official Numina deployment/call path.
