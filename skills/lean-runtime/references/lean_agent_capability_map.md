@@ -5,9 +5,12 @@ AI4Math Lean skills. It separates three layers:
 
 - `distilled default`: implemented as the normal coding-agent workflow without
   external APIs or backend services;
-- `adapter recipe`: documented for explicit user-approved escalation, then
+- `adapter_recipe`: documented for explicit user-approved escalation, then
   locally validated before acceptance;
 - `not claimed`: related work that is cited as inspiration only.
+
+Use "adapter recipe" in prose and `adapter_recipe` as the machine-readable
+support status.
 
 Do not claim parity with a specialist Lean prover unless the original backend
 is actually configured, called, and its output is validated locally.
@@ -49,13 +52,13 @@ benchmark-specific assumptions, or upstream implementation details.
 | Statement normalization and preservation | Numina, COPRA, local coding-agent review | distilled default | `lean-formalization` playbook and `review` statement-drift guard |
 | Theorem-state loop from concrete Lean errors/goals | LeanDojo/ReProver, Lean LSP/MCP, COPRA | distilled default | direct edit/check loop; optional MCP goal tools when approved |
 | Local context pack: imports, nearby proofs, project declarations, failed attempts | LeanDojo/ReProver, Numina, LeanCopilot | distilled default | `rg`, nearby proof inspection, failed-strategy notes |
-| Premise retrieval before invention | LeanDojo/ReProver, LeanCopilot, Lean LSP/MCP | distilled default plus adapter recipe | local `rg`; optional `lean_local_search`, `lean_leansearch`, `lean_loogle`, `lean_state_search` through MCP |
-| Bounded tactic/proof attempts | COPRA, LeanDojo/ReProver, LeanCopilot, Lean LSP/MCP | distilled default plus adapter recipe | local iteration caps; optional `lean_multi_attempt` through MCP |
-| External proof-search orchestration | Numina, COPRA | adapter recipe | built-in Numina adapter; other backends follow `backend_adapter_checklist.md` |
+| Premise retrieval before invention | LeanDojo/ReProver, LeanCopilot, Lean LSP/MCP | distilled default plus `adapter_recipe` | local `rg`; optional `lean_local_search`, `lean_leansearch`, `lean_loogle`, `lean_state_search` through MCP |
+| Bounded tactic/proof attempts | COPRA, LeanDojo/ReProver, LeanCopilot, Lean LSP/MCP | distilled default plus `adapter_recipe` | local iteration caps; optional `lean_multi_attempt` through MCP |
+| External proof-search orchestration | Numina, COPRA | `built_in_recipe` or `adapter_recipe` | built-in Numina adapter; other backends follow `backend_adapter_checklist.md` |
 | Native Lean tactic suggestion / proof search | LeanCopilot | adapter candidate | cite or use only when the target project imports/configures LeanCopilot |
-| Lean LSP goal, hover, diagnostics, completions, declaration lookup | Lean LSP/MCP | adapter recipe | `lean_lsp_mcp_adapter.md` |
-| Semantic/external theorem search | Numina, Lean LSP/MCP, LeanDojo ecosystem | adapter recipe | MCP external search tools or backend-specific skill keys after approval |
-| Result directory, round limits, and run artifacts | Numina, COPRA | adapter recipe | Numina runtime recipe and backend adapter checklist |
+| Lean LSP goal, hover, diagnostics, completions, declaration lookup | Lean LSP/MCP | `adapter_recipe` | `lean_lsp_mcp_adapter.md` |
+| Semantic/external theorem search | Numina, Lean LSP/MCP, LeanDojo ecosystem | `adapter_recipe` | MCP external search tools or backend-specific skill keys after approval |
+| Result directory, round limits, and run artifacts | Numina, COPRA | `built_in_recipe` or `adapter_recipe` | Numina runtime recipe and backend adapter checklist |
 | Validation oracle | Lean itself, all source families | distilled default | `lake env lean`, `lake build`, `check`, `detect-sorry`, `review` |
 | Minimal failure handoff | local skill design, COPRA-style stop condition | distilled default | `minimize-failure`, exact errors/goals, tried routes |
 
@@ -105,7 +108,7 @@ review pass.
 A delivery claiming Lean-agent capability distillation must include:
 
 - this capability map;
-- a Lean LSP/MCP adapter recipe;
+- a Lean LSP/MCP `adapter_recipe`;
 - `lean-formalization` text that names the distilled default loop, not only
   related work;
 - `verify-delivery` checks that require these references;

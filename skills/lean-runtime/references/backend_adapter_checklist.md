@@ -4,14 +4,18 @@ Use this checklist before connecting any Lean-specialist backend. Backend integr
 
 ## Support Status
 
-- `supported`: setup, readiness checks, invocation, local validation, and failure triage are documented and guarded.
-- `experimental`: partial adapter exists, but the agent must explain gaps and request approval before use.
-- `candidate`: recommended backend family or related work, but not a default dependency.
-- `future`: related work only; do not call it automatically.
+- `built_in_recipe`: optional adapter recipe maintained in this repository.
+  The agent still needs explicit approval, documented readiness, invocation,
+  local validation, and failure triage before use.
+- `adapter_recipe`: documented adapter recipe for explicit user-approved
+  escalation. Treat it as opt-in, not as a default dependency.
+- `candidate`: recommended backend family or related work, but no complete
+  adapter recipe is maintained here.
+- `unsupported`: related work only; do not call it automatically.
 
 Built-in recommended adapter: official Numina Lean Agent runtime.
 
-Numina and Archon are recommended adapter candidates, not defaults or hard requirements. Lean LSP/MCP is a documented adapter recipe in `lean_lsp_mcp_adapter.md` for goal-state tooling and MCP-backed theorem search when the user explicitly asks for it. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist, but do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
+Numina and Archon are recommended adapter candidates, not defaults or hard requirements. The official Numina runtime is `built_in_recipe`; Lean LSP/MCP is `adapter_recipe` in `lean_lsp_mcp_adapter.md` for goal-state tooling and MCP-backed theorem search when the user explicitly asks for it. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist, but do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
 ## Adapter Contract
 

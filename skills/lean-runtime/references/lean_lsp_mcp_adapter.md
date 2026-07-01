@@ -5,7 +5,7 @@ Lean MCP, richer goal-state tooling, MCP-backed theorem search, or an optional
 Lean-specialist backend that depends on MCP. The default coding-agent Lean path
 does not require MCP.
 
-Support status: `adapter recipe`.
+Support status: `adapter_recipe`.
 
 This file documents the boundary required before a coding agent may configure or
 call a Lean LSP/MCP server. It does not make MCP a default dependency.
@@ -15,6 +15,8 @@ call a Lean LSP/MCP server. It does not make MCP a default dependency.
 Recommended public source:
 
 - `project-numina/lean-lsp-mcp`: https://github.com/project-numina/lean-lsp-mcp
+
+Source note: last checked 2026-07-01 against the public README. `uvx lean-lsp-mcp` is unpinned; record the resolved version or audited commit in setup evidence.
 
 The public README describes a Lean theorem prover MCP server that talks to Lean
 through the Language Server Protocol. It exposes diagnostics, goal states, hover
@@ -46,10 +48,18 @@ Before configuring MCP, state these facts and ask for approval:
 - The target must be a buildable Lake project. Run `lake build` manually first
   when feasible so the LSP server starts faster and avoids timeout failures.
 - The MCP server may access local files and run local Lean/build operations.
-- External theorem-search tools may call remote services unless disabled or
-  replaced with self-hosted endpoints.
+- Default transport: `stdio` only.
+- `lean_run_code` is default-deny; expose it only inside a disposable trusted
+  sandbox after explicit user approval.
+- External theorem search is local-only unless the user approves the remote service and data disclosure.
+- External theorem-search tools may call remote services unless disabled,
+  replaced with self-hosted endpoints, or approved for the specific project.
 - Any project-scoped MCP config, such as `.mcp.json`, is a source-controlled
   file unless the user chooses a local/global scope.
+- Review any existing project-scoped `.mcp.json` before enabling it.
+- Allowlist direct `uvx lean-lsp-mcp` invocation or an audited pinned command;
+  reject shell wrappers, unexpected environment variables, and committed
+  secrets.
 - Secrets such as bearer tokens must not be committed.
 
 ## Readiness Checks
@@ -71,6 +81,8 @@ When a project path cannot be detected automatically, set:
 export LEAN_PROJECT_PATH="/absolute/path/to/lake/project"
 ```
 
+Set `LEAN_PROJECT_PATH` in every MCP client configuration.
+
 ## MCP Client Configuration
 
 Use the upstream documented command shape and choose the user's actual client.
@@ -81,12 +93,14 @@ Do not write config until the user approves the scope.
 Run from the Lean project root:
 
 ```bash
+export LEAN_PROJECT_PATH="$PWD"
 claude mcp add lean-lsp uvx lean-lsp-mcp
 ```
 
 For project-scoped config:
 
 ```bash
+export LEAN_PROJECT_PATH="$PWD"
 claude mcp add lean-lsp -s project uvx lean-lsp-mcp
 ```
 
@@ -122,7 +136,7 @@ toolchain live there:
     "lean-lsp": {
       "type": "stdio",
       "command": "wsl.exe",
-      "args": ["uvx", "lean-lsp-mcp"]
+      "args": ["env", "LEAN_PROJECT_PATH=/absolute/path/to/lake/project", "uvx", "lean-lsp-mcp"]
     }
   }
 }
@@ -137,11 +151,17 @@ Use Cursor MCP settings with:
   "mcpServers": {
     "lean-lsp": {
       "command": "uvx",
-      "args": ["lean-lsp-mcp"]
+      "args": ["lean-lsp-mcp"],
+      "env": {
+        "LEAN_PROJECT_PATH": "/absolute/path/to/lake/project",
+        "LEAN_LOG_LEVEL": "NONE"
+      }
     }
   }
 }
 ```
+
+Do not expose HTTP/SSE on `0.0.0.0` or a public interface. HTTP/SSE requires explicit approval, `127.0.0.1`, and a bearer token. Prefer local project config for private work and global config only when the user accepts the broader scope.
 
 ## Tool Use Policy
 
@@ -153,10 +173,15 @@ Prefer MCP tools in this order:
    local symbol understanding.
 4. `lean_local_search` before external theorem search.
 5. `lean_leansearch`, `lean_loogle`, `lean_leanfinder`, `lean_state_search`, or
-   `lean_hammer_premise` only when the query is specific and rate limits or
-   network use are acceptable.
+   `lean_hammer_premise` only when the query is specific and the user has
+   approved the remote service, network use, and data disclosure for the
+   current project.
 6. `lean_multi_attempt` for bounded screening of a few candidate tactics.
 7. `lean_build` only after edits or when the LSP state needs a rebuild.
+
+Do not call `lean_run_code` in the default adapter path. If a user explicitly
+approves it, run only in a trusted disposable sandbox and still treat the result
+as untrusted until local Lean/Lake validation passes.
 
 Never accept an MCP result as final proof. The final gate remains local
 Lean/Lake validation plus patch review.
@@ -171,10 +196,10 @@ Common failures and responses:
   do not change project versions without approval.
 - MCP server cannot access files: check client working directory and config
   scope.
-- External search is rate-limited or unavailable: fall back to local `rg`,
+- External search is rate-limited, unavailable, or not approved: fall back to local `rg`,
   `lean_local_search`, nearby proofs, and mathlib names.
-- Security concern: use local/global config only as approved, avoid HTTP/SSE
-  transport unless needed, and do not expose bearer tokens.
+- Security concern: use stdio by default, keep HTTP/SSE on `127.0.0.1` only
+  with an explicit bearer token when approved, and do not expose bearer tokens.
 
 ## Validation Gate
 

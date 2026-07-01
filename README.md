@@ -80,6 +80,15 @@ environment, and the extension setup guide provides platform-specific guidance;
 the same `elan`/`lake` toolchain should be used by both the IDE and
 command-line checks.
 
+These are not the same thing:
+
+- VS Code and Lean InfoView are the human frontend for reading goals and
+  diagnostics.
+- Lean LSP/MCP is an optional agent tool server and is configured only when the
+  user asks for MCP-backed goal/search tooling.
+- Numina is an optional backend adapter recipe and is not part of default Lean
+  setup, IDE setup, or local validation.
+
 Formalization or proof work:
 
 ```text
@@ -155,13 +164,21 @@ claims.
 
 Run commands from the repository root:
 
+Default local validation:
+
 ```bash
 python skills/lean-runtime/scripts/ai4m_lean.py env --cwd .
 python skills/lean-runtime/scripts/ai4m_lean.py doctor --cwd .
 python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --create-workspace
-python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs --dry-run
 python skills/lean-runtime/scripts/ai4m_lean.py check --cwd . --skip-build
 python skills/lean-runtime/scripts/ai4m_lean.py verify-delivery --cwd . --require-environment --include-workspace-build --run-tests
+```
+
+Optional adapter setup, only after the user asks for Numina or another backend
+adapter and approves the setup plan:
+
+```bash
+python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --setup-numina --project-name myproofs --dry-run
 ```
 
 The helper CLI is not the proof engine. The coding agent remains responsible for reading Lean errors, editing proofs, choosing proof strategy, and matching the user's language.

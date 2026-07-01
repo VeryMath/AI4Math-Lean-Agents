@@ -28,7 +28,7 @@ REQUIRED_FORMALIZATION_FILES = [
 REQUIRED_RUNTIME_FILES = [
     "config/lean_agent.example.toml",
     "config/numina_runtime.example.toml",
-    "examples/smoke/NuminaSmoke.lean",
+    "examples/smoke/LocalLeanSmoke.lean",
     "schemas/task.schema.json",
     "schemas/result.schema.json",
     "schemas/config.schema.json",

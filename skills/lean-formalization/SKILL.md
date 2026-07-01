@@ -35,7 +35,7 @@ Do not remove the built-in official Numina adapter recipe. Treat Numina and Arch
 
 ## Agent Playbook
 
-1. Start by orienting the session: inspect the current repository/workspace when possible, distinguish existing Lake project, shared Lean workspace, local Lean validation readiness, Numina runtime, and Numina credentials/auth, and summarize what is already usable. Treat upstream Numina example projects as demos only; do not let their pinned `lean-toolchain` make the shared workspace look broken.
+1. Start by orienting the session: inspect the current repository/workspace when possible, distinguish an existing Lake project, shared Lean workspace, and local Lean validation readiness, then summarize what is already usable. Mention Numina runtime or credentials/auth only when the user asks for an optional backend adapter path. Treat upstream Numina example projects as demos only; do not let their pinned `lean-toolchain` make the shared workspace look broken.
 2. If the user has not provided a precise target, offer a small next-step menu such as run the bundled smoke test, repair an existing Lean file, formalize a natural-language/LaTeX theorem, or inspect a Lean project. Include backend readiness or credential setup only when the user asks for an optional backend adapter path. Recommend one default path based on what inspection found.
 3. Ask at most one blocking question at a time. Prefer a concrete recommendation plus one decision question over a list of required inputs.
 4. Understand the user's intent: direct coding-agent repair/formalization, configure or call a backend adapter, repair a file, formalize a statement, prove a target, complete `sorry`, review a patch, batch a folder, or minimize a failure.
@@ -56,7 +56,7 @@ Use `python ../lean-runtime/scripts/ai4m_lean.py <command>` when it saves effort
 - `env` / `doctor`: inspect Lean workspace, local tool availability, and optional backend readiness when requested.
 - `configure --create-workspace`: create or reuse the shared managed workspace.
 - `configure --setup-numina --project-name <name>`: after user approval, clone/configure the official Numina runtime under `${AI4MATH_HOME:-~/.ai4math}/numina-runtime/`.
-- `smoke-test`: run the bundled `../lean-runtime/examples/smoke/NuminaSmoke.lean` target in the shared workspace without external API calls.
+- `smoke-test`: run the bundled `../lean-runtime/examples/smoke/LocalLeanSmoke.lean` target in the shared workspace without external API calls; this is a local Lean smoke theorem, not a Numina run.
 - `check`: run a structured Lean/Lake validation.
 - `review` / `detect-sorry`: guard against placeholders, axioms, and statement drift.
 - `minimize-failure`: extract a compact failing Lean fragment.

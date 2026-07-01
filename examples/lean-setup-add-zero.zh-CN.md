@@ -40,6 +40,8 @@ Use lean-setup:
 当 agent 报告 Lean/Lake 可用、共享工作区已存在或已创建后，可以继续请求一个最小验证：
 
 ```text
+Use lean-formalization:
+
 请将 `forall n : Nat, n + 0 = n` 形式化为 Lean 4，并在刚才的共享工作区里验证。
 ```
 
