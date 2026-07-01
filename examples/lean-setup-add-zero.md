@@ -49,9 +49,9 @@ After command-line validation succeeds, optionally ask the agent to guide the hu
 Now guide me through the VS Code frontend setup for this same Lean workspace.
 
 Please tell me which directory to open in VS Code, which `.lean` file to open
-first, how to install or verify the Lean 4 extension, and what I should see in
-Lean InfoView to know the IDE is connected to the same toolchain that passed
-the smoke test.
+first, how to install or verify the Lean 4 extension on my operating system
+(macOS, Windows, or Linux), and what I should see in Lean InfoView to know the
+IDE is connected to the same toolchain that passed the smoke test.
 ```
 
 ## Expected Agent Behavior
@@ -62,7 +62,7 @@ the smoke test.
 4. Use the managed standalone baseline `leanprover/lean4:v4.28.0` unless the user explicitly overrides it.
 5. Explain the target path and purpose before writing or compiling a Lean file.
 6. Run Lean/Lake validation and report the concrete result.
-7. If the user wants the IDE frontend, guide them to open the verified Lake project or shared workspace in VS Code with the Lean 4 extension and confirm Lean InfoView is connected.
+7. If the user wants the IDE frontend, guide them to open the verified Lake project or shared workspace in VS Code with the Lean 4 extension on macOS, Windows, or Linux, and confirm Lean InfoView is connected.
 8. Do not commit machine-local temp paths, download caches, API keys, or Numina runtime state.
 
 ## Minimal Lean File
@@ -95,6 +95,6 @@ A good result should report:
 - Setup-only tasks use `lean-setup` and do not require a theorem target.
 - Formalization and proof repair hand off to `lean-formalization`.
 - The default coding-agent path does not need API keys and does not call Numina by default.
-- VS Code and Lean InfoView are recommended for human inspection after local Lean/Lake validation, not a replacement for that validation.
+- VS Code and Lean InfoView are recommended for human inspection on macOS, Windows, and Linux after local Lean/Lake validation, not a replacement for that validation.
 - Numina, Archon, or another backend is used only when the user explicitly asks for an optional backend adapter.
 - Final delivery is grounded in local Lean/Lake validation.

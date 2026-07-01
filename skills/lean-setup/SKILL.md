@@ -21,7 +21,7 @@ The shared implementation lives in `../lean-runtime/`. This skill must reuse the
 8. Run the bundled smoke test after setup.
 9. Report the installed tools, workspace path, Lean toolchain, mathlib revision when available, smoke-test result, and any remaining action.
 10. After successful setup or smoke-test validation, do not end passively. Offer a short next-step menu and recommend one default next action.
-11. Include an optional IDE frontend path in that menu: guide the user to install or verify VS Code with the Lean 4 extension, open the verified Lake project or shared workspace, open a known passing `.lean` file, and confirm Lean InfoView is connected to the same toolchain that passed local validation.
+11. Include an optional cross-platform IDE frontend path in that menu: identify the user's OS when needed, then guide them to install or verify VS Code with the Lean 4 extension on macOS, Windows, or Linux, open the verified Lake project or shared workspace, open a known passing `.lean` file, and confirm Lean InfoView is connected to the same toolchain that passed local validation.
 12. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
 
 ## Post-Setup Guidance
@@ -30,7 +30,7 @@ Offer a short next-step menu after setup succeeds:
 
 - inspect an existing Lean/Lake project;
 - run or explain the built-in smoke theorem result;
-- configure the VS Code / Lean 4 extension frontend for the verified project and confirm Lean InfoView works;
+- configure the VS Code / Lean 4 extension frontend for the verified project on macOS, Windows, or Linux, and confirm Lean InfoView works;
 - repair a Lean file or complete `sorry`;
 - formalize a natural-language or LaTeX theorem;
 - continue setup-only validation if the user only wants environment readiness.
