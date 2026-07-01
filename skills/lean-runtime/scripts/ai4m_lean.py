@@ -55,7 +55,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="AI4Math coding-agent Lean skill CLI with optional Lean-specialist backend adapter support")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    env = sub.add_parser("env", help="Inspect Lean workspace and supported optional backend environment")
+    env = sub.add_parser("env", help="Inspect Lean workspace and optional backend adapter environment")
     add_common(env)
     env.add_argument("--target", default=None)
 

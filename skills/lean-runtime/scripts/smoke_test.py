@@ -9,7 +9,7 @@ from tool_status import find_tool
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-SMOKE_FILE = SKILL_ROOT / "examples" / "smoke" / "NuminaSmoke.lean"
+SMOKE_FILE = SKILL_ROOT / "examples" / "smoke" / "LocalLeanSmoke.lean"
 
 
 def run_smoke_test(
@@ -35,11 +35,11 @@ def run_smoke_test(
             "command": command,
             "missing_config": [] if workspace_root else ["lean_workspace"],
             "theorems": [
-                "ai4math_numina_smoke_add_zero",
-                "ai4math_numina_smoke_le_succ",
+                "ai4math_local_smoke_add_zero",
+                "ai4math_local_smoke_le_succ",
             ],
             "external_api_call": False,
-            "recommended_next_action": "run the bundled smoke target, then start the coding-agent Lean task or discuss the supported optional Numina backend path",
+            "recommended_next_action": "run the bundled smoke target, then start the coding-agent Lean task or discuss an adapter-first optional backend path",
         }
     if not workspace_root:
         return {
@@ -60,8 +60,8 @@ def run_smoke_test(
         "smoke_file": str(SMOKE_FILE),
         "command": command,
         "theorems": [
-            "ai4math_numina_smoke_add_zero",
-            "ai4math_numina_smoke_le_succ",
+            "ai4math_local_smoke_add_zero",
+            "ai4math_local_smoke_le_succ",
         ],
         "external_api_call": False,
         "recommended_next_action": "use this verified workspace for the next coding-agent Lean task; call official Numina only if the optional backend path is approved",

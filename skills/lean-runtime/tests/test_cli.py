@@ -85,7 +85,7 @@ class CliTests(unittest.TestCase):
         payload = json.loads(result.stdout)
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["status"], "dry_run")
-        self.assertTrue(payload["smoke_file"].endswith("examples/smoke/NuminaSmoke.lean"))
+        self.assertTrue(payload["smoke_file"].endswith("examples/smoke/LocalLeanSmoke.lean"))
         self.assertFalse(payload["external_api_call"])
 
     def test_doctor_outputs_tool_report(self) -> None:
@@ -218,7 +218,7 @@ class CliTests(unittest.TestCase):
         self.assertIn("formalize a natural-language or LaTeX theorem", text)
         self.assertIn("mention optional Numina only when the user explicitly asks", text)
 
-    def test_optional_backend_language_distinguishes_current_and_future_adapters(self) -> None:
+    def test_optional_backend_language_is_adapter_first_and_not_numina_locked(self) -> None:
         repo_root = SKILLS_ROOT.parent
         texts = [
             (SKILLS_ROOT / "lean-formalization" / "SKILL.md").read_text(encoding="utf-8"),
@@ -230,18 +230,92 @@ class CliTests(unittest.TestCase):
             texts.append(readme_path.read_text(encoding="utf-8"))
 
         for text in texts:
-            self.assertIn("optional Lean-specialist backend", text)
-            self.assertIn("Currently supported optional backend: official Numina Lean Agent runtime", text)
-            self.assertIn("Future backend adapters", text)
-            self.assertIn("do not claim support until deployment, readiness checks, invocation, validation, and failure triage are documented", text)
-            self.assertNotIn("Currently supported optional backend: Archon", text)
+            self.assertIn("adapter-first", text)
+            self.assertIn("Built-in recommended adapter: official Numina Lean Agent runtime", text)
+            self.assertIn("Numina and Archon are recommended adapter candidates, not defaults or hard requirements", text)
+            self.assertIn("Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist", text)
+            self.assertIn("do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented", text)
+            self.assertNotIn("Official Numina is the only currently supported deployable backend adapter", text)
+            self.assertNotIn("Currently supported optional backend: official Numina Lean Agent runtime", text)
+            self.assertNotIn("supported-optional-backend-adapter", text)
 
         if readme_zh_path.exists():
             readme_zh = readme_zh_path.read_text(encoding="utf-8")
-            self.assertIn("可选 Lean 专用 agent backend", readme_zh)
-            self.assertIn("当前支持的可选 backend：official Numina Lean Agent runtime", readme_zh)
-            self.assertIn("未来 backend adapter", readme_zh)
-            self.assertIn("不要写成已支持", readme_zh)
+            self.assertIn("adapter-first", readme_zh)
+            self.assertIn("当前内置推荐 adapter：official Numina Lean Agent runtime", readme_zh)
+            self.assertIn("Numina 和 Archon 是推荐 adapter candidates，不是默认项或硬依赖", readme_zh)
+            self.assertIn("其他 Lean-specialist backend 可由 coding agent 按 backend adapter checklist 接入", readme_zh)
+            self.assertIn("不要调用任何 backend", readme_zh)
+
+    def test_release_branch_and_default_helper_commands_are_consistent(self) -> None:
+        repo_root = SKILLS_ROOT.parent
+        agent_text = (repo_root / ".agent.md").read_text(encoding="utf-8")
+        example_text = (repo_root / "examples" / "lean-setup-add-zero.md").read_text(encoding="utf-8")
+        example_zh_text = (repo_root / "examples" / "lean-setup-add-zero.zh-CN.md").read_text(encoding="utf-8")
+        readme_text = (repo_root / "README.md").read_text(encoding="utf-8")
+        readme_zh_text = (repo_root / "README.zh-CN.md").read_text(encoding="utf-8")
+
+        self.assertIn("Default branch: `main`", agent_text)
+        self.assertNotIn("feature/numina-runtime-delivery", agent_text)
+        self.assertIn("Branch: main", example_text)
+        self.assertIn("分支：main", example_zh_text)
+        self.assertIn("Default local validation", readme_text)
+        self.assertIn("Optional adapter setup", readme_text)
+        self.assertIn("默认本地验证", readme_zh_text)
+        self.assertIn("可选 adapter 设置", readme_zh_text)
+
+    def test_distilled_lean_agent_capability_layer_is_documented(self) -> None:
+        capability_map = SKILL_ROOT / "references" / "lean_agent_capability_map.md"
+        mcp_adapter = SKILL_ROOT / "references" / "lean_lsp_mcp_adapter.md"
+        formalization_text = (SKILLS_ROOT / "lean-formalization" / "SKILL.md").read_text(encoding="utf-8")
+        direct_workflow = (SKILL_ROOT / "references" / "direct_lean_workflow.md").read_text(encoding="utf-8")
+
+        self.assertTrue(capability_map.exists())
+        self.assertTrue(mcp_adapter.exists())
+        cap_text = capability_map.read_text(encoding="utf-8")
+        mcp_text = mcp_adapter.read_text(encoding="utf-8")
+
+        for phrase in [
+            "distilled Lean-agent capability layer",
+            "distilled default",
+            "adapter recipe",
+            "retrieve-before-inventing",
+            "bounded proof attempts",
+            "failed-route memory",
+            "lean_lsp_mcp_adapter.md",
+        ]:
+            self.assertIn(phrase, cap_text)
+
+        for phrase in [
+            "Support status: `adapter_recipe`",
+            "project-numina/lean-lsp-mcp",
+            "LEAN_PROJECT_PATH",
+            "lean_multi_attempt",
+            "Never accept an MCP result as final proof",
+            "lake build",
+        ]:
+            self.assertIn(phrase, mcp_text)
+
+        self.assertIn("This skill must act as a distilled Lean-agent capability layer", formalization_text)
+        self.assertIn("lean_agent_capability_map.md", formalization_text)
+        self.assertIn("lean_lsp_mcp_adapter.md", formalization_text)
+        self.assertIn("default distilled Lean-agent workflow", direct_workflow)
+        self.assertIn("Retrieve before inventing", direct_workflow)
+
+    def test_mcp_adapter_safety_policy_is_documented(self) -> None:
+        mcp_text = (SKILL_ROOT / "references" / "lean_lsp_mcp_adapter.md").read_text(encoding="utf-8")
+
+        for phrase in [
+            "Default transport: `stdio` only.",
+            "`lean_run_code` is default-deny",
+            "Do not expose HTTP/SSE on `0.0.0.0` or a public interface.",
+            "HTTP/SSE requires explicit approval, `127.0.0.1`, and a bearer token.",
+            "External theorem search is local-only unless the user approves the remote service and data disclosure.",
+            "Review any existing project-scoped `.mcp.json` before enabling it.",
+            "Set `LEAN_PROJECT_PATH` in every MCP client configuration.",
+            "`uvx lean-lsp-mcp` is unpinned; record the resolved version or audited commit in setup evidence.",
+        ]:
+            self.assertIn(phrase, mcp_text)
 
     def test_package_hygiene_scans_lean_setup_entrypoint(self) -> None:
         generated = SKILL_ROOT.parent / "lean-setup" / "__pycache__" / "sentinel.pyc"

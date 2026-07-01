@@ -1,20 +1,25 @@
 # Backend Adapter Checklist
 
-Use this checklist before claiming that a Lean-specialist backend is supported. Backend adapters are optional escalation paths; default coding-agent Lean work must not require any backend adapter.
+Use this checklist before connecting any Lean-specialist backend. Backend integration is adapter-first: default coding-agent Lean work must not require any backend adapter, and every backend call must pass through an explicit adapter contract.
 
 ## Support Status
 
-- `supported`: setup, readiness checks, invocation, local validation, and failure triage are documented and guarded.
-- `experimental`: partial adapter exists, but the agent must explain gaps and request approval before use.
-- `future`: related work or candidate backend only; do not claim support or call it automatically.
+- `built_in_recipe`: optional adapter recipe maintained in this repository.
+  The agent still needs explicit approval, documented readiness, invocation,
+  local validation, and failure triage before use.
+- `adapter_recipe`: documented adapter recipe for explicit user-approved
+  escalation. Treat it as opt-in, not as a default dependency.
+- `candidate`: recommended backend family or related work, but no complete
+  adapter recipe is maintained here.
+- `unsupported`: related work only; do not call it automatically.
 
-Currently supported optional backend: official Numina Lean Agent runtime.
+Built-in recommended adapter: official Numina Lean Agent runtime.
 
-Future backend adapters may include Archon or other Lean-specialist systems, but do not claim support until deployment, readiness checks, invocation, validation, and failure triage are documented.
+Numina and Archon are recommended adapter candidates, not defaults or hard requirements. The official Numina runtime is `built_in_recipe`; Lean LSP/MCP is `adapter_recipe` in `lean_lsp_mcp_adapter.md` for goal-state tooling and MCP-backed theorem search when the user explicitly asks for it. Other Lean-specialist backends may be connected by the coding agent through the backend adapter checklist, but do not call any backend until deployment, readiness checks, invocation, validation, and failure triage are documented.
 
 ## Adapter Contract
 
-Document all of the following before moving a backend out of `future`:
+Document all of the following before calling a backend adapter:
 
 - Name, upstream source, license, and support status.
 - Trigger phrases that justify using this backend.
@@ -28,4 +33,4 @@ Document all of the following before moving a backend out of `future`:
 
 ## Non-Claim Rule
 
-Do not claim support for a backend adapter unless its setup, call, credential, mutation, and validation contracts are documented. Unimplemented adapters may be cited as related work or future adapters only.
+Do not call a backend adapter unless its setup, call, credential, mutation, and validation contracts are documented. Undocumented adapters may be cited as related work or recommended candidates only.

@@ -88,7 +88,7 @@ def inspect_environment(cwd: str | Path = ".", config_path: str | Path | None = 
             "mode": "coding-agent",
             "backend": "none",
             "numina_required": False,
-            "numina_runtime": "supported-optional-backend-adapter",
+            "numina_runtime": "built_in_recipe",
         },
         "lean": {
             "target": str(target_path),

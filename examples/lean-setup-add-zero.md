@@ -40,6 +40,8 @@ Check whether this environment has Lean 4 installed. If it is missing, install i
 Once the agent reports that Lean/Lake are available and the shared workspace exists or has been created, ask for a minimal proof check:
 
 ```text
+Use lean-formalization:
+
 Formalize `forall n : Nat, n + 0 = n` in Lean 4 and verify it in the shared workspace you just prepared.
 ```
 
