@@ -49,8 +49,9 @@ Use lean-setup:
 现在请继续引导我完成这个 Lean workspace 的 VS Code 前端配置。
 
 请告诉我应该在 VS Code 中打开哪个目录、先打开哪个 `.lean` 文件、
-如何安装或确认 Lean 4 extension，以及我在 Lean InfoView 里应该看到什么，
-才能确认 IDE 使用的是刚才通过 smoke test 的同一套 toolchain。
+如何在我的操作系统上安装或确认 Lean 4 extension（macOS、Windows 或
+Linux），以及我在 Lean InfoView 里应该看到什么，才能确认 IDE 使用的是
+刚才通过 smoke test 的同一套 toolchain。
 ```
 
 ## Agent 应该怎么做
@@ -61,7 +62,7 @@ Use lean-setup:
 4. 默认使用 `leanprover/lean4:v4.28.0` 管理 standalone workspace，除非用户明确覆盖。
 5. 在写入或编译 Lean 文件前说明路径与目标。
 6. 运行 Lean/Lake 验证，并报告具体结果。
-7. 如果用户希望配置 IDE 前端，引导其在 VS Code 中打开已验证的 Lake project 或共享 workspace，安装 Lean 4 extension，并确认 Lean InfoView 已连接。
+7. 如果用户希望配置 IDE 前端，引导其在 macOS、Windows 或 Linux 上使用 VS Code 打开已验证的 Lake project 或共享 workspace，安装 Lean 4 extension，并确认 Lean InfoView 已连接。
 8. 不把本机临时路径、下载缓存、API key 或 Numina runtime 状态提交到仓库。
 
 ## 可验证的最小 Lean 文件
@@ -94,6 +95,6 @@ theorem my_add_zero (n : Nat) : n + 0 = n := by
 - setup-only 任务只使用 `lean-setup`，不要求用户提供 theorem。
 - 形式化或 proof repair 才交给 `lean-formalization`。
 - 默认 coding-agent 路径不需要 API key，也不默认调用 Numina。
-- VS Code 和 Lean InfoView 推荐用于人类查看 proof state，但不能替代本地 Lean/Lake 验证。
+- VS Code 和 Lean InfoView 推荐用于在 macOS、Windows 和 Linux 上查看 proof state，但不能替代本地 Lean/Lake 验证。
 - Numina、Archon 或其他 backend 只有在用户明确要求 optional backend adapter 时才进入流程。
 - 最终交付必须以本地 Lean/Lake 验证结果为准。
