@@ -19,10 +19,32 @@ The shared implementation lives in `../lean-runtime/`. This skill must reuse the
 6. For standalone future Lean work, create or reuse the canonical managed workspace `${AI4MATH_HOME:-~/.ai4math}/lean-workspace` with the AI4Math managed baseline toolchain `leanprover/lean4:v4.28.0`.
 7. Create the workspace only after explaining that Lean/mathlib artifacts may be downloaded or built. If the canonical workspace already exists and is complete, reuse it instead of rebuilding or downloading again.
 8. Run the bundled smoke test after setup.
-9. Report the installed tools, workspace path, Lean toolchain, mathlib revision when available, smoke-test result, and any remaining action.
-10. After successful setup or smoke-test validation, do not end passively. Offer a short next-step menu and recommend one default next action.
-11. Include an optional cross-platform IDE frontend path in that menu: identify the user's OS when needed, then guide them to install or verify VS Code with the Lean 4 extension on macOS, Windows, or Linux, open the verified Lake project or shared workspace, open a known passing `.lean` file, and confirm Lean InfoView is connected to the same toolchain that passed local validation.
-12. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
+9. Report the installed tools, workspace path, Lean toolchain, mathlib revision when available, smoke-test result, and any remaining action. Distinguish Lean core ready from mathlib ready.
+10. If Lean toolchain and pure Lean smoke tests pass but `lake update`, `lake exe cache get`, `lake build`, or `import Mathlib` is blocked by GitHub/network/cache failure, report partial readiness instead of total failure or full success.
+11. After successful setup or smoke-test validation, do not end passively. Offer a short next-step menu and recommend one default next action.
+12. Include an optional cross-platform IDE frontend path in that menu: identify the user's OS when needed, then guide them to install or verify VS Code with the Lean 4 extension on macOS, Windows, or Linux, open the verified Lake project or shared workspace, open a known passing `.lean` file, and confirm Lean InfoView is connected to the same toolchain that passed local validation.
+13. If the user next wants formalization, proof repair, theorem transcription, `sorry` completion, patch review, or Numina proof search, hand off to `lean-formalization`.
+
+## Readiness Levels
+
+Report setup status in two layers:
+
+- Lean core ready: `lean --version`, `lake --version`, and a pure Lean smoke theorem pass.
+- mathlib ready: the workspace can run `lake update`, `lake exe cache get`, `lake build`, and a file with `import Mathlib`.
+
+If Lean core ready passes but mathlib ready fails because GitHub, proxy, or cache download is unavailable, call it partial readiness. `import Mathlib` tasks are blocked, but pure `.lean` files and basic Lean compilation can still be verified. Do not present this as full mathlib workspace readiness. Do not recommend formalization, `sorry` completion, or Numina as the default next step while mathlib is missing. The default next step should be to diagnose Git/mathlib access or continue only with pure Lean smoke validation.
+
+For Windows mathlib clone/cache failures, use copyable recovery commands such as:
+
+```powershell
+git ls-remote https://github.com/leanprover-community/mathlib4.git HEAD
+Remove-Item -Recurse -Force .lake\packages\mathlib
+lake update
+lake exe cache get
+lake build
+```
+
+If `git ls-remote` fails, diagnose Git proxy/network inheritance before rerunning Lake. If it succeeds but Lake reports that `.lake\packages\mathlib` cannot resolve `HEAD`, remove that corrupted package directory and rerun `lake update`.
 
 ## Post-Setup Guidance
 
@@ -34,6 +56,8 @@ Offer a short next-step menu after setup succeeds:
 - repair a Lean file or complete `sorry`;
 - formalize a natural-language or LaTeX theorem;
 - continue setup-only validation if the user only wants environment readiness.
+
+If only partial readiness is available, limit the default menu to Git/mathlib recovery, pure Lean smoke validation, or IDE frontend verification for the same pure Lean file. Do not offer Mathlib-dependent proof work as ready.
 
 As a rule, mention optional Numina only when the user explicitly asks for the official Lean Agent, batch proof search, or an external backend adapter; do not make Numina or API keys part of the default next step.
 

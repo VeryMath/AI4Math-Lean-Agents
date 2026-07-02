@@ -45,6 +45,27 @@ elan run leanprover/lean4:v4.28.0 lake build
 
 If a user project already has `lean-toolchain` and `lakefile.{lean,toml}`, use that project and do not change versions without approval. If the canonical workspace already has `lake-manifest.json` and `.lake/`, reuse it instead of rerunning cache/build. If a standalone task needs a different Lean/mathlib revision than the shared managed workspace, use a versioned workspace under `${AI4MATH_HOME:-~/.ai4math}/lean-workspaces/` instead of overwriting `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`.
 
+## Partial Readiness
+
+Report readiness in two layers:
+
+- Lean core ready: `lean --version`, `lake --version`, and a pure Lean smoke theorem pass.
+- mathlib ready: `lake update`, `lake exe cache get`, `lake build`, and `import Mathlib` pass in the selected Lake project.
+
+When Lean core ready passes but mathlib ready is blocked by GitHub, proxy, or cache download failure, call this degraded mode or partial readiness. Pure Lean compilation is available, but Mathlib-dependent work is not ready. The next action should be Git/mathlib recovery, not Numina setup or Mathlib-dependent formalization.
+
+Useful Windows diagnostics and recovery commands:
+
+```powershell
+git ls-remote https://github.com/leanprover-community/mathlib4.git HEAD
+Remove-Item -Recurse -Force .lake\packages\mathlib
+lake update
+lake exe cache get
+lake build
+```
+
+If `git ls-remote` fails, fix Git proxy/network inheritance first. If it succeeds and Lake reports a corrupt `.lake\packages\mathlib` checkout or cannot resolve `HEAD`, remove that package directory and rerun `lake update`.
+
 ## Local Config
 
 Machine-specific settings live in `.ai4math/lean_agent.local.toml` and should not be committed. Example:

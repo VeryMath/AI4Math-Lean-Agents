@@ -218,6 +218,37 @@ class CliTests(unittest.TestCase):
         self.assertIn("formalize a natural-language or LaTeX theorem", text)
         self.assertIn("mention optional Numina only when the user explicitly asks", text)
 
+    def test_lean_setup_distinguishes_core_and_mathlib_readiness(self) -> None:
+        text = (SKILL_ROOT.parent / "lean-setup" / "SKILL.md").read_text(encoding="utf-8")
+        openai_yaml = (SKILL_ROOT.parent / "lean-setup" / "agents" / "openai.yaml").read_text(encoding="utf-8")
+        runtime_config = (SKILL_ROOT / "references" / "lean_runtime_configuration.md").read_text(encoding="utf-8")
+
+        for phrase in [
+            "Lean core ready",
+            "mathlib ready",
+            "partial readiness",
+            "`import Mathlib` tasks are blocked",
+            "Do not present this as full mathlib workspace readiness.",
+            "Do not recommend formalization, `sorry` completion, or Numina as the default next step while mathlib is missing.",
+            "git ls-remote https://github.com/leanprover-community/mathlib4.git HEAD",
+            "Remove-Item -Recurse -Force .lake\\packages\\mathlib",
+        ]:
+            self.assertIn(phrase, text)
+
+        for phrase in [
+            "区分 Lean core ready 和 mathlib ready",
+            "mathlib 未完成时不要把正式形式化、sorry completion 或 Numina 作为默认下一步",
+        ]:
+            self.assertIn(phrase, openai_yaml)
+
+        for phrase in [
+            "Partial Readiness",
+            "Lean core ready",
+            "mathlib ready",
+            "degraded mode",
+        ]:
+            self.assertIn(phrase, runtime_config)
+
     def test_optional_backend_language_is_adapter_first_and_not_numina_locked(self) -> None:
         repo_root = SKILLS_ROOT.parent
         texts = [
