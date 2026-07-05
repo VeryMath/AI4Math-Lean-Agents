@@ -199,6 +199,7 @@ coding-agent-first 工作流和本地 Lean 验证边界：
 - [mathlib4](https://github.com/leanprover-community/mathlib4)
 - [Numina Lean Agent](https://github.com/project-numina/numina-lean-agent)
 - [Numina Putnam 2025](https://github.com/project-numina/Numina-Putnam2025)
+- [Archon](https://github.com/frenzymath/Archon)
 - [LeanDojo](https://github.com/lean-dojo/LeanDojo) 和 [ReProver](https://github.com/lean-dojo/ReProver)
 - [LeanCopilot](https://github.com/lean-dojo/LeanCopilot)
 - [lean-lsp-mcp](https://github.com/project-numina/lean-lsp-mcp)

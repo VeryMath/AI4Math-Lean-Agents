@@ -278,6 +278,16 @@ class CliTests(unittest.TestCase):
             self.assertIn("其他 Lean-specialist backend 可由 coding agent 按 backend adapter checklist 接入", readme_zh)
             self.assertIn("不要调用任何 backend", readme_zh)
 
+    def test_related_work_references_include_archon(self) -> None:
+        repo_root = SKILLS_ROOT.parent
+        readme_text = (repo_root / "README.md").read_text(encoding="utf-8")
+        readme_zh_text = (repo_root / "README.zh-CN.md").read_text(encoding="utf-8")
+
+        self.assertIn("## Related Work and Public References", readme_text)
+        self.assertIn("- [Archon](https://github.com/frenzymath/Archon)", readme_text)
+        self.assertIn("## 相关工作与公开参考", readme_zh_text)
+        self.assertIn("- [Archon](https://github.com/frenzymath/Archon)", readme_zh_text)
+
     def test_release_branch_and_default_helper_commands_are_consistent(self) -> None:
         repo_root = SKILLS_ROOT.parent
         agent_text = (repo_root / ".agent.md").read_text(encoding="utf-8")
