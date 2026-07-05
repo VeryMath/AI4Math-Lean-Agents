@@ -1,0 +1,15 @@
+# Codex Loading Notes
+
+This repository exposes a shared Skill layer at:
+
+```text
+skills/lean-formalization/SKILL.md
+```
+
+Use from the checkout by asking Codex to read `AGENTS.md`, `SKILL.md`, and the
+concrete Skill file. For local discovery, sync or link
+`skills/lean-setup/` and `skills/lean-formalization/` into the Codex Skill path
+used by your installation, and keep `skills/lean-runtime/` as their sibling
+support directory. Then restart or reload if required.
+
+Do not duplicate workflow logic in `.codex/`; update the shared Skill layer.
