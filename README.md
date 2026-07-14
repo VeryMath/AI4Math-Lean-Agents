@@ -13,6 +13,11 @@ and local Lean/mathlib validation.
 
 </div>
 
+<p align="center">
+  If this project helps your work, please consider giving the repository a Star ⭐
+  <a href="https://github.com/VeryMath/AI4Math-Lean-Agents"><img alt="GitHub stars" src="https://img.shields.io/github/stars/VeryMath/AI4Math-Lean-Agents?style=social"></a>
+</p>
+
 ## What This Repository Is
 
 This repository is the AI4Math home for Lean agent skills. It gives coding

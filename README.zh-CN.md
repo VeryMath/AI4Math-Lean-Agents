@@ -13,6 +13,11 @@ Lean/mathlib validation workflows。
 
 </div>
 
+<p align="center">
+  如果这个项目对你有帮助，欢迎为仓库点 Star ⭐
+  <a href="https://github.com/VeryMath/AI4Math-Lean-Agents"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/VeryMath/AI4Math-Lean-Agents?style=social"></a>
+</p>
+
 ## 这个仓库是什么
 
 本仓库是 AI4Math 的 Lean agent skills 主页。它让 coding agent 能够按结构化
