@@ -1,163 +1,71 @@
-# Lean Agent Numina Skill 使用说明
+# Stat Inference Lean — Agent 测试床
 
-本说明用于当前项目内的 `lean-agent-numina` 技能，目标是让你稳定调用 `project-numina/numina-lean-agent` 完成 Lean 自动证明任务。
+本仓库是 **Lean 自动证明 Agent 的测试床 / 语料 / Skill 载体**，不是「只教你装环境」的安装页。
 
-## 0. 一键安装给别人（新电脑）
+核心闭环与 KPI 见 **[`docs/VISION.md`](docs/VISION.md)**。  
+调用规则以 Cursor Skill 为单源：[`/.cursor/skills/lean-agent-numina/`](.cursor/skills/lean-agent-numina/)。
 
-这套 Skill 已支持一键安装。把整个项目目录发给对方（或让对方 `git clone` 后进入项目根目录），执行以下命令即可：
+## 本仓提供什么
 
-### Windows PowerShell
+| 资产 | 路径 | 说明 |
+|------|------|------|
+| Skill（主源） | `.cursor/skills/lean-agent-numina/` | 阶段状态机、认证 Mode A/C、排障 |
+| OpenCode Agent（派生） | `.opencode/agents/numina-lean-agent.md` | 由 sync 脚本从 Skill **覆盖生成** |
+| Fixture | `StatInferenceLean/Exercises/Fixtures/` | ErrorBank `broken` / `fixed` |
+| 冒烟 / Formalize 靶 | `Exercises/InteractiveDemo.lean` | 可进默认 build |
+| 回归集说明 | [`docs/REGRESSION.md`](docs/REGRESSION.md) | 含 Bernoulli 单独 lean |
+| 评测规格 | [`eval/tasks.yaml`](eval/tasks.yaml) | 6 任务，$5/run 封顶 |
+| Success Bank 架构 | [`docs/SUCCESS_BANK.md`](docs/SUCCESS_BANK.md) | 实现在 Phase 2（numina 仓） |
+
+Runner / Error Bank **代码** 在 `~/numina-lean-agent`（本 Phase 不改 Python；见 VISION 仓边界）。
+
+## 快速开始（文档入口）
+
+1. 读愿景：[`docs/VISION.md`](docs/VISION.md)  
+2. 读 Skill：[`SKILL.md`](.cursor/skills/lean-agent-numina/SKILL.md) · [`reference.md`](.cursor/skills/lean-agent-numina/reference.md) · [`examples.md`](.cursor/skills/lean-agent-numina/examples.md)  
+3. 认证模板：[`.env.example`](.env.example) · [`docs/AUTH.md`](docs/AUTH.md)  
+4. 改 Skill 后同步 OpenCode Agent：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync_opencode_agent.ps1
+```
+
+```bash
+bash ./scripts/sync_opencode_agent.sh
+```
+
+5. （可选）安装 Skill 到用户目录 — **先 sync**：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File ".\.cursor\skills\lean-agent-numina\install.ps1"
 ```
 
-### WSL / Linux / macOS
-
 ```bash
 bash ./.cursor/skills/lean-agent-numina/install.sh
 ```
 
-执行后会自动完成：
+## 认证默认（摘要）
 
-- 安装 Skill 到 `~/.cursor/skills/lean-agent-numina`
-- 安装 OpenCode 子 Agent 到 `~/.opencode/agents/numina-lean-agent.md`（若项目内存在）
+- **Mode A（默认）**：Gemini → LiteLLM（**WSL-only**）→ `ANTHROPIC_MODEL=anthropic-claude`（映射 `gemini/gemini-2.5-pro`）
+- **Mode C（回退）**：DeepSeek Anthropic 兼容直连
+- 禁止：模型名带 `[1m]`；`BASE_URL=localhost` 却 `MODEL=deepseek*`
+- 1211 排障树见 Skill `reference.md`
 
-可选参数（仅安装 Skill，不安装 OpenCode 子 Agent）：
+## 冒烟验证（不依赖 API）
 
-- PowerShell: `-SkipOpenCode`
-- Bash: `--skip-opencode`
-
-## 1. 组件关系（先看这个）
-
-- `SKILL.md`：给 Cursor Skill 的主规则（何时触发、标准流程、检查点格式）。
-- `reference.md`：详细排障和补充说明。
-- `examples.md`：可直接复制的命令示例。
-- `.opencode/agents/numina-lean-agent.md`：OpenCode 子 Agent 定义（用于 `opencode` 场景）。
-
-结论：你已经同时具备「Cursor Skill」和「OpenCode 子 Agent」两条调用路径。
-
-## 2. 前置条件
-
-在 WSL 中确认以下项目存在：
-
-- Numina 仓库：`~/numina-lean-agent`
-- 虚拟环境：`~/numina-lean-agent/.venv`
-- Lean 项目：`/mnt/d/Lean/projects/stat-inference-lean`
-
-建议先执行：
-
-```bash
-cd ~/numina-lean-agent
-source .venv/bin/activate
-python --version
-uv --version
+```powershell
+# 需 lake 在 PATH（如 d:\Lean\elan\bin）
+lake build
+lake env lean StatInferenceLean/Exercises/InteractiveDemo.lean
+lake env lean StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.fixed.lean
+lake env lean StatInferenceLean/Exercises/Bernoulli.lean
+# broken 预期失败：
+lake env lean StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.broken.lean
 ```
 
-## 3. DeepSeek 直连配置（推荐，最稳定）
+或：`.\scripts\smoke_verify.ps1` / `bash ./scripts/smoke_verify.sh`
 
-使用 DeepSeek 的 Anthropic 兼容接口，避免 LiteLLM 映射带来的模型别名问题。
+## 仓边界一句话
 
-设置 key（不要写进仓库文件）：
-
-```bash
-export DEEPSEEK_API_KEY='你的DeepSeek_API_KEY'
-```
-
-## 4. 标准运行步骤（单终端即可）
-
-```bash
-cd ~/numina-lean-agent
-source .venv/bin/activate
-export PYTHONPATH="$PWD"
-export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
-export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
-export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
-export ANTHROPIC_MODEL="deepseek-v4-flash"
-```
-
-先做基础可用性检查：
-
-```bash
-python -m scripts.run_claude --help
-```
-
-## 5. 三种任务执行方式
-
-### 单文件（run）
-
-```bash
-python -m scripts.run_claude run \
-  /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises/Week01.lean \
-  --prompt-file "$HOME/numina-lean-agent/prompts/prompt_complete_file.txt" \
-  --max-rounds 3 \
-  --cwd /mnt/d/Lean/projects/stat-inference-lean
-```
-
-### 文件夹批量（from-folder）
-
-```bash
-python -m scripts.run_claude from-folder \
-  /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises \
-  --prompt-file "$HOME/numina-lean-agent/prompts/prompt_complete_file.txt" \
-  --max-rounds 3 \
-  --cwd /mnt/d/Lean/projects/stat-inference-lean
-```
-
-### 配置批量并行（batch）
-
-```bash
-python -m scripts.run_claude batch config/config_minif2f.yaml --parallel --max-workers 4
-```
-
-## 6. 如何通过 OpenCode 子 Agent 调用
-
-在 WSL 进入 Lean 项目后执行：
-
-```bash
-cd /mnt/d/Lean/projects/stat-inference-lean
-opencode
-```
-
-在会话里明确指令（示例）：
-
-```text
-调用 numina-lean-agent，目标文件是 StatInferenceLean/Exercises/Week01.lean。
-请按 run_claude run 执行，max-rounds=1，并输出 [check]/[next action]。
-```
-
-## 7. 如何判定“真的跑通了”
-
-至少同时满足以下 4 条：
-
-- `run_claude --help` 成功（命令入口可用）。
-- `DEEPSEEK_API_KEY` 已导出，且不为空。
-- 子 Agent 输出出现 `run_claude run` 实际执行结果（不只是环境检查）。
-- 无 `401`、无 `模型不存在`、无网络连接错误。
-
-## 8. 常见问题与修复
-
-- 现象：`Command 'wsl' not found`
-  - 原因：你已经在 WSL 里了，还在 WSL 内再执行 `wsl`。
-  - 修复：直接 `cd /mnt/d/Lean/projects/stat-inference-lean`。
-
-- 现象：`模型不存在 (code 1211)`
-  - 原因：模型名写错或账号无该模型权限。
-  - 修复：确认 `ANTHROPIC_MODEL=deepseek-v4-flash`（或改为 `deepseek-v4-pro`）。
-
-- 现象：`401 Unauthorized`
-  - 原因：`DEEPSEEK_API_KEY` 无效、过期或未导出到当前 shell。
-  - 修复：重新 `export DEEPSEEK_API_KEY='...'`，然后重试。
-
-## 9. 安全建议
-
-- 不要在仓库文件中写明文 API key。
-- 如果 key 曾在终端历史中明文出现，建议立刻在提供商后台旋转并更换。
-- 日志和截图中避免暴露完整 key。
-
-## 10. 推荐最小验证命令（复制即用）
-
-```bash
-cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH="$PWD" && export DEEPSEEK_API_KEY='你的DeepSeek_API_KEY' && export ANTHROPIC_BASE_URL='https://api.deepseek.com/anthropic' && export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY" && export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY" && export ANTHROPIC_MODEL='deepseek-v4-flash' && python -m scripts.run_claude run /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises/Week01.lean --prompt-file "$HOME/numina-lean-agent/prompts/prompt_complete_file.txt" --max-rounds 1 --cwd /mnt/d/Lean/projects/stat-inference-lean
-```
-
+- **本仓**：语料、Fixture、Skill、评测 YAML、文档  
+- **numina-lean-agent**：runner、bank 实现、routing（Phase 2+）

@@ -1,6 +1,6 @@
 ---
 name: lean-agent-numina
-description: 在 Lean 项目中安装与调用 Numina Lean Agent（run_claude），支持 Gemini+LiteLLM 代理链路与 Anthropic 直连。用户提到 numina、lean agent、run_claude、from-folder、batch proof、mcp、litellm 时使用。
+description: 在 Lean 项目中按阶段状态机调用 Numina Lean Agent（run_claude）。默认 Gemini+LiteLLM（Mode A），失败回退 DeepSeek 直连（Mode C）。用户提到 numina、lean agent、run_claude、from-folder、batch proof、mcp、litellm、error bank 时使用。
 disable-model-invocation: true
 ---
 
@@ -8,70 +8,62 @@ disable-model-invocation: true
 
 ## 适用场景
 
-- 用户要“调用 Lean agent / Numina”。
-- 用户提到 `python -m scripts.run_claude`、`from-folder`、`batch`、`MCP`。
-- 需要在 WSL + Lean 项目中跑自动证明工作流。
+- 用户要「调用 Lean agent / Numina」。
+- 用户提到 `python -m scripts.run_claude`、`from-folder`、`batch`、`MCP`、Error Bank。
+- 需要在 WSL + Lean 项目中跑自动证明 / Formalize 工作流。
 
 ## 执行原则
 
-- 仅在目标 Lean 项目内执行（祖先目录必须有 `lean-toolchain` 与 `lakefile.toml`/`lakefile.lean`）。
+- 仅在目标 Lean 项目内执行（祖先目录有 `lean-toolchain` 与 `lakefile.toml`/`lakefile.lean`）。
 - 不在命令中硬编码明文 key；只用环境变量。
-- 每一步都输出检查点：`[check] [pass/fail] [next action]`。
-- 出现阻塞时优先给“最小可执行修复命令”。
+- 每一步输出：`[check] <item> | pass/fail` 与 `[next action] <一条命令>`。
+- **验证前移**：能 `lake env lean <file>` 的先做单文件验证，再扩大到 `lake build` / 多轮 LLM。
+- 主 KPI：端到端成功率；成本次要。
+- OpenCode agent 文件由 `scripts/sync_opencode_agent.*` 从本 Skill **生成**；改规则先改本目录再 sync。
 
-## 标准流程（强制顺序）
+## 阶段状态机（强制）
 
-1. **项目可构建性检查**
-   - 检查目标文件是否在 Lean 项目内。
-   - 必要时提示先跑：`lake build`。
+```text
+Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
+```
 
-2. **运行环境检查**
-   - 检查 `wsl`、`uv`、`claude`、`python`、`lake`。
-   - 若在 WSL，检查代理连通（如 `curl -I https://github.com`）。
+| 阶段 | 做什么 | 成功标准 | 退出条件（进入下一阶段或停） |
+|------|--------|----------|------------------------------|
+| **Inspect** | 确认目标文件/定理、项目根、是否 broken fixture | 路径在可构建项目内；明确目标类型 | 缺 lakefile / 目标不明 → 停并给出修复命令 |
+| **Workspace** | 检查 WSL/venv/lake、选认证模式、MCP 作用域 | Mode A 或 C 可用；`run_claude --help` 过 | 鉴权/代理失败 → 按 Mode C 回退或停 |
+| **Formalize** | 自然语言 → `.lean`（如 InteractiveDemo）或确认已有陈述 | 文件含 theorem/example 与 `by` 骨架 | 用户只要检查环境则可跳到 Verify |
+| **Prove/Fix** | `run_claude` 迭代；Error Bank tier0 → few-shot → 升 tier | 本轮产出可编译候选或明确错误类 | 达 `max-rounds` / 配额 / 不可修类别 → 停 |
+| **Verify** | **优先** `lake env lean <file>`；必要时 `lake build` | 退出码 0；无 sorry（按任务约定） | 失败 → 回 Prove/Fix（计数 +1） |
+| **Memory** | verify pass 写 Success/Error（均 `pending_review`）；人工 review 后才进检索 | 输出结果摘要与下一命令 | 会话结束 |
 
-3. **认证模式选择**
-   - 模式 A（默认）：Gemini -> LiteLLM -> Anthropic-compatible -> Numina。
-   - 模式 B（备选）：Anthropic 直连。
-   - 若两者都可用，优先模式 A（与当前项目路线一致）。
+类别门控：`--max-model-tier` 默认可到 **3**，但按错误类别封顶（见 [`docs/MODEL_ROUTING.md`](../../../docs/MODEL_ROUTING.md)）；同诊断指纹无效重试 ≤1。
 
-4. **MCP 作用域检查**
-   - 必须在目标 Lean 项目目录执行 `claude mcp add ...`。
-   - 用 `claude mcp list`确认连接状态。
+## 认证模式
 
-5. **运行 numina 命令**
-   - 单文件：`run`
-   - 文件夹：`from-folder`
-   - 批量配置：`batch`
+### Mode A（默认）：Gemini + LiteLLM
 
-6. **失败即分流排障**
-   - 401 鉴权错误
-   - 代理不可达
-   - MCP 目录作用域错误
-   - `lake=fail`（目标不在可构建 Lean 项目内）
-
-## 模式 A：Gemini + LiteLLM（默认）
-
-### 先决条件
-
-- 已有 `GEMINI_API_KEY`（或团队网关上游 key）。
-- LiteLLM 可在本机启动并监听 `localhost:4000`。
-
-### 变量模板
+- **LiteLLM：WSL-only**。
+- 模型别名：`ANTHROPIC_MODEL=anthropic-claude` → LiteLLM 映射 `gemini/gemini-2.5-pro`。
 
 ```bash
 export ANTHROPIC_BASE_URL="http://localhost:4000"
 export ANTHROPIC_AUTH_TOKEN="sk-anything"
 export ANTHROPIC_MODEL="anthropic-claude"
+# 上游：GEMINI_API_KEY 配在 LiteLLM 进程环境
 ```
 
-### 关键检查
+### Mode C（回退）：DeepSeek 直连
 
-- `curl -s http://localhost:4000/v1/messages ...` 返回 JSON 正常。
-- `run_claude` 启动后不再出现 `AuthenticationError`。
+Mode A 不可用（LiteLLM 挂、1211、上游 Gemini 失败）时切换：
 
-## 模式 B：Anthropic 直连
+```bash
+export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
+export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
+export ANTHROPIC_MODEL="deepseek-v4-flash"
+```
 
-### 变量模板
+### Mode B（可选）：Anthropic 直连
 
 ```bash
 export ANTHROPIC_BASE_URL="https://api.anthropic.com"
@@ -79,23 +71,28 @@ export ANTHROPIC_AUTH_TOKEN="<your-anthropic-key>"
 export ANTHROPIC_MODEL="claude-opus-4-7"
 ```
 
-### 关键检查
+### 硬性禁止
 
-- `claude` 命令可正常鉴权。
-- `run_claude run ...` 可进入 round 循环。
+- 模型名带 `[1m]` 或其它 ANSI/脏字符。
+- `BASE_URL=http://localhost:4000` 却设置 `MODEL=deepseek*`（Mode A/C 混用）。
+
+### 启动检查清单
+
+见 [reference.md](reference.md)「启动检查清单」与「1211 排障树」；摘要见仓库 [`docs/AUTH.md`](../../../docs/AUTH.md)。
 
 ## run_claude 命令模板
 
-### 单文件
+在 `~/numina-lean-agent`（`source .venv`，`PYTHONPATH=$PWD`）：
 
 ```bash
 python -m scripts.run_claude run <target_lean_file> \
   --prompt-file prompts/prompt_complete_file.txt \
   --max-rounds 5 \
-  --cwd <lean_project_root>
+  --cwd <lean_project_root> \
+  --max-model-tier 3 \
+  --success-bank true
+# 关闭记忆飞轮：--no-error-bank  或  --success-bank false
 ```
-
-### 文件夹
 
 ```bash
 python -m scripts.run_claude from-folder <target_folder> \
@@ -104,30 +101,45 @@ python -m scripts.run_claude from-folder <target_folder> \
   --cwd <lean_project_root>
 ```
 
-### 批量配置
-
 ```bash
 python -m scripts.run_claude batch <config_yaml> --parallel --max-workers 4
 ```
 
-## 输出规范（实时汇报）
+验证前移示例：
 
-每个关键步骤都按以下格式汇报：
-
-```text
-[check] proxy connectivity | pass
-[check] mcp in project scope | fail
-[next action] 在目标项目目录执行 `claude mcp add ...`
+```bash
+lake env lean <target_lean_file>
 ```
 
-## 常见错误 -> 立即动作
+## Error Bank / Success Bank（默认启用）
 
-- `AuthenticationError`：检查上游 key 格式、有效性与环境变量是否在当前终端生效。
-- `Failed to connect`：检查 WSL 代理地址/端口、`NO_PROXY` 是否包含 `localhost,127.0.0.1`。
-- `mcp not connected`：在目标项目目录重新 `claude mcp add`。
-- `lake=fail`：目标文件不在可构建 Lean 项目内，先切到含 `lakefile` 的目录。
+- Error：`<lean_project_root>/.lean-error-bank/`；Success：`.lean-success-bank/`（均 gitignore）
+- 默认开 Error Bank + Success Bank；关闭：`--no-error-bank` / `--success-bank false`
+- 入库默认 `pending_review`；检索 **只取 `active`**；`fixed_code=null` 禁止进 Few-Shot
+- Few-Shot：优先 Success **最小 diff**；Error 只给短策略
+- Fixture：`Exercises/Fixtures/ErrorBankDemo.broken.lean` + `.fixed.lean`（broken 勿 import 进根模块）
+- 路由：[`docs/MODEL_ROUTING.md`](../../../docs/MODEL_ROUTING.md)；Success：[`docs/SUCCESS_BANK.md`](../../../docs/SUCCESS_BANK.md)
+
+```bash
+python -m scripts.error_bank --bank_dir .lean-error-bank list
+python -m scripts.error_bank --bank_dir .lean-error-bank review <id> --approve
+python -m scripts.error_bank success --bank_dir .lean-success-bank list
+python -m scripts.error_bank success --bank_dir .lean-success-bank review <id> --approve
+python -m scripts.error_bank --bank_dir .lean-error-bank stats
+```
+
+## 输出规范
+
+```text
+[check] stage=Inspect | pass
+[check] auth Mode A litellm | fail
+[next action] 切换 Mode C：export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic ...
+```
 
 ## 额外资料
 
-- 详细排障命令见 [reference.md](reference.md)
-- 常用会话模板见 [examples.md](examples.md)
+- [reference.md](reference.md) — 排障、1211、LiteLLM、flags
+- [examples.md](examples.md) — 可复制会话与命令
+- 愿景：[docs/VISION.md](../../../docs/VISION.md)
+- 路由：[docs/MODEL_ROUTING.md](../../../docs/MODEL_ROUTING.md)
+- Success Bank：[docs/SUCCESS_BANK.md](../../../docs/SUCCESS_BANK.md)

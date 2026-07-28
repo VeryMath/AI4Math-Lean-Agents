@@ -4,3 +4,7 @@
 !.env.example
 .cursor/cache/
 dist/
+*.lean.bak.*
+.lean-error-bank/
+.lean-error-bank-test/
+.lean-success-bank/

@@ -1,0 +1,74 @@
+# Phase 0–1 评测任务规格（恰好 6 条）
+# 真 API 跑分属 Phase 3；本文件先定配额与任务列表。
+# runner 脚本可占位；实现主在 ~/numina-lean-agent（Phase 2+）
+
+version: 1
+description: >
+  End-to-end success-rate eval for numina-lean-agent against this Lean corpus.
+  Primary KPI: success rate. Cost is secondary but hard-capped per run.
+
+quota:
+  max_usd_per_run: 5
+  max_rounds: 5
+  max_model_tier: 3
+  default_auth_mode: A   # Gemini+LiteLLM; fallback C = DeepSeek
+  fallback_auth_mode: C
+
+# Phase 2: offline harness available; live API agent scoring is Phase 3
+harness:
+  placeholder: false
+  entrypoint: >
+    cd ~/numina-lean-agent && PYTHONPATH=$PWD
+    python -m scripts.run_eval --config <lean>/eval/tasks.yaml
+    --project-root <lean> [--offline]
+  notes: >
+    Do not exceed max_usd_per_run ($5). Prefer lake env lean verification.
+    Without API keys, use --offline (verify-only / broken+fixed control).
+    Skip importing broken fixtures into the root module.
+    Live run_claude per task is Phase 3; do not burn quota blindly.
+
+tasks:
+  - id: T1_interactive_demo
+    name: InteractiveDemo smoke / formalize target
+    path: StatInferenceLean/Exercises/InteractiveDemo.lean
+    kind: prove_or_verify
+    expect: compile_ok
+    max_rounds: 3
+
+  - id: T2_week01_subset
+    name: Week01 exercise file
+    path: StatInferenceLean/Exercises/Week01.lean
+    kind: prove_or_verify
+    expect: compile_ok
+    max_rounds: 5
+
+  - id: T3_errorbank_broken
+    name: ErrorBankDemo broken (unknown identifier)
+    path: StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.broken.lean
+    kind: fix_then_verify
+    expect: agent_repairs_to_compile_ok
+    reference_fixed: StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.fixed.lean
+    max_rounds: 5
+    max_model_tier: 3
+
+  - id: T4_errorbank_fixed
+    name: ErrorBankDemo fixed control
+    path: StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.fixed.lean
+    kind: verify_only
+    expect: compile_ok
+    max_rounds: 1
+
+  - id: T5_bernoulli
+    name: Bernoulli corpus (not in default root import)
+    path: StatInferenceLean/Exercises/Bernoulli.lean
+    kind: verify_only
+    expect: compile_ok
+    max_rounds: 1
+    notes: Run via `lake env lean` only; do not add to StatInferenceLean.lean.
+
+  - id: T6_week02_subset
+    name: Week02 exercise file
+    path: StatInferenceLean/Exercises/Week02.lean
+    kind: prove_or_verify
+    expect: compile_ok
+    max_rounds: 5

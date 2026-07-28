@@ -11,6 +11,7 @@ function Write-Step {
 
 $skillSourceDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectRoot = Resolve-Path (Join-Path $skillSourceDir "..\..\..")
+$syncScript = Join-Path $projectRoot "scripts\sync_opencode_agent.ps1"
 $agentSourceFile = Join-Path $projectRoot ".opencode\agents\numina-lean-agent.md"
 
 $cursorSkillTarget = Join-Path $HOME ".cursor\skills\lean-agent-numina"
@@ -19,6 +20,16 @@ $openCodeAgentTargetFile = Join-Path $openCodeAgentTargetDir "numina-lean-agent.
 
 Write-Step "Source skill: $skillSourceDir"
 Write-Step "Target skill: $cursorSkillTarget"
+
+# Single source: regenerate OpenCode agent from Skill before copy
+if (-not $SkipOpenCode) {
+  if (Test-Path $syncScript) {
+    Write-Step "Running sync_opencode_agent.ps1 ..."
+    & powershell -ExecutionPolicy Bypass -File $syncScript
+  } else {
+    Write-Step "WARN: sync script missing ($syncScript). Generate OpenCode agent manually before install."
+  }
+}
 
 New-Item -ItemType Directory -Force -Path $cursorSkillTarget | Out-Null
 Copy-Item -Path (Join-Path $skillSourceDir "*") -Destination $cursorSkillTarget -Recurse -Force
@@ -31,7 +42,7 @@ if (-not $SkipOpenCode) {
     Write-Step "Copied OpenCode agent file."
   } else {
     Write-Step "OpenCode agent file not found in project: $agentSourceFile"
-    Write-Step "Skill is installed. OpenCode agent copy skipped."
+    Write-Step "Skill is installed. OpenCode agent copy skipped. Run scripts/sync_opencode_agent.ps1 first."
   }
 } else {
   Write-Step "SkipOpenCode enabled. OpenCode agent copy skipped."
