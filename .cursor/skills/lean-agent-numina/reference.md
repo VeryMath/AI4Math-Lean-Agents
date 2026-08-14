@@ -8,9 +8,11 @@
 4. 选模式：**国内个人优先 Mode C**；课题组 / 已有 Gemini 用 Mode A；A 失败再 C。
 5. 确认模型名 **无** `[1m]` / 不可见字符：`echo "$ANTHROPIC_MODEL" | od -c | head`。
 6. **禁止** `ANTHROPIC_BASE_URL` 为 localhost 且 `ANTHROPIC_MODEL` 为 `deepseek*`。
-7. Mode A：`curl` LiteLLM `/v1/messages` 正常；`NO_PROXY` 含 `localhost,127.0.0.1`。
-8. MCP（若用）：在 **Lean 项目目录** `claude mcp add` + `claude mcp list`。
-9. Phase 3：`python -m scripts.run_eval --dry-run` 必须绿；真跑 `--real-api --auth-mode C`（$5 硬顶）。
+7. **禁止** `~/.claude/settings.json` 指向智谱 / GLM 却跑 DeepSeek（1211）。`run_claude` 会 abort。
+8. Mode A：`curl` LiteLLM `/v1/messages` 正常；`NO_PROXY` 含 `localhost,127.0.0.1`。
+9. MCP（若用）：在 **Lean 项目目录** `claude mcp add` + `claude mcp list`。
+10. Phase 3：`python -m scripts.run_eval --dry-run` 必须绿；**不要**再跑会长 `clone mathlib` 的全量 `--real-api`，除非护栏已确认。
+11. 禁止碰 `.lake/` / mathlib / toolchain / lakefile；round 内验证用 `lake env lean`，不用全仓 `lake build`。
 
 ## Mode C：DeepSeek 直连（国内实操推荐 / 回退）
 
@@ -85,7 +87,9 @@ curl -s http://localhost:4000/v1/messages \
 │     账号是否开通该模型？
 ├─ 5. 混用？
 │     localhost + deepseek* → 禁止；改成纯 A 或纯 C
-└─ 6. 仍失败 → 换 Mode C 最小命令重试；记录 [check] 与提供商原始报错
+├─ 6. ~/.claude/settings.json 是否仍指向智谱 / GLM / bigmodel.cn？
+│     是且本 run 要 DeepSeek → 改 settings 或移走 env 块（runner 会 abort）
+└─ 7. 仍失败 → 换 Mode C 最小命令重试；记录 [check] 与提供商原始报错
 ```
 
 ## Lean 项目判定
@@ -162,3 +166,16 @@ cd ~/numina-lean-agent && PYTHONPATH=$PWD \
 python -m scripts.error_bank success review <id> --approve --bank_dir <lean>/.lean-success-bank
 python -m scripts.error_bank review <id> --approve --bank_dir <lean>/.lean-error-bank
 ```
+
+记忆闭环离线证明：`python -m unittest scripts.error_bank.tests.test_memory_loop -v`（见 [`docs/MEMORY_LOOP.md`](../../../docs/MEMORY_LOOP.md)）。
+
+## 禁止操作（工具护栏）
+
+Prove/Fix / Verify 阶段 **不得**：
+
+- `rm -rf .lake` / `.lake/packages/mathlib`；`git clone` mathlib4 当修复
+- 改 `lean-toolchain`、`lakefile.toml` / `lakefile.lean`
+- 用全仓 `lake build` 作为 round 内验证（用 `lake env lean <file>` / `lean_diagnostic_messages`）
+- 把 deepseek 打到 localhost LiteLLM；把智谱 BASE_URL 与 deepseek 模型混用
+
+Runner 侧：`--disallowed-tools Bash(rm *)` 等 + system prompt 硬约束 + mathlib 完整性检查。

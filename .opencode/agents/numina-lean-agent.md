@@ -26,6 +26,8 @@ Hard constraints:
 - Never print or hardcode plaintext API keys.
 - Always emit `[check] <item> | pass/fail` and `[next action] <one command>`.
 - Prefer `lake env lean <file>` before full `lake build` / extra LLM rounds.
+- Never modify/delete `.lake/`, mathlib, toolchain, or lakefile unless Workspace stage AND user explicitly asked. Never `rm -rf` mathlib or `git clone` mathlib as a fix.
+- Never mix localhost BASE_URL with deepseek MODEL; never mix 鏅鸿氨/GLM settings.json with DeepSeek (1211).
 - Do not import ErrorBank `broken` fixtures into the root module.
 - Bernoulli is regression-only (`lake env lean`), not default root import.
 - Success/Error banks default `pending_review`; retriever only `active`; never Few-Shot null `fixed_code`.
@@ -90,7 +92,7 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 | **Formalize** | 自然语言 → `.lean`（如 InteractiveDemo）或确认已有陈述 | 文件含 theorem/example 与 `by` 骨架 | 用户只要检查环境则可跳到 Verify |
 | **Prove/Fix** | `run_claude` 迭代；Error Bank tier0 → few-shot → 升 tier | 本轮产出可编译候选或明确错误类 | 达 `max-rounds` / 配额 / 不可修类别 → 停 |
 | **Verify** | **优先** `lake env lean <file>`；必要时 `lake build` | 退出码 0；无 sorry（按任务约定） | 失败 → 回 Prove/Fix（计数 +1） |
-| **Memory** | verify pass 写 Success/Error（均 `pending_review`）；人工 review 后才进检索 | 输出结果摘要与下一命令 | 会话结束 |
+| **Memory** | verify pass 写 Success/Error（均 `pending_review`）；人工 `review --approve` 后才进检索 | 只注入 `active`；`pending_review` / `fixed_code=null` 不进 Few-Shot | 会话结束 |
 
 类别门控：`--max-model-tier` 默认可到 **3**，但按错误类别封顶（见 [`docs/MODEL_ROUTING.md`](../../../docs/MODEL_ROUTING.md)）；同诊断指纹无效重试 ≤1。
 
@@ -134,6 +136,10 @@ export ANTHROPIC_MODEL="claude-opus-4-7"
 
 - 模型名带 `[1m]` 或其它 ANSI/脏字符。
 - `BASE_URL=http://localhost:4000` 却设置 `MODEL=deepseek*`（Mode A/C 混用）。
+- `~/.claude/settings.json` 指向智谱 / GLM / `bigmodel.cn` 却跑 DeepSeek（1211）。
+- **禁止操作（准确度护栏）**：修改/删除 `.lake/`、`mathlib`、`lean-toolchain`、lakefile（除非 Workspace 阶段且用户明确要求）；round 内用全仓 `lake build` 当验证；`rm -rf` / `git clone mathlib` 当「修复」。
+
+`run_claude` 会：`--disallowed-tools Bash(rm *)` 等、`--append-system-prompt` 硬约束、启动 `probe_auth`、round 后检查 mathlib 是否还在。
 
 ### 启动检查清单
 
@@ -189,6 +195,7 @@ lake env lean <target_lean_file>
 - 默认开 Error Bank + Success Bank；关闭：`--no-error-bank` / `--success-bank false`
 - 入库默认 `pending_review`；检索 **只取 `active`**；`fixed_code=null` 禁止进 Few-Shot
 - Few-Shot：优先 Success **最小 diff**；Error 只给短策略
+- 闭环剧本：[`docs/MEMORY_LOOP.md`](../../../docs/MEMORY_LOOP.md)；进度：[`docs/PROGRESS.md`](../../../docs/PROGRESS.md)
 - Fixture：`Exercises/Fixtures/ErrorBankDemo.broken.lean` + `.fixed.lean`（broken 勿 import 进根模块）
 - 路由：[`docs/MODEL_ROUTING.md`](../../../docs/MODEL_ROUTING.md)；Success：[`docs/SUCCESS_BANK.md`](../../../docs/SUCCESS_BANK.md)
 
@@ -213,6 +220,8 @@ python -m scripts.error_bank --bank_dir .lean-error-bank stats
 - [reference.md](reference.md) — 排障、1211、LiteLLM、flags
 - [examples.md](examples.md) — 可复制会话与命令
 - 愿景：[docs/VISION.md](../../../docs/VISION.md)
+- 进度复盘：[docs/PROGRESS.md](../../../docs/PROGRESS.md)
+- 记忆闭环：[docs/MEMORY_LOOP.md](../../../docs/MEMORY_LOOP.md)
 - 路由：[docs/MODEL_ROUTING.md](../../../docs/MODEL_ROUTING.md)
 - Success Bank：[docs/SUCCESS_BANK.md](../../../docs/SUCCESS_BANK.md)
 

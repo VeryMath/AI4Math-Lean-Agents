@@ -125,4 +125,18 @@ python -m scripts.run_claude batch config/config_minif2f.yaml --parallel --max-w
 # 错误：LiteLLM + deepseek 混用
 export ANTHROPIC_BASE_URL="http://localhost:4000"
 export ANTHROPIC_MODEL="deepseek-v4-flash"   # 禁止
+
+# 错误：用毁环境当「修复」（Phase 3 事故）
+rm -rf .lake/packages/mathlib && git clone https://github.com/leanprover-community/mathlib4
+```
+
+```text
+[check] auth settings.json vs Mode C | fail
+[next action] 编辑 ~/.claude/settings.json，将 BASE_URL 改为 https://api.deepseek.com/anthropic（不要指向智谱）
+```
+
+记忆闭环（离线）：
+
+```bash
+python -m unittest scripts.error_bank.tests.test_memory_loop -v
 ```

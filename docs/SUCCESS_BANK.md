@@ -68,6 +68,8 @@ python -m scripts.run_claude run <file> \
 
 verify pass → 投影 `fixed_code` + `minimal_diff` → Success(`pending_review`)；对应 Error 条目亦保持 `pending_review` 直至人工 `review --approve`。
 
+端到端剧本（ErrorBankDemo + 离线 unittest）：[`MEMORY_LOOP.md`](MEMORY_LOOP.md)。进度与缺口：[`PROGRESS.md`](PROGRESS.md)。
+
 ## 本仓语料
 
 - `StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.fixed.lean`

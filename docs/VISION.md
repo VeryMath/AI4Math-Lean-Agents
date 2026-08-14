@@ -83,6 +83,10 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 | M1 | broken+fixed、REGRESSION、sync 脚本、tasks.yaml、SUCCESS_BANK 文档 |
 | M2 | numina 仓：Success Bank 代码、类别门控 routing、eval runner |
 | M3 | harness `--dry-run` 绿 + `--real-api` 入口与 $5 硬顶；有 key 则 6 任务填 BASELINE，无 key 则记录阻塞与复跑命令 |
+| M4 | 工具护栏（禁碰 `.lake`/mathlib、禁 Mode 混用、1211 settings 探测）+ 记忆闭环离线证明（pending→approve→active 命中） |
+| M5 | 冒烟习惯化、Skill↔OpenCode 同步纪律、护栏确认后的短跑基线对比 |
+
+进度复盘（目标 vs 缺口）：[`PROGRESS.md`](PROGRESS.md)。记忆剧本：[`MEMORY_LOOP.md`](MEMORY_LOOP.md)。
 
 ## 9. 决策摘要（已拍板）
 
@@ -96,3 +100,4 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 8. 暂停教材进度 KPI  
 9. Skill 单源 + sync 生成 OpenCode agent  
 10. 方案 A+C：阶段化 Skill；验证前移 `lake env lean`；`max-model-tier` 可达 3，仍类别门控  
+11. Phase 4：护栏优先于再烧 API；记忆飞轮以离线测试锁门控，真 API 仅 `--max-rounds 1` 且禁止碰 `.lake`  

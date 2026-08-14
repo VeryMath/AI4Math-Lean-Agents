@@ -53,6 +53,8 @@ Hard constraints:
 - Never print or hardcode plaintext API keys.
 - Always emit `[check] <item> | pass/fail` and `[next action] <one command>`.
 - Prefer `lake env lean <file>` before full `lake build` / extra LLM rounds.
+- Never modify/delete `.lake/`, mathlib, toolchain, or lakefile unless Workspace stage AND user explicitly asked. Never `rm -rf` mathlib or `git clone` mathlib as a fix.
+- Never mix localhost BASE_URL with deepseek MODEL; never mix 智谱/GLM settings.json with DeepSeek (1211).
 - Do not import ErrorBank `broken` fixtures into the root module.
 - Bernoulli is regression-only (`lake env lean`), not default root import.
 - Success/Error banks default `pending_review`; retriever only `active`; never Few-Shot null `fixed_code`.

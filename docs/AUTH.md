@@ -33,6 +33,21 @@
 
 1. 模型名含 ANSI / `[1m]` 等脏字符（复制终端高亮时易混入）  
 2. `ANTHROPIC_BASE_URL` 指向 localhost（LiteLLM），同时 `ANTHROPIC_MODEL=deepseek*`  
+3. `~/.claude/settings.json` 指向智谱 / GLM / `bigmodel.cn`，同时本 run 要用 DeepSeek（**1211 根因**）  
+4. 把 deepseek 模型打到 localhost LiteLLM / 把智谱 BASE_URL 与 deepseek 模型混用  
+
+`run_claude` 启动时会 `probe_auth`：Mode 混用或 settings 冲突则 **直接 abort**（`NUMINA_IGNORE_SETTINGS_CONFLICT=1` 可强制继续，不推荐）。
+
+### 1211：settings.json 曾指向智谱
+
+Claude Code 会读 `~/.claude/settings.json`（user 级）。若其中 `env.ANTHROPIC_BASE_URL` 是智谱，即使 shell 已 `export` DeepSeek，仍可能 1211。
+
+```bash
+# 查看（不要把 key 贴到聊天/git）
+python3 -c "import json,pathlib; p=pathlib.Path.home()/'.claude'/'settings.json'; print(p.exists()); d=json.loads(p.read_text()) if p.exists() else {}; e=d.get('env',{}); print('BASE_URL', e.get('ANTHROPIC_BASE_URL','<unset>')); print('MODEL', e.get('ANTHROPIC_MODEL','<unset>'))"
+```
+
+修复：把 settings 里的 BASE_URL/MODEL 改成与当前 Mode 一致（Mode C → `https://api.deepseek.com/anthropic` + `deepseek-v4-flash`），或暂时移走冲突的 `env` 块。  
 
 ## Mode C 最小步骤（国内）
 
@@ -70,4 +85,5 @@ python -m scripts.run_eval --real-api --auth-mode C \
 - [ ] 国内用户：Mode C 变量已导出；**未**同时设 localhost + deepseek  
 - [ ] Mode A：WSL 内 LiteLLM 在 `:4000`，且 `NO_PROXY` 含 `localhost,127.0.0.1`  
 - [ ] Mode A：`ANTHROPIC_MODEL=anthropic-claude`（不是 gemini 原始名、不是 deepseek）  
+- [ ] `~/.claude/settings.json` 的 BASE_URL **未**指向智谱（若本 run 是 Mode C）  
 - [ ] `python -m scripts.run_claude --help` 与 `python -m scripts.run_eval --dry-run` 可用  
