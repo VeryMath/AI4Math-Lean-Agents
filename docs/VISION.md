@@ -43,9 +43,11 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 
 | 模式 | 用途 | 要点 |
 |------|------|------|
-| **Mode A（默认）** | Gemini + LiteLLM | `ANTHROPIC_MODEL=anthropic-claude` → LiteLLM 映射 `gemini/gemini-2.5-pro`；**LiteLLM 仅 WSL** |
-| **Mode C（回退）** | DeepSeek 直连 | `ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic`，`MODEL=deepseek-v4-flash`（或 pro） |
+| **Mode A（课题组默认叙事）** | Gemini + LiteLLM | `ANTHROPIC_MODEL=anthropic-claude` → LiteLLM 映射 `gemini/gemini-2.5-pro`；**LiteLLM 仅 WSL** |
+| **Mode C（国内实操推荐 / 回退）** | DeepSeek 直连 | `ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic`，`MODEL=deepseek-v4-flash`（或 pro）；**可跳过 LiteLLM** |
 | Mode B（可选） | Anthropic 直连 | 非默认 |
+
+> 国内个人开发者（仅国内 API 可买）**先配 Mode C**；课题组文档默认仍写 Mode A。详见 [`AUTH.md`](AUTH.md)。
 
 硬性禁止：
 
@@ -63,8 +65,9 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 ## 6. 评测配额
 
 - 任务数：**恰好 6**（[`eval/tasks.yaml`](../eval/tasks.yaml)）
-- **`max_usd_per_run: 5`**
-- 脚本可先占位；真跑在 Phase 3
+- **`max_usd_per_run: 5`**（harness 硬顶；另封顶 rounds / tier）
+- Phase 3 入口：`python -m scripts.run_eval --dry-run` / `--offline` / `--real-api [--auth-mode C]`
+- 基线填数：[`BASELINE.md`](BASELINE.md)
 
 ## 7. 文档单源
 
@@ -79,12 +82,12 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 | M0 | VISION / README / Skill 认证与阶段机 / `.env.example` |
 | M1 | broken+fixed、REGRESSION、sync 脚本、tasks.yaml、SUCCESS_BANK 文档 |
 | M2 | numina 仓：Success Bank 代码、类别门控 routing、eval runner |
-| M3 | 6 任务真 API 一轮 + BASELINE 填数 |
+| M3 | harness `--dry-run` 绿 + `--real-api` 入口与 $5 硬顶；有 key 则 6 任务填 BASELINE，无 key 则记录阻塞与复跑命令 |
 
 ## 9. 决策摘要（已拍板）
 
 1. 主 KPI = 端到端成功率  
-2. 认证默认 Mode A，失败回退 Mode C；LiteLLM WSL-only  
+2. 认证：课题组默认 Mode A，失败回退 Mode C；国内个人实操推荐先 C；LiteLLM WSL-only  
 3. Phase 0–1 只动 Lean 仓文档/Skill/Fixture  
 4. ErrorBankDemo → broken + fixed  
 5. Bernoulli 不进默认 import  

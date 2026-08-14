@@ -1,6 +1,6 @@
-# Phase 0–1 评测任务规格（恰好 6 条）
-# 真 API 跑分属 Phase 3；本文件先定配额与任务列表。
-# runner 脚本可占位；实现主在 ~/numina-lean-agent（Phase 2+）
+# Phase 3 评测任务规格（恰好 6 条）
+# dry-run / offline 可随时跑；真 API：--real-api（$5/run 硬顶）
+# runner：~/numina-lean-agent → python -m scripts.run_eval
 
 version: 1
 description: >
@@ -11,21 +11,23 @@ quota:
   max_usd_per_run: 5
   max_rounds: 5
   max_model_tier: 3
-  default_auth_mode: A   # Gemini+LiteLLM; fallback C = DeepSeek
-  fallback_auth_mode: C
+  # 课题组默认叙事 = Mode A；国内个人开发者实操推荐先 Mode C（见 docs/AUTH.md）
+  default_auth_mode: A   # Gemini+LiteLLM (WSL)
+  fallback_auth_mode: C  # DeepSeek 直连；run_eval --auth-mode C
 
-# Phase 2: offline harness available; live API agent scoring is Phase 3
 harness:
   placeholder: false
   entrypoint: >
-    cd ~/numina-lean-agent && PYTHONPATH=$PWD
+    cd ~/numina-lean-agent && source .venv/bin/activate && PYTHONPATH=$PWD
     python -m scripts.run_eval --config <lean>/eval/tasks.yaml
-    --project-root <lean> [--offline]
+    --project-root <lean>
+    [--dry-run | --offline | --real-api [--auth-mode C|A|auto]]
   notes: >
-    Do not exceed max_usd_per_run ($5). Prefer lake env lean verification.
-    Without API keys, use --offline (verify-only / broken+fixed control).
+    Hard caps from quota.* ($ / rounds / tier). Prefer lake env lean verification.
+    Without API keys: --dry-run or --offline.
+    Live run_claude per prove/fix task: --real-api (auto prefers Mode C if DEEPSEEK_API_KEY).
     Skip importing broken fixtures into the root module.
-    Live run_claude per task is Phase 3; do not burn quota blindly.
+    Do not burn quota blindly; stop when spent_usd >= max_usd_per_run.
 
 tasks:
   - id: T1_interactive_demo

@@ -5,11 +5,24 @@
 1. 在可构建 Lean 项目根（有 `lean-toolchain` + `lakefile`）。
 2. `lake env lean <目标文件>` 或先确认 Fixture 角色（broken 预期失败）。
 3. WSL 中：`~/numina-lean-agent`、`.venv`、`python -m scripts.run_claude --help`。
-4. 选模式：**优先 Mode A**；失败则 **Mode C**。
+4. 选模式：**国内个人优先 Mode C**；课题组 / 已有 Gemini 用 Mode A；A 失败再 C。
 5. 确认模型名 **无** `[1m]` / 不可见字符：`echo "$ANTHROPIC_MODEL" | od -c | head`。
 6. **禁止** `ANTHROPIC_BASE_URL` 为 localhost 且 `ANTHROPIC_MODEL` 为 `deepseek*`。
 7. Mode A：`curl` LiteLLM `/v1/messages` 正常；`NO_PROXY` 含 `localhost,127.0.0.1`。
 8. MCP（若用）：在 **Lean 项目目录** `claude mcp add` + `claude mcp list`。
+9. Phase 3：`python -m scripts.run_eval --dry-run` 必须绿；真跑 `--real-api --auth-mode C`（$5 硬顶）。
+
+## Mode C：DeepSeek 直连（国内实操推荐 / 回退）
+
+**可跳过 LiteLLM。** 详见 [`docs/AUTH.md`](../../../docs/AUTH.md)。
+
+```bash
+export DEEPSEEK_API_KEY='...'
+export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
+export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
+export ANTHROPIC_MODEL="deepseek-v4-flash"
+```
 
 ## Mode A：LiteLLM（WSL-only）+ Gemini
 
@@ -49,16 +62,6 @@ curl -s http://localhost:4000/v1/messages \
     "max_tokens": 64,
     "messages": [{"role":"user","content":"reply ok"}]
   }'
-```
-
-## Mode C：DeepSeek 直连（回退）
-
-```bash
-export DEEPSEEK_API_KEY='...'
-export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
-export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
-export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
-export ANTHROPIC_MODEL="deepseek-v4-flash"
 ```
 
 ## 1211 排障树（模型不存在）

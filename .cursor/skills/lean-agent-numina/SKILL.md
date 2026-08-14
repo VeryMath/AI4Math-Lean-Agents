@@ -1,6 +1,6 @@
 ---
 name: lean-agent-numina
-description: 在 Lean 项目中按阶段状态机调用 Numina Lean Agent（run_claude）。默认 Gemini+LiteLLM（Mode A），失败回退 DeepSeek 直连（Mode C）。用户提到 numina、lean agent、run_claude、from-folder、batch proof、mcp、litellm、error bank 时使用。
+description: 在 Lean 项目中按阶段状态机调用 Numina Lean Agent（run_claude / run_eval）。课题组默认 Gemini+LiteLLM（Mode A）；国内个人开发者实操优先 DeepSeek 直连（Mode C）。用户提到 numina、lean agent、run_claude、run_eval、from-folder、batch proof、mcp、litellm、error bank 时使用。
 disable-model-invocation: true
 ---
 
@@ -40,7 +40,21 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 
 ## 认证模式
 
-### Mode A（默认）：Gemini + LiteLLM
+> **国内个人（仅国内 API）→ 先 Mode C。** 课题组默认叙事 → Mode A；A 失败再回退 C。勿 A/C 混用。
+
+### Mode C（国内实操推荐 / 回退）：DeepSeek 直连
+
+**可跳过 LiteLLM。** 密钥只放 `.env`（gitignore）。
+
+```bash
+export DEEPSEEK_API_KEY="..."
+export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
+export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
+export ANTHROPIC_MODEL="deepseek-v4-flash"
+```
+
+### Mode A（课题组默认）：Gemini + LiteLLM
 
 - **LiteLLM：WSL-only**。
 - 模型别名：`ANTHROPIC_MODEL=anthropic-claude` → LiteLLM 映射 `gemini/gemini-2.5-pro`。
@@ -50,17 +64,6 @@ export ANTHROPIC_BASE_URL="http://localhost:4000"
 export ANTHROPIC_AUTH_TOKEN="sk-anything"
 export ANTHROPIC_MODEL="anthropic-claude"
 # 上游：GEMINI_API_KEY 配在 LiteLLM 进程环境
-```
-
-### Mode C（回退）：DeepSeek 直连
-
-Mode A 不可用（LiteLLM 挂、1211、上游 Gemini 失败）时切换：
-
-```bash
-export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
-export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
-export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
-export ANTHROPIC_MODEL="deepseek-v4-flash"
 ```
 
 ### Mode B（可选）：Anthropic 直连
@@ -79,6 +82,19 @@ export ANTHROPIC_MODEL="claude-opus-4-7"
 ### 启动检查清单
 
 见 [reference.md](reference.md)「启动检查清单」与「1211 排障树」；摘要见仓库 [`docs/AUTH.md`](../../../docs/AUTH.md)。
+
+## Phase 3 评测（$5 硬顶）
+
+```bash
+cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH=$PWD
+python -m scripts.run_eval --dry-run --config <lean>/eval/tasks.yaml
+python -m scripts.run_eval --offline --config <lean>/eval/tasks.yaml --project-root <lean>
+# 有 key 后（国内推荐 C）：
+python -m scripts.run_eval --real-api --auth-mode C \
+  --config <lean>/eval/tasks.yaml --project-root <lean>
+```
+
+基线填数：[`docs/BASELINE.md`](../../../docs/BASELINE.md)。
 
 ## run_claude 命令模板
 

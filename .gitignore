@@ -8,3 +8,5 @@ dist/
 .lean-error-bank/
 .lean-error-bank-test/
 .lean-success-bank/
+eval/*.log
+eval/last_real_api_run.log

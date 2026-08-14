@@ -9,7 +9,32 @@
 [next action] python -m scripts.run_claude run ... --max-rounds 1
 ```
 
-## 示例 1：Mode A（Gemini + LiteLLM，WSL）
+## 示例 1：Mode C（国内推荐，DeepSeek 直连，跳过 LiteLLM）
+
+```bash
+cd ~/numina-lean-agent
+source .venv/bin/activate
+export PYTHONPATH="$PWD"
+export DEEPSEEK_API_KEY='...'
+export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
+export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
+export ANTHROPIC_MODEL="deepseek-v4-flash"
+
+python -m scripts.run_claude run \
+  /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises/Week01.lean \
+  --prompt-file prompts/prompt_complete_file.txt \
+  --max-rounds 3 \
+  --cwd /mnt/d/Lean/projects/stat-inference-lean \
+  --max-model-tier 3 --auth-mode C
+
+# Phase 3 整套评测（$5 硬顶）
+python -m scripts.run_eval --real-api --auth-mode C \
+  --config /mnt/d/Lean/projects/stat-inference-lean/eval/tasks.yaml \
+  --project-root /mnt/d/Lean/projects/stat-inference-lean
+```
+
+## 示例 2：Mode A（Gemini + LiteLLM，WSL；课题组默认）
 
 ```bash
 # 终端 1（WSL）：LiteLLM
@@ -38,25 +63,6 @@ python -m scripts.run_claude run \
 ```bash
 cd /mnt/d/Lean/projects/stat-inference-lean
 lake env lean StatInferenceLean/Exercises/InteractiveDemo.lean
-```
-
-## 示例 2：Mode C 回退（DeepSeek）
-
-```bash
-cd ~/numina-lean-agent
-source .venv/bin/activate
-export PYTHONPATH="$PWD"
-export DEEPSEEK_API_KEY='...'
-export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
-export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
-export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
-export ANTHROPIC_MODEL="deepseek-v4-flash"
-
-python -m scripts.run_claude run \
-  /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises/Week01.lean \
-  --prompt-file prompts/prompt_complete_file.txt \
-  --max-rounds 3 \
-  --cwd /mnt/d/Lean/projects/stat-inference-lean
 ```
 
 ## 示例 3：Error Bank Fixture

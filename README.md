@@ -17,7 +17,7 @@
 | 评测规格 | [`eval/tasks.yaml`](eval/tasks.yaml) | 6 任务，$5/run 封顶 |
 | Success Bank 架构 | [`docs/SUCCESS_BANK.md`](docs/SUCCESS_BANK.md) | 实现在 Phase 2（numina 仓） |
 
-Runner / Error Bank **代码** 在 `~/numina-lean-agent`（本 Phase 不改 Python；见 VISION 仓边界）。
+Runner / Error Bank / `run_eval` **代码** 在 `~/numina-lean-agent`（见 VISION 仓边界）。
 
 ## 快速开始（文档入口）
 
@@ -44,12 +44,26 @@ powershell -ExecutionPolicy Bypass -File ".\.cursor\skills\lean-agent-numina\ins
 bash ./.cursor/skills/lean-agent-numina/install.sh
 ```
 
-## 认证默认（摘要）
+## 认证（摘要）
 
-- **Mode A（默认）**：Gemini → LiteLLM（**WSL-only**）→ `ANTHROPIC_MODEL=anthropic-claude`（映射 `gemini/gemini-2.5-pro`）
-- **Mode C（回退）**：DeepSeek Anthropic 兼容直连
+- **国内个人开发者**：优先 **Mode C（DeepSeek 直连）**，可跳过 LiteLLM — 见 [`docs/AUTH.md`](docs/AUTH.md)
+- **课题组默认叙事**：**Mode A** = Gemini → LiteLLM（**WSL-only**）→ `anthropic-claude` → `gemini/gemini-2.5-pro`
+- Mode A 失败再回退 Mode C
 - 禁止：模型名带 `[1m]`；`BASE_URL=localhost` 却 `MODEL=deepseek*`
 - 1211 排障树见 Skill `reference.md`
+
+## Phase 3 评测
+
+```bash
+cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH=$PWD
+python -m scripts.run_eval --dry-run --config /mnt/d/Lean/projects/stat-inference-lean/eval/tasks.yaml
+# 有 DeepSeek key 后：
+python -m scripts.run_eval --real-api --auth-mode C \
+  --config /mnt/d/Lean/projects/stat-inference-lean/eval/tasks.yaml \
+  --project-root /mnt/d/Lean/projects/stat-inference-lean
+```
+
+基线：[`docs/BASELINE.md`](docs/BASELINE.md)（$5/run 硬顶）。
 
 ## 冒烟验证（不依赖 API）
 
