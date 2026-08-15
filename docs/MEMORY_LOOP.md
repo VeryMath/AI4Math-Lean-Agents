@@ -31,6 +31,7 @@ python -m unittest scripts.error_bank.tests.test_guardrails -v
 2. `review --approve` → `active`
 3. 同类 query（`unknown identifier sampleMean`）检索命中；prompt 含 `Probability.sampleMean` 最小 diff
 4. `pending_review` / `fixed_code=null` 永不进 Few-Shot
+5. Phase 5：命中后 `augment_prompt` **必须含该条 `minimal_diff` 全文**（冷 prompt 不含）；见 `test_retrieve_after_approve_prompt_contains_minimal_diff`
 
 ## 人工 CLI（真实 bank 目录，可选）
 
@@ -64,10 +65,12 @@ python -m scripts.run_claude run \
   --cwd $LEAN --max-model-tier 1 --auth-mode C
 ```
 
-成功后走上面的 `list` → `review --approve`。全量 `run_eval --real-api` **不要跑**，除非护栏已用短任务确认。
+成功后走上面的 `list` → `review --approve`。全量 `run_eval --real-api` **不要跑**。  
+Phase 5 把真短跑标为**可选、需用户批准**；abort 门与日常清单见 [`OPS.md`](OPS.md)。
 
 ## 成功标准
 
 - [x] pending 不进检索（unittest）
 - [x] approve 后同类任务能检索到 ErrorBankDemo 修复 diff（unittest）
-- [ ] 真任务上「命中后下一轮更准」—— Phase 5 短跑对比，需护栏已确认
+- [x] 命中后 prompt 含该条 `minimal_diff`（Phase 5 离线）
+- [ ] 真任务上「命中后下一轮更准」—— 可选短跑，需用户批准；未批准不阻塞运维

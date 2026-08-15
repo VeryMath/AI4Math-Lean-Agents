@@ -12,7 +12,7 @@
 | 2 | Runner / Bank 实现 | Error Bank 强化、Success Bank 代码、routing | 主改 `~/numina-lean-agent` |
 | 3 | 评测跑通 | 6 任务真 API（$5/run 封顶） | `eval/` + runner |
 | 4 | 记忆闭环 | pending_review → 审核入库 → 检索命中 | success/error bank |
-| 5 | 稳态运维 | 冒烟、同步 Skill↔OpenCode、基线对比 | scripts + CI 可选 |
+| 5 | 稳态运维 | 冒烟、同步 Skill↔OpenCode、基线对比 | scripts + CI `--check`；协议见 [`OPS.md`](OPS.md) |
 
 状态机（Agent 单次任务，见 Skill）：
 
@@ -84,9 +84,9 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 | M2 | numina 仓：Success Bank 代码、类别门控 routing、eval runner |
 | M3 | harness `--dry-run` 绿 + `--real-api` 入口与 $5 硬顶；有 key 则 6 任务填 BASELINE，无 key 则记录阻塞与复跑命令 |
 | M4 | 工具护栏（禁碰 `.lake`/mathlib、禁 Mode 混用、1211 settings 探测）+ 记忆闭环离线证明（pending→approve→active 命中） |
-| M5 | 冒烟习惯化、Skill↔OpenCode 同步纪律、护栏确认后的短跑基线对比 |
+| M5 | 冒烟习惯化、Skill↔OpenCode 同步纪律、护栏确认后的短跑基线对比（默认离线；真 API 可选且需批准） |
 
-进度复盘（目标 vs 缺口）：[`PROGRESS.md`](PROGRESS.md)。记忆剧本：[`MEMORY_LOOP.md`](MEMORY_LOOP.md)。
+进度复盘（目标 vs 缺口）：[`PROGRESS.md`](PROGRESS.md)。记忆剧本：[`MEMORY_LOOP.md`](MEMORY_LOOP.md)。运维：[`OPS.md`](OPS.md)。
 
 ## 9. 决策摘要（已拍板）
 
@@ -101,3 +101,4 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 9. Skill 单源 + sync 生成 OpenCode agent  
 10. 方案 A+C：阶段化 Skill；验证前移 `lake env lean`；`max-model-tier` 可达 3，仍类别门控  
 11. Phase 4：护栏优先于再烧 API；记忆飞轮以离线测试锁门控，真 API 仅 `--max-rounds 1` 且禁止碰 `.lake`  
+12. Phase 5：日常 = `ops_daily`（sync `--check` + `smoke_verify`）；准确度对比默认离线（命中后 prompt 含 `minimal_diff`）；真 API 短跑可选、需用户批准；**禁止**全量 6 任务 `--real-api`  

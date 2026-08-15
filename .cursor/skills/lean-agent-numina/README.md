@@ -15,7 +15,7 @@
 
 ## 一键安装（先 sync）
 
-在仓库根：
+改 `SKILL.md` 后必须先 sync。CI 跑 `bash ./scripts/sync_opencode_agent.sh --check`。日常：`.\scripts\ops_daily.ps1`（见 [`docs/OPS.md`](../../../docs/OPS.md)）。
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\sync_opencode_agent.ps1

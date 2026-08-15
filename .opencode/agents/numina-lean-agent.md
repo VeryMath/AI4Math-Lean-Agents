@@ -77,7 +77,8 @@ Commands (from `~/numina-lean-agent` with venv + PYTHONPATH):
 - 每一步输出：`[check] <item> | pass/fail` 与 `[next action] <一条命令>`。
 - **验证前移**：能 `lake env lean <file>` 的先做单文件验证，再扩大到 `lake build` / 多轮 LLM。
 - 主 KPI：端到端成功率；成本次要。
-- OpenCode agent 文件由 `scripts/sync_opencode_agent.*` 从本 Skill **生成**；改规则先改本目录再 sync。
+- OpenCode agent 文件由 `scripts/sync_opencode_agent.*` 从本 Skill **生成**；改规则先改本目录再 sync（`--check` / CI 会卡住漂移）。
+- 日常运维：`scripts/ops_daily.ps1`（sync `--check` + `smoke_verify`）。真 API 短跑默认不做，见 [`docs/OPS.md`](../../../docs/OPS.md)。
 
 ## 阶段状态机（强制）
 
@@ -195,7 +196,7 @@ lake env lean <target_lean_file>
 - 默认开 Error Bank + Success Bank；关闭：`--no-error-bank` / `--success-bank false`
 - 入库默认 `pending_review`；检索 **只取 `active`**；`fixed_code=null` 禁止进 Few-Shot
 - Few-Shot：优先 Success **最小 diff**；Error 只给短策略
-- 闭环剧本：[`docs/MEMORY_LOOP.md`](../../../docs/MEMORY_LOOP.md)；进度：[`docs/PROGRESS.md`](../../../docs/PROGRESS.md)
+- 闭环剧本：[`docs/MEMORY_LOOP.md`](../../../docs/MEMORY_LOOP.md)；进度：[`docs/PROGRESS.md`](../../../docs/PROGRESS.md)；运维：[`docs/OPS.md`](../../../docs/OPS.md)
 - Fixture：`Exercises/Fixtures/ErrorBankDemo.broken.lean` + `.fixed.lean`（broken 勿 import 进根模块）
 - 路由：[`docs/MODEL_ROUTING.md`](../../../docs/MODEL_ROUTING.md)；Success：[`docs/SUCCESS_BANK.md`](../../../docs/SUCCESS_BANK.md)
 
@@ -222,6 +223,7 @@ python -m scripts.error_bank --bank_dir .lean-error-bank stats
 - 愿景：[docs/VISION.md](../../../docs/VISION.md)
 - 进度复盘：[docs/PROGRESS.md](../../../docs/PROGRESS.md)
 - 记忆闭环：[docs/MEMORY_LOOP.md](../../../docs/MEMORY_LOOP.md)
+- 稳态运维：[docs/OPS.md](../../../docs/OPS.md)
 - 路由：[docs/MODEL_ROUTING.md](../../../docs/MODEL_ROUTING.md)
 - Success Bank：[docs/SUCCESS_BANK.md](../../../docs/SUCCESS_BANK.md)
 

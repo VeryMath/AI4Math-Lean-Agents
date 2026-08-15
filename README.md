@@ -24,7 +24,7 @@ Runner / Error Bank / `run_eval` **代码** 在 `~/numina-lean-agent`（见 VISI
 1. 读愿景：[`docs/VISION.md`](docs/VISION.md)  
 2. 读 Skill：[`SKILL.md`](.cursor/skills/lean-agent-numina/SKILL.md) · [`reference.md`](.cursor/skills/lean-agent-numina/reference.md) · [`examples.md`](.cursor/skills/lean-agent-numina/examples.md)  
 3. 认证模板：[`.env.example`](.env.example) · [`docs/AUTH.md`](docs/AUTH.md)  
-4. 改 Skill 后同步 OpenCode Agent：
+4. 改 Skill 后同步 OpenCode Agent（**必须**，CI 会 `--check`）：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\sync_opencode_agent.ps1
@@ -67,17 +67,19 @@ python -m scripts.run_eval --real-api --auth-mode C \
 
 ## 冒烟验证（不依赖 API）
 
+日常一键（sync 纪律 + 编译回归）：
+
 ```powershell
-# 需 lake 在 PATH（如 d:\Lean\elan\bin）
-lake build
-lake env lean StatInferenceLean/Exercises/InteractiveDemo.lean
-lake env lean StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.fixed.lean
-lake env lean StatInferenceLean/Exercises/Bernoulli.lean
-# broken 预期失败：
-lake env lean StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.broken.lean
+powershell -ExecutionPolicy Bypass -File .\scripts\ops_daily.ps1
 ```
 
-或：`.\scripts\smoke_verify.ps1` / `bash ./scripts/smoke_verify.sh`
+仅冒烟（脚本会前置 `d:\Lean\elan\bin`）：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke_verify.ps1
+```
+
+稳态运维与「命中后 prompt 含 minimal_diff」对比协议：[`docs/OPS.md`](docs/OPS.md)。
 
 ## 仓边界一句话
 

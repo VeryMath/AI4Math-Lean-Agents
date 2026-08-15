@@ -11,8 +11,9 @@
 7. **禁止** `~/.claude/settings.json` 指向智谱 / GLM 却跑 DeepSeek（1211）。`run_claude` 会 abort。
 8. Mode A：`curl` LiteLLM `/v1/messages` 正常；`NO_PROXY` 含 `localhost,127.0.0.1`。
 9. MCP（若用）：在 **Lean 项目目录** `claude mcp add` + `claude mcp list`。
-10. Phase 3：`python -m scripts.run_eval --dry-run` 必须绿；**不要**再跑会长 `clone mathlib` 的全量 `--real-api`，除非护栏已确认。
+10. Phase 3：`python -m scripts.run_eval --dry-run` 必须绿；**不要**再跑会长 `clone mathlib` 的全量 `--real-api`。
 11. 禁止碰 `.lake/` / mathlib / toolchain / lakefile；round 内验证用 `lake env lean`，不用全仓 `lake build`。
+12. Phase 5 日常：`scripts/ops_daily.*`（sync `--check` + `smoke_verify`）。真 API 短跑见 [`docs/OPS.md`](../../../docs/OPS.md) abort 门；未批准则只做离线 `test_memory_loop`。
 
 ## Mode C：DeepSeek 直连（国内实操推荐 / 回退）
 
@@ -167,7 +168,8 @@ python -m scripts.error_bank success review <id> --approve --bank_dir <lean>/.le
 python -m scripts.error_bank review <id> --approve --bank_dir <lean>/.lean-error-bank
 ```
 
-记忆闭环离线证明：`python -m unittest scripts.error_bank.tests.test_memory_loop -v`（见 [`docs/MEMORY_LOOP.md`](../../../docs/MEMORY_LOOP.md)）。
+记忆闭环离线证明：`python -m unittest scripts.error_bank.tests.test_memory_loop -v`（见 [`docs/MEMORY_LOOP.md`](../../../docs/MEMORY_LOOP.md)）。  
+Phase 5 运维：[`docs/OPS.md`](../../../docs/OPS.md)（改 Skill 必须 `scripts/sync_opencode_agent.*`）。
 
 ## 禁止操作（工具护栏）
 

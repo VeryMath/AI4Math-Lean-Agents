@@ -9,11 +9,17 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectRoot = Resolve-Path (Join-Path $scriptDir "..")
 Set-Location $projectRoot
 
-# Prefer project-known elan if present
+# Prefer project-known elan if present (daily one-shot: PATH=d:\Lean\elan\bin)
 $elanBin = "d:\Lean\elan\bin"
 if (Test-Path (Join-Path $elanBin "lake.exe")) {
   $env:Path = "$elanBin;$env:Path"
 }
+
+$lakeCmd = Get-Command lake -ErrorAction SilentlyContinue
+if (-not $lakeCmd) {
+  throw "lake not found. Prepend d:\Lean\elan\bin to PATH, then re-run .\scripts\smoke_verify.ps1"
+}
+Write-Host "Using lake: $($lakeCmd.Source)"
 
 function Invoke-Ok {
   param([string]$Label, [scriptblock]$Cmd)

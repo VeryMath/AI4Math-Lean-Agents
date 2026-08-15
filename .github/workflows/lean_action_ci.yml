@@ -1,5 +1,9 @@
 name: Lean Action CI
 
+# Skill is the single source for OpenCode. After editing
+# .cursor/skills/lean-agent-numina/SKILL.md you MUST run
+# scripts/sync_opencode_agent.ps1 / .sh (CI checks --check).
+
 on:
   push:
   pull_request:
@@ -17,5 +21,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+      - name: Skill and OpenCode agent stay in sync
+        run: bash ./scripts/sync_opencode_agent.sh --check
       - uses: leanprover/lean-action@v1
       - uses: leanprover-community/docgen-action@v1

@@ -71,8 +71,34 @@ python -m scripts.run_eval --real-api --auth-mode C \
 | Bernoulli | 通过 | **通过** |
 | ErrorBank broken | **失败** | **按预期失败** |
 
+## D. Phase 5 对比协议（准确度飞轮）
+
+| 对照 | 方法 | 结果 | 笔记 |
+|------|------|------|------|
+| 离线冷 prompt | `augment_prompt` 无 Success 命中 | 不含 `Minimal diff:` / 不含修复 hunk | unittest |
+| 离线热 prompt | pending→approve→retrieve 后 `augment_prompt` | **含该条 `minimal_diff`**（`+…sampleMean` hunk） | `test_retrieve_after_approve_prompt_contains_minimal_diff` |
+| 真 API 冷 vs 热 | `--max-rounds 1` × ErrorBankDemo.broken | **未跑** | 需用户批准；abort 见 [`OPS.md`](OPS.md) |
+
+复跑离线对比（WSL）：
+
+```bash
+cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH=$PWD
+python -m unittest scripts.error_bank.tests.test_memory_loop -v
+```
+
+可选真短跑（**默认不要**；禁止 `run_eval --real-api` 全套）：
+
+```bash
+python -m scripts.run_claude run \
+  /mnt/d/Lean/projects/stat-inference-lean/StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.broken.lean \
+  --prompt-file prompts/prompt_complete_file.txt \
+  --max-rounds 1 --cwd /mnt/d/Lean/projects/stat-inference-lean \
+  --max-model-tier 1 --auth-mode C
+```
+
 ## 变更相对上次
 
 - 上次：真 API 阻塞（无 key）
-- 本次：Mode C 连通；单任务 T3 **SUCCESS**；全量自动评测因 agent 误伤 mathlib 中止并已恢复环境
-- 下一优先（Phase 4）：工具护栏 + pending_review→active 闭环演示，避免再改 `.lake/packages`
+- Phase 3：Mode C 连通；单任务 T3 **SUCCESS**；全量自动评测因 agent 误伤 mathlib 中止并已恢复环境
+- Phase 4：护栏 + pending_review→active 离线闭环
+- Phase 5：日常冒烟/同步纪律；离线热 prompt 含 `minimal_diff` 已锁门；真 API 冷/热对比保留为经批准可选项（因 22 分钟 / rm mathlib 风险，本轮不烧额度）

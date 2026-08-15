@@ -140,3 +140,13 @@ rm -rf .lake/packages/mathlib && git clone https://github.com/leanprover-communi
 ```bash
 python -m unittest scripts.error_bank.tests.test_memory_loop -v
 ```
+
+## 示例 9：Phase 5 日常运维（不烧 API）
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\ops_daily.ps1
+# 改 Skill 之后必须先 sync，再 --check / 使用 OpenCode
+powershell -ExecutionPolicy Bypass -File .\scripts\sync_opencode_agent.ps1
+```
+
+真 API `--max-rounds 1` 仅在 [`docs/OPS.md`](../../../docs/OPS.md) abort 门全绿 **且用户批准** 时跑；禁止全量 `--real-api`。

@@ -44,8 +44,12 @@ lake env lean StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.broken.lean
 
 ## 一键脚本
 
-- Windows：`.\scripts\smoke_verify.ps1`
+日常（sync `--check` + 本清单）：`.\scripts\ops_daily.ps1` / `bash ./scripts/ops_daily.sh`
+
+- Windows：`.\scripts\smoke_verify.ps1`（自动前置 `d:\Lean\elan\bin`）
 - Unix/WSL：`bash ./scripts/smoke_verify.sh`
+
+改 Skill 后必须 `.\scripts\sync_opencode_agent.ps1`（或 `.sh`）；CI 跑 `--check`。协议见 [`OPS.md`](OPS.md)。
 
 ## 与 Agent 评测的关系
 

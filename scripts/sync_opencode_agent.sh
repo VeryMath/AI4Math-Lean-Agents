@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 # Generate/overwrite .opencode/agents/numina-lean-agent.md from the Cursor Skill (single source).
 # Header is English/ASCII; Skill body is embedded as UTF-8 from SKILL.md.
+# Usage: bash ./scripts/sync_opencode_agent.sh [--check]
+# --check: do not write; exit 1 if generated agent is stale (Skill changed, sync forgotten).
 set -euo pipefail
+
+check_only=0
+if [[ "${1:-}" == "--check" ]]; then
+  check_only=1
+fi
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd -- "$script_dir/.." && pwd)"
@@ -24,6 +31,8 @@ skill_body="$(awk '
 ' "$skill_file")"
 
 mkdir -p "$out_dir"
+tmp_out="$(mktemp)"
+trap 'rm -f "$tmp_out"' EXIT
 
 {
   cat <<'EOF'
@@ -94,7 +103,22 @@ Commands (from `~/numina-lean-agent` with venv + PYTHONPATH):
 
 EOF
   printf '%s\n' "$skill_body"
-} > "$out_file"
+} > "$tmp_out"
 
+if [[ "$check_only" -eq 1 ]]; then
+  if [[ ! -f "$out_file" ]]; then
+    echo "OpenCode agent missing: $out_file (run scripts/sync_opencode_agent.sh)" >&2
+    exit 1
+  fi
+  if ! diff -u "$out_file" "$tmp_out" >/dev/null; then
+    echo "OpenCode agent is stale vs Skill. Re-run: bash ./scripts/sync_opencode_agent.sh" >&2
+    diff -u "$out_file" "$tmp_out" || true
+    exit 1
+  fi
+  echo "[sync_opencode_agent] check OK: $out_file matches Skill"
+  exit 0
+fi
+
+cp "$tmp_out" "$out_file"
 echo "[sync_opencode_agent] Wrote $out_file"
 echo "[sync_opencode_agent] Source: $skill_file"

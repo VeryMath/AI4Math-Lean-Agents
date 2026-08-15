@@ -4,7 +4,12 @@
   Generate/overwrite .opencode/agents/numina-lean-agent.md from the Cursor Skill (single source).
   Header text is ASCII/English to avoid Windows PowerShell script-encoding mojibake;
   Skill body is read as UTF-8 from SKILL.md.
+.PARAMETER CheckOnly
+  Do not write. Exit 1 if the generated OpenCode agent is stale (Skill changed, sync forgotten).
 #>
+param(
+  [switch]$CheckOnly
+)
 $ErrorActionPreference = "Stop"
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
@@ -93,6 +98,23 @@ Commands (from `~/numina-lean-agent` with venv + PYTHONPATH):
 '@
 
 $generated = $header + $skillBody + "`n"
+function Normalize-Newlines([string]$text) {
+  return ($text -replace "`r`n", "`n" -replace "`r", "`n")
+}
+
+if ($CheckOnly) {
+  if (-not (Test-Path $outFile)) {
+    throw "OpenCode agent missing: $outFile (run scripts/sync_opencode_agent.ps1)"
+  }
+  $existing = [System.IO.File]::ReadAllText($outFile, $utf8NoBom)
+  if ((Normalize-Newlines $existing) -ne (Normalize-Newlines $generated)) {
+    Write-Error "OpenCode agent is stale vs Skill. Re-run: powershell -ExecutionPolicy Bypass -File .\scripts\sync_opencode_agent.ps1"
+    exit 1
+  }
+  Write-Host "[sync_opencode_agent] check OK: $outFile matches Skill"
+  exit 0
+}
+
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 [System.IO.File]::WriteAllText($outFile, $generated, $utf8NoBom)
 

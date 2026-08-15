@@ -38,6 +38,16 @@
 
 `run_claude` 启动时会 `probe_auth`：Mode 混用或 settings 冲突则 **直接 abort**（`NUMINA_IGNORE_SETTINGS_CONFLICT=1` 可强制继续，不推荐）。
 
+### 真 API 短跑 abort（Phase 5）
+
+日常只跑 [`OPS.md`](OPS.md) 清单。再烧 `--max-rounds 1` 之前，下列任一成立则 **abort**（只做离线对比）：
+
+- settings.json 的 BASE_URL 仍是智谱 / GLM / `bigmodel.cn`
+- `probe_auth` 失败（localhost+deepseek、脏模型名）
+- 护栏缺失（prompt 未禁 `.lake`/mathlib，或 CLI 无 `Bash(rm *)` / `Bash(git clone *)`）
+- 用户未明确批准本次短跑
+- 请求的是全量 6 任务 `--real-api`
+
 ### 1211：settings.json 曾指向智谱
 
 Claude Code 会读 `~/.claude/settings.json`（user 级）。若其中 `env.ANTHROPIC_BASE_URL` 是智谱，即使 shell 已 `export` DeepSeek，仍可能 1211。

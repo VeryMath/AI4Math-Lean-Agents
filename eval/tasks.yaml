@@ -28,6 +28,7 @@ harness:
     Live run_claude per prove/fix task: --real-api (auto prefers Mode C if DEEPSEEK_API_KEY).
     Skip importing broken fixtures into the root module.
     Do not burn quota blindly; stop when spent_usd >= max_usd_per_run.
+    Phase 5: never run full --real-api here; live short-run is opt-in (docs/OPS.md).
 
 tasks:
   - id: T1_interactive_demo
