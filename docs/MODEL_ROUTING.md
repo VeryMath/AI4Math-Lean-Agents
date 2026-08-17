@@ -24,6 +24,7 @@
 | `type` | 2 | |
 | `dependency` | 2 | 缺 import / 未知标识符 |
 | `proof` | 3 | 战术 / 未解 goal 可到强模型 |
+| `infra` | 1 | 环境故障：**不入库、不升模型** |
 | `unknown` | 2 | 无分类时的默认帽 |
 
 有效上限 = `min(全局 max-model-tier, 类别帽)`；多错误并存时取各类别帽的 **最大值**。
@@ -31,7 +32,8 @@
 ## 升级策略
 
 ```text
-失败 → tier-0 规则（若启用）
+失败 → 若为 infra（找不到 lake / timeout / Linux lake 拒跑）→ **停**，不写 Error Bank，不加 LLM 轮次
+     → 否则 tier-0 规则（若启用）
      → 注入 Success 最小 diff + Error 短策略
      → 同指纹在本 tier 最多再试 1 次
      → 仍无诊断变化 / 仍失败 → escalate（受类别帽）

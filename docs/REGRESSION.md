@@ -20,6 +20,12 @@ lake build
 | R3 | `StatInferenceLean/Exercises/Bernoulli.lean` | 统计语料；**单独 lean，不进默认 import** |
 | R4 | `StatInferenceLean/Exercises/Week01.lean` | 教材周次子集 |
 | R5 | `StatInferenceLean/Exercises/Week02.lean` | 教材周次子集 |
+| R6 | `StatInferenceLean/Exercises/Fixtures/InfinitelyManyPrimes.lean` | 素数无穷评测 Fixture；**不进根 import**；2026-08-16 已补全 |
+| R7 | `StatInferenceLean/Exercises/Fixtures/StrictMonoComp.lean` | 严格单调复合；`exact hg.comp hf`；不进根 import |
+| R8 | `StatInferenceLean/Exercises/Fixtures/DvdTrans.lean` | 整除传递；`exact dvd_trans`；不进根 import |
+| R9 | `StatInferenceLean/Exercises/Fixtures/OddSquareMod8.lean` | 奇平方减 1 整除 8；`exact Int.eight_dvd_sq_sub_one_of_odd`；不进根 import |
+
+`EvenSquare.lean` 为评测 Fixture，**当前仍 `sorry`**（2026-08-16 真 API 未闭环），**不要**当正例冒烟。详见 [`EVAL_FOUR.md`](EVAL_FOUR.md)。
 
 命令示例（项目根，PATH 含 elan/lake）：
 
@@ -29,6 +35,10 @@ lake env lean StatInferenceLean/Exercises/Fixtures/ErrorBankDemo.fixed.lean
 lake env lean StatInferenceLean/Exercises/Bernoulli.lean
 lake env lean StatInferenceLean/Exercises/Week01.lean
 lake env lean StatInferenceLean/Exercises/Week02.lean
+lake env lean StatInferenceLean/Exercises/Fixtures/InfinitelyManyPrimes.lean
+lake env lean StatInferenceLean/Exercises/Fixtures/StrictMonoComp.lean
+lake env lean StatInferenceLean/Exercises/Fixtures/DvdTrans.lean
+lake env lean StatInferenceLean/Exercises/Fixtures/OddSquareMod8.lean
 ```
 
 ## 负例（应失败）

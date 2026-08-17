@@ -32,7 +32,8 @@ Bank 代码改过之后（WSL，`~/numina-lean-agent`）：
 cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH=$PWD
 python -m unittest scripts.error_bank.tests.test_memory_loop \
   scripts.error_bank.tests.test_error_bank \
-  scripts.error_bank.tests.test_guardrails -v
+  scripts.error_bank.tests.test_guardrails \
+  scripts.error_bank.tests.test_lean_checker -v
 ```
 
 ## Skill ↔ OpenCode 同步纪律

@@ -96,9 +96,43 @@ python -m scripts.run_claude run \
   --max-model-tier 1 --auth-mode C
 ```
 
+## E. InfinitelyManyPrimes 短跑（2026-08-16，用户批准）
+
+| 字段 | 值 |
+|------|-----|
+| 文件 | `StatInferenceLean/Exercises/Fixtures/InfinitelyManyPrimes.lean`（**未**进根 import） |
+| 设计 | statement 对齐 `Nat.infinite_setOf_prime`；证明先 `sorry`，agent 补全 |
+| Mode / 模型 | C / `deepseek-v4-flash`；`--max-rounds 3`；`--max-model-tier 2` |
+| Agent 证明 | **是**：`exact Nat.infinite_setOf_prime`（接上 mathlib，未重写 Euclid） |
+| 验证 | Windows `lake env lean` **通过**（exit 0，无 sorry） |
+| Runner 轮次 | **1**（round 1 内已改对；WSL `lake env lean` 卡在 mathlib `.git` `git diff` / `index.lock`，约 5–6 min 后人工中止以保环境） |
+| 成本 | API `result` 行未写出。会话 token 快照：18535 in / 297 out / 19968 cache_read。按当时 Flash 标价估算 **≈ $0.003–0.02**（远低于 $5） |
+| Bank | Success/Error **未**写入 `pending_review`（中止在 Verify，Memory 未跑）。**未** auto-approve |
+| 误伤 | 无。`ErrorBankDemo.broken` / 根模块 / lakefile / toolchain / mathlib lakefile 哈希未变；仅改目标 Fixture |
+| 护栏 | `probe_auth` pass；settings 为 DeepSeek 非智谱；`Bash(rm *)` / `git clone` 仍在 |
+
+注意：WSL 里 Linux `lake` 对 `/mnt/d` 上的 mathlib 会跑依赖仓 `git diff`，可能持有 `.lake/packages/mathlib/.git/index.lock`。验证优先用 Windows `d:\Lean\elan\bin\lake`。
+
 ## 变更相对上次
 
 - 上次：真 API 阻塞（无 key）
 - Phase 3：Mode C 连通；单任务 T3 **SUCCESS**；全量自动评测因 agent 误伤 mathlib 中止并已恢复环境
 - Phase 4：护栏 + pending_review→active 离线闭环
 - Phase 5：日常冒烟/同步纪律；离线热 prompt 含 `minimal_diff` 已锁门；真 API 冷/热对比保留为经批准可选项（因 22 分钟 / rm mathlib 风险，本轮不烧额度）
+- 2026-08-16：用户批准 InfinitelyManyPrimes 短跑 — agent 用 `exact Nat.infinite_setOf_prime` 补全；Windows `lake env lean` 通过；WSL lake 卡 mathlib git 后中止；Bank 未入库；冷/热对比仍未跑
+- 2026-08-16：四题评测短跑（StrictMonoComp / DvdTrans / EvenSquare / OddSquareMod8）— 详见 [`EVAL_FOUR.md`](EVAL_FOUR.md)
+- 2026-08-17：修好 Verify（`lake.exe`）/ infra 不入库 / Success 真写入 + 评测 auto-active；相对裸 LLM 口径见 [`ADVANTAGE.md`](ADVANTAGE.md)。未重跑四题真 API，未跑全量 `--real-api`。
+
+
+## F. 四题评测短跑（2026-08-16）
+
+未跑全量 `run_eval --real-api`。Mode C / `deepseek-v4-flash` / `--max-rounds 3` / `--max-model-tier 2`。完整过程与「agent vs 裸 LLM」见 [`EVAL_FOUR.md`](EVAL_FOUR.md)。
+
+| 题 | 文件 | 结果 | 轮次 | Windows 验证 | Bank | 备注 |
+|----|------|------|------|--------------|------|------|
+| 1 | `StrictMonoComp.lean` | **pass**（`exact hg.comp hf`） | 1 内改对后因 `lake exe cache get` 中止 | 通过 | Success 无 | mathlib `StrictMono.comp` |
+| 2 | `DvdTrans.lean` | **pass**（`exact dvd_trans`） | 1 COMPLETE（$0.597）；r2 WSL lake 杀掉 | 通过 | Error pending 是「找不到 lake」假阳性；Success 无 | 多了一个非必要 import |
+| 3 | `EvenSquare.lean` | **未闭环**（仍 `sorry`） | 第一轮写错 `Even.pow_of_ne_zero`；第二轮 MCP 断 + cache 循环 | sorry 警告 | 无 Success | 唯一「错 lemma 被 lake 拦住」实证；没修到通过 |
+| 4 | `OddSquareMod8.lean` | **pass**（`exact Int.eight_dvd_sq_sub_one_of_odd`） | runner 3 轮 COMPLETE，**$0.798** | 通过 | 同上假阳性 Error；Success 仍空 | r1 已证完；r2–3 是 runner 误判 |
+
+四题均未 import 进根模块。`ErrorBankDemo.broken` / InfinitelyManyPrimes / mathlib lakefile / toolchain 未误伤。

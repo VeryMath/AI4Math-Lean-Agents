@@ -12,7 +12,8 @@
 | `active` 且有可复用 fix | **进入**（Success 优先最小 diff；Error 只给短策略） |
 | `invalid` | **不进入** |
 
-verify pass → 写入 Success（及对应 Error 的 `fixed_code`）仍为 `pending_review`，直到人工 `review --approve`。
+verify pass → 写入 Success（及对应 Error 的 `fixed_code`）仍为 `pending_review`，直到人工 `review --approve`。  
+评测例外：`NUMINA_SUCCESS_AUTO_ACTIVE=1` 或 `--success-auto-active` 直接 `active`（只为证明检索；日常不要开）。环境故障（找不到 lake 等）是 `infra_error`，**不**进 Bank。
 
 ## 离线证明（推荐，每次改 Bank 后跑）
 
@@ -20,9 +21,10 @@ WSL：
 
 ```bash
 cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH=$PWD
-python -m unittest scripts.error_bank.tests.test_memory_loop -v
-python -m unittest scripts.error_bank.tests.test_error_bank -v
-python -m unittest scripts.error_bank.tests.test_guardrails -v
+python -m unittest scripts.error_bank.tests.test_memory_loop \
+  scripts.error_bank.tests.test_error_bank \
+  scripts.error_bank.tests.test_guardrails \
+  scripts.error_bank.tests.test_lean_checker -v
 ```
 
 `test_memory_loop` 用 ErrorBankDemo 的 broken→fixed 语料：

@@ -66,7 +66,16 @@ python -m scripts.run_claude run <file> \
 # 关闭：--success-bank false  /  --no-error-bank
 ```
 
-verify pass → 投影 `fixed_code` + `minimal_diff` → Success(`pending_review`)；对应 Error 条目亦保持 `pending_review` 直至人工 `review --approve`。
+verify pass → 投影 `fixed_code` + `minimal_diff` → Success（默认 `pending_review`）。对应 Error 条目亦保持 `pending_review` 直至人工 `review --approve`。
+
+评测短跑可自动 `active`（日常仍要审核）：
+
+```bash
+export NUMINA_SUCCESS_AUTO_ACTIVE=1
+# 或 run_claude --success-auto-active
+```
+
+`infra_error` / `fixed_code=null` **永不**进检索。Verify 必须是 Windows/elan `lake.exe`；Linux lake 对 `/mnt/d` mathlib 不作成功判据。
 
 端到端剧本（ErrorBankDemo + 离线 unittest）：[`MEMORY_LOOP.md`](MEMORY_LOOP.md)。进度与缺口：[`PROGRESS.md`](PROGRESS.md)。
 

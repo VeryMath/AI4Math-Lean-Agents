@@ -128,6 +128,9 @@ export ANTHROPIC_MODEL="deepseek-v4-flash"   # 禁止
 
 # 错误：用毁环境当「修复」（Phase 3 事故）
 rm -rf .lake/packages/mathlib && git clone https://github.com/leanprover-community/mathlib4
+
+# 错误：MCP 挂了就 lake exe cache get（碰 .lake，烧轮次）
+lake exe cache get
 ```
 
 ```text

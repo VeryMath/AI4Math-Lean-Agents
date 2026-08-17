@@ -57,12 +57,13 @@ Hard constraints:
 - Target must be inside a buildable Lean project (`lean-toolchain` + lakefile).
 - Never print or hardcode plaintext API keys.
 - Always emit `[check] <item> | pass/fail` and `[next action] <one command>`.
-- Prefer `lake env lean <file>` before full `lake build` / extra LLM rounds.
-- Never modify/delete `.lake/`, mathlib, toolchain, or lakefile unless Workspace stage AND user explicitly asked. Never `rm -rf` mathlib or `git clone` mathlib as a fix.
+- Prefer Windows/elan `lake.exe` `lake env lean <file>` (WSL: `/mnt/d/Lean/elan/bin/lake.exe`). Never use Linux lake on `/mnt/d` mathlib as the success gate (hangs on `.git`).
+- Never modify/delete `.lake/`, mathlib, toolchain, or lakefile unless Workspace stage AND user explicitly asked. Never `rm -rf` mathlib or `git clone` mathlib as a fix. Never `lake exe cache get`.
+- If MCP `lean_diagnostic_messages` fails (Connection closed): skip, do not retry, do not run lake cache.
 - Never mix localhost BASE_URL with deepseek MODEL; never mix 智谱/GLM settings.json with DeepSeek (1211).
 - Do not import ErrorBank `broken` fixtures into the root module.
 - Bernoulli is regression-only (`lake env lean`), not default root import.
-- Success/Error banks default `pending_review`; retriever only `active`; never Few-Shot null `fixed_code`.
+- Success/Error banks default `pending_review`; retriever only `active`; never Few-Shot null `fixed_code` or infra_error. Eval-only `--success-auto-active` / `NUMINA_SUCCESS_AUTO_ACTIVE=1`.
 - Category-gated `--max-model-tier` (default up to 3); same fingerprint invalid retry <= 1. See docs/MODEL_ROUTING.md.
 
 Stage machine (mandatory order):
@@ -70,8 +71,8 @@ Stage machine (mandatory order):
 2. Workspace - toolchain, auth Mode A then C, MCP scope
 3. Formalize - NL -> `.lean` if needed (e.g. InteractiveDemo)
 4. Prove/Fix - `run_claude` + error bank; `--max-model-tier` up to 3 with category gating
-5. Verify - `lake env lean` (then build if needed)
-6. Memory - summarize; mark success candidates pending_review
+5. Verify - Windows/elan lake.exe `lake env lean` (never Linux lake on /mnt/d)
+6. Memory - summarize; mark success candidates pending_review (eval may auto-active)
 
 Mode A env:
 - `ANTHROPIC_BASE_URL=http://localhost:4000`

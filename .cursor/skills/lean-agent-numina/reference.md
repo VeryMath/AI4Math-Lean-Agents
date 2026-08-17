@@ -12,8 +12,8 @@
 8. Mode A：`curl` LiteLLM `/v1/messages` 正常；`NO_PROXY` 含 `localhost,127.0.0.1`。
 9. MCP（若用）：在 **Lean 项目目录** `claude mcp add` + `claude mcp list`。
 10. Phase 3：`python -m scripts.run_eval --dry-run` 必须绿；**不要**再跑会长 `clone mathlib` 的全量 `--real-api`。
-11. 禁止碰 `.lake/` / mathlib / toolchain / lakefile；round 内验证用 `lake env lean`，不用全仓 `lake build`。
-12. Phase 5 日常：`scripts/ops_daily.*`（sync `--check` + `smoke_verify`）。真 API 短跑见 [`docs/OPS.md`](../../../docs/OPS.md) abort 门；未批准则只做离线 `test_memory_loop`。
+11. 禁止碰 `.lake/` / mathlib / toolchain / lakefile；round 内验证用 `lake env lean`（Windows `lake.exe`），不用全仓 `lake build`，不用 `lake exe cache get`。MCP 失败则跳过。
+12. Phase 5 日常：`scripts/ops_daily.*`（sync `--check` + `smoke_verify`）。真 API 短跑见 [`docs/OPS.md`](../../../docs/OPS.md) abort 门；未批准则只做离线 `test_memory_loop` / `test_lean_checker`。
 
 ## Mode C：DeepSeek 直连（国内实操推荐 / 回退）
 
@@ -150,6 +150,7 @@ claude mcp list
 | `--initial-model-tier` | 1 | 首轮 LLM tier |
 | `--error-bank` / `--no-error-bank` | 开 | Error Bank |
 | `--success-bank` / `--success-bank false` | 开 | Success Bank |
+| `--success-auto-active` | 关 | 评测：Success 直接 `active`（日常不要） |
 | `--enable-auto-fix` | 开 | Tier-0 规则修复 |
 | `--auth-mode` | 自动 | `A` / `C` / `B` |
 
@@ -177,7 +178,8 @@ Prove/Fix / Verify 阶段 **不得**：
 
 - `rm -rf .lake` / `.lake/packages/mathlib`；`git clone` mathlib4 当修复
 - 改 `lean-toolchain`、`lakefile.toml` / `lakefile.lean`
-- 用全仓 `lake build` 作为 round 内验证（用 `lake env lean <file>` / `lean_diagnostic_messages`）
+- 用全仓 `lake build` 或 `lake exe cache get` 作为 round 内验证（用 runner 的 `lake env lean <file>`）
+- MCP `lean_diagnostic_messages` 失败后死循环重试
 - 把 deepseek 打到 localhost LiteLLM；把智谱 BASE_URL 与 deepseek 模型混用
 
 Runner 侧：`--disallowed-tools Bash(rm *)` 等 + system prompt 硬约束 + mathlib 完整性检查。

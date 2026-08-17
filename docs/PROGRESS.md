@@ -50,3 +50,25 @@ Inspect → Workspace → Formalize → Prove/Fix → Verify → Memory
 - 真 API：settings 已是 DeepSeek 且护栏仍在，但上次短跑曾 ~22 分钟并 `rm` mathlib → **本 Phase 不烧 API**；冷/热 `--max-rounds 1` 仅在用户批准且 abort 门全绿时做
 
 闭环（Inspect→Memory + Bank 门控）**可用**；「命中后真任务下一轮更准」仍欠一次经批准的短跑，不阻塞日常运维。
+
+## 2026-08-17 — Verify / Bank 真可用（相对裸 LLM）
+
+四题评测暴露的工程故障已修（实现在 `~/numina-lean-agent`，镜像 `d:\Lean\temp\error_bank_implementation`）。汇报口径见 [`ADVANTAGE.md`](ADVANTAGE.md)。
+
+| 缺口 | 状态 |
+|------|------|
+| Success 未入库 / Few-Shot 从未发生 | **已修**：真 `lake.exe env lean` pass 后写入；评测可用 `--success-auto-active` / `NUMINA_SUCCESS_AUTO_ACTIVE=1` |
+| Error Bank 把找不到 lake 当错题 | **已修**：`infra_error` 不入库、不检索、不升 tier |
+| WSL Linux lake 卡 mathlib git，证明对了仍失败 | **已修**：Verify 优先 `/mnt/d/Lean/elan/bin/lake.exe`；拒绝 Linux lake 作成功判据 |
+| MCP 不稳 → `lake exe cache get` | **已修**：诊断主路径 = `lake env lean`；MCP 失败跳过；禁 cache 命令 |
+| 相对裸 LLM「下一题更省」真 API 实证 | **未跑**（本轮离线/集成测试已证明热 prompt 含 `minimal_diff`） |
+
+离线锁门：
+
+```bash
+cd ~/numina-lean-agent && source .venv/bin/activate && export PYTHONPATH=$PWD
+python -m unittest scripts.error_bank.tests.test_lean_checker \
+  scripts.error_bank.tests.test_memory_loop \
+  scripts.error_bank.tests.test_error_bank \
+  scripts.error_bank.tests.test_guardrails -v
+```
