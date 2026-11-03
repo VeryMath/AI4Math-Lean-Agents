@@ -34,13 +34,23 @@ For standalone tasks, prefer `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`. This 
 python skills/lean-runtime/scripts/ai4m_lean.py configure --cwd . --create-workspace
 ```
 
-Equivalent Lake commands:
+For a new canonical workspace with the default settings, use these equivalent
+Lake commands. Set `AI4MATH_HOME` to an absolute path when overriding it. Reuse
+existing workspaces with the helper above.
 
 ```bash
-elan run leanprover/lean4:v4.28.0 lake new lean_workspace math
-elan run leanprover/lean4:v4.28.0 lake update
-elan run leanprover/lean4:v4.28.0 lake exe cache get
-elan run leanprover/lean4:v4.28.0 lake build
+(
+  set -e
+  mkdir -p "${AI4MATH_HOME:-$HOME/.ai4math}"
+  cd "${AI4MATH_HOME:-$HOME/.ai4math}"
+  test ! -e lean-workspace
+  elan run leanprover/lean4:v4.28.0 lake new lean_workspace math
+  mv lean_workspace lean-workspace
+  cd lean-workspace
+  elan run leanprover/lean4:v4.28.0 lake update
+  elan run leanprover/lean4:v4.28.0 lake exe cache get
+  elan run leanprover/lean4:v4.28.0 lake build
+)
 ```
 
 If a user project already has `lean-toolchain` and `lakefile.{lean,toml}`, use that project and do not change versions without approval. If the canonical workspace already has `lake-manifest.json` and `.lake/`, reuse it instead of rerunning cache/build. If a standalone task needs a different Lean/mathlib revision than the shared managed workspace, use a versioned workspace under `${AI4MATH_HOME:-~/.ai4math}/lean-workspaces/` instead of overwriting `${AI4MATH_HOME:-~/.ai4math}/lean-workspace`.
@@ -85,8 +95,8 @@ backend = "none"
 Environment overrides:
 
 ```bash
-export AI4MATH_HOME="~/.ai4math"
-export AI4MATH_LEAN_WORKSPACE="~/.ai4math/lean-workspace"
+export AI4MATH_HOME="$HOME/.ai4math"
+export AI4MATH_LEAN_WORKSPACE="$AI4MATH_HOME/lean-workspace"
 export AI4MATH_LEAN_TOOLCHAIN="leanprover/lean4:v4.28.0"
-export AI4MATH_NUMINA_HOME="~/.ai4math/numina-runtime"
+export AI4MATH_NUMINA_HOME="$AI4MATH_HOME/numina-runtime"
 ```
